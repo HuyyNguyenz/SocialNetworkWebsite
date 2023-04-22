@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .center {
+    @apply absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%];
+  }
+
+  .animation-btn {
+    @apply bg-gradient-to-br from-secondary-color to-primary-color opacity-90 transition-all ease-in duration-200;
+  }
+}
