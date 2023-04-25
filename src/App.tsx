@@ -1,7 +1,19 @@
-import Register from './pages/Register'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { publicRoutes } from './routes/index.ts'
+import { Router } from './types/index.ts'
+import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
-  return <Register />
+  return (
+    <BrowserRouter>
+      <Routes>
+        {publicRoutes.map((route: Router) => {
+          const Page = route.component
+          return <Route key={route.path} path={route.path} element={<Page />} />
+        })}
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App

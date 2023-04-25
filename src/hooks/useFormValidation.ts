@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MessageValidation, User } from '~/types/user.type'
+import { MessageValidation, User } from '~/types'
 
 const useFormValidation = (
   formData: User

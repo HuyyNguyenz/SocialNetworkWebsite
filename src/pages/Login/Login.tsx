@@ -1,27 +1,27 @@
 import logo from '~/assets/images/Social-removebg-preview.png'
-import RegisterForm from '~/components/RegisterForm'
 import { Link } from 'react-router-dom'
+import LoginForm from '~/components/LoginForm'
 import { ToastContainer } from 'react-toastify'
 
-export default function Register() {
+export default function Login() {
   return (
     <>
       <div className='font-inter relative w-screen h-screen bg-gradient-to-br from-primary-color to-secondary-color'>
-        <div className='bg-white center flex items-start justify-start rounded-2xl overflow-hidden'>
+        <div className='bg-white center flex items-center justify-center rounded-2xl overflow-hidden'>
           <div className='bg-eeeeee-color'>
-            <div className='min-w-[28.125rem] min-h-[28.125rem]'>
+            <div className='min-w-[25rem] min-h-[25rem]'>
               <img src={logo} alt='logo_social' />
             </div>
             <div className='flex flex-col items-start justify-start mb-8 ml-8 text-14'>
-              <span>Đã có tài khoản ?</span>
-              <Link to='/login'>
+              <span>Chưa có tài khoản ?</span>
+              <Link to='/register'>
                 <span className='bg-gradient-to-r from-primary-color to-secondary-color bg-clip-text text-transparent font-bold'>
-                  Đăng nhập
+                  Đăng ký
                 </span>
               </Link>
             </div>
           </div>
-          <RegisterForm />
+          <LoginForm />
         </div>
       </div>
       <ToastContainer />

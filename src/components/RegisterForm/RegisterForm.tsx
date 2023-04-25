@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
-import { User } from '~/types/user.type'
+import { User } from '~/types'
 import Tippy from '@tippyjs/react'
 import 'tippy.js/dist/tippy.css'
 import useFormValidation from '~/hooks/useFormValidation'
-import axios from 'axios'
+import fetchApi from '~/utils/fetchApi'
+import { toast } from 'react-toastify'
 
 export default function RegisterForm() {
-  const [formData, setFormData] = useState<User>({
+  const initialData = {
     email: '',
     password: '',
     firstName: '',
@@ -15,7 +16,8 @@ export default function RegisterForm() {
     gender: 'male',
     dateCreated: '',
     roleId: ''
-  })
+  }
+  const [formData, setFormData] = useState<User>(initialData)
   const [messages, handleValidation, disableValidation] = useFormValidation(formData)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +47,27 @@ export default function RegisterForm() {
     if (!(isFormNull || isFormError)) {
       const stringArray = formData.birthDay.split('-')
       const birthDay = `${stringArray[2]}/${stringArray[1]}/${stringArray[0]}`
-      axios.post('http://localhost:3001/api/register', formData).then((res) => console.log(res.data))
+      const data = { ...formData, birthDay }
+      const createAccount = async () => {
+        try {
+          const result = await fetchApi.post('register', data)
+          if (result.data.message) {
+            toast(result.data.message, {
+              position: 'top-center',
+              type: 'success',
+              autoClose: 2000
+            })
+            setFormData(initialData)
+          } else {
+            toast(result.data.error.message, { position: 'top-center', type: 'warning', autoClose: 2000 })
+          }
+        } catch (error: any) {
+          if (error) {
+            toast(error.message, { position: 'top-center', type: 'error', autoClose: 2000 })
+          }
+        }
+      }
+      createAccount()
     }
   }
 

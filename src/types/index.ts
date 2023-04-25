@@ -21,3 +21,8 @@ export interface MessageValidation {
   lastName?: string
   birthDay?: string
 }
+
+export interface Router {
+  path: string
+  component: () => JSX.Element
+}
