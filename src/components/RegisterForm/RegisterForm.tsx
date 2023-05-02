@@ -14,8 +14,7 @@ export default function RegisterForm() {
     lastName: '',
     birthDay: '',
     gender: 'male',
-    dateCreated: '',
-    roleId: ''
+    dateCreated: ''
   }
   const [formData, setFormData] = useState<User>(initialData)
   const [messages, handleValidation, disableValidation] = useFormValidation(formData)
@@ -27,7 +26,7 @@ export default function RegisterForm() {
     const year = date.getFullYear()
     const dateCreated = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`
 
-    setFormData((prev) => ({ ...prev, [event.target.name]: event.target.value, roleId: '2', dateCreated }))
+    setFormData((prev) => ({ ...prev, [event.target.name]: event.target.value, dateCreated }))
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -51,18 +50,17 @@ export default function RegisterForm() {
       const createAccount = async () => {
         try {
           const result = await fetchApi.post('register', data)
-          if (result.data.message) {
-            toast(result.data.message, {
-              position: 'top-center',
-              type: 'success',
-              autoClose: 2000
-            })
-            setFormData(initialData)
-          } else {
-            toast(result.data.error.message, { position: 'top-center', type: 'warning', autoClose: 2000 })
-          }
+          toast(result.data.message, {
+            position: 'top-center',
+            type: 'success',
+            autoClose: 2000
+          })
+          setFormData(initialData)
         } catch (error: any) {
-          if (error) {
+          if (error.response) {
+            const message: string = error.response.data.message
+            toast(message, { position: 'top-center', type: 'error', autoClose: 2000 })
+          } else {
             toast(error.message, { position: 'top-center', type: 'error', autoClose: 2000 })
           }
         }
@@ -87,15 +85,11 @@ export default function RegisterForm() {
       messages.birthDay !== ''
 
     if (isFormNull || isFormError) {
-      submitBtn?.classList.add('cursor-not-allowed')
-      submitBtn?.classList.add('opacity-50')
-      submitBtn?.classList.remove('cursor-pointer')
-      submitBtn?.classList.remove('hover:animation-btn')
+      submitBtn?.classList.add('cursor-not-allowed', 'opacity-50')
+      submitBtn?.classList.remove('cursor-pointer', 'hover:animation-btn')
     } else {
-      submitBtn?.classList.remove('cursor-not-allowed')
-      submitBtn?.classList.remove('opacity-50')
-      submitBtn?.classList.add('cursor-pointer')
-      submitBtn?.classList.add('hover:animation-btn')
+      submitBtn?.classList.remove('cursor-not-allowed', 'opacity-50')
+      submitBtn?.classList.add('cursor-pointer', 'hover:animation-btn')
     }
   }, [formData, messages])
 

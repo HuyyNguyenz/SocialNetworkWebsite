@@ -11,7 +11,6 @@ export interface User {
   avatar?: string
   backgroundImage?: string
   slogan?: string
-  roleId: string
 }
 
 export interface MessageValidation {
