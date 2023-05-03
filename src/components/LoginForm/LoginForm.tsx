@@ -96,14 +96,14 @@ export default function LoginForm() {
   }
 
   return (
-    <div className='p-8'>
+    <div className='p-8 w-[22.5rem] md:w-full'>
       <h1 className='text-title-color text-24 font-bold text-center mb-8'>Đăng nhập</h1>
       <form className='text-14 text-center' autoComplete='off' onSubmit={handleSubmit}>
         <div className='mb-4'>
           <input
             onChange={handleChange}
             value={formData.accountName}
-            className='min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-input-color'
+            className='min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-input-color'
             type='text'
             name='accountName'
             id='accountName'
@@ -114,7 +114,7 @@ export default function LoginForm() {
           <input
             onChange={handleChange}
             value={formData.password}
-            className='min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-input-color'
+            className='min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-input-color'
             type='password'
             name='password'
             id='password'
@@ -136,11 +136,8 @@ export default function LoginForm() {
           type='submit'
           value='Đăng nhập'
           id='submitBtn'
-          className='mt-4 rounded-md bg-gradient-to-br from-primary-color to-secondary-color text-white font-bold py-2 px-16 cursor-pointer hover:animation-btn'
+          className='w-full lg:w-auto mt-4 rounded-md bg-gradient-to-br from-primary-color to-secondary-color text-white font-bold py-2 px-16 cursor-pointer hover:animation-btn'
         />
-        {/* <button onClick={handleGetUsers} type='button'>
-          Get users
-        </button> */}
       </form>
     </div>
   )

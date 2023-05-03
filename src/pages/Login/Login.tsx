@@ -6,27 +6,25 @@ import { useEffect, useState } from 'react'
 import useCookie from '~/hooks/useCookie'
 
 export default function Login() {
-  const [isLogout, setLogout] = useState<boolean>(false)
   const { getCookie } = useCookie()
+  const refreshToken = getCookie('refreshToken')
+  const [isLogout] = useState<boolean>(!refreshToken)
   const navigate = useNavigate()
 
   useEffect(() => {
-    const refreshToken = getCookie('refreshToken')
     if (refreshToken) {
       navigate('/')
-    } else {
-      setLogout(true)
     }
-  }, [getCookie, navigate])
+  }, [refreshToken, navigate])
 
   return (
     <>
       {isLogout && (
         <>
-          <div className='font-inter relative w-screen h-screen bg-gradient-to-br from-primary-color to-secondary-color'>
-            <div className='bg-white center flex items-center justify-center rounded-2xl overflow-hidden'>
-              <div className='bg-eeeeee-color'>
-                <div className='min-w-[25rem] min-h-[25rem]'>
+          <div className='font-inter relative w-screen min-h-screen bg-gradient-to-br from-primary-color to-secondary-color'>
+            <div className='bg-white center flex flex-col-reverse rounded-2xl overflow-hidden lg:flex-row lg:items-center lg:justify-center'>
+              <div className='bg-white lg:bg-eeeeee-color'>
+                <div className='min-w-[25rem] min-h-[25rem] hidden lg:block'>
                   <img src={logo} alt='logo_social' />
                 </div>
                 <div className='flex flex-col items-start justify-start mb-8 ml-8 text-14'>

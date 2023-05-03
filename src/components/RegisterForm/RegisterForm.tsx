@@ -18,6 +18,7 @@ export default function RegisterForm() {
   }
   const [formData, setFormData] = useState<User>(initialData)
   const [messages, handleValidation, disableValidation] = useFormValidation(formData)
+  const [isMobileTablet, setMobileTablet] = useState<boolean>(false)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const date = new Date()
@@ -93,45 +94,76 @@ export default function RegisterForm() {
     }
   }, [formData, messages])
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (document.body.clientWidth < 1024) {
+        setMobileTablet(true)
+      } else {
+        setMobileTablet(false)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
   return (
-    <div className='p-8'>
+    <div className='p-8 w-[22.5rem] max-h-[32.5rem] overflow-y-scroll md:w-[32.5rem] lg:w-full lg:h-full lg:overflow-y-hidden'>
       <h1 className='text-title-color text-24 font-bold text-center mb-8'>Đăng ký tài khoản</h1>
       <form className='text-14 text-center' onSubmit={handleSubmit} autoComplete='off'>
-        <div className='mb-4 flex items-center justify-start'>
-          <Tippy content={messages.firstName} disabled={messages.firstName ? false : true}>
-            <input
-              onFocus={disableValidation}
-              onBlur={handleValidation}
-              onChange={handleChange}
-              className={`bg-input-color border border-solid outline-none rounded-md py-2 px-4 mr-4 ${
-                messages.firstName ? 'border-red-600 text-red-600' : 'border-border-input-color'
-              }`}
-              type='text'
-              name='firstName'
-              id='firstName'
-              placeholder='Họ lót'
-              value={formData.firstName}
-            />
-          </Tippy>
+        <div className='mb-4 flex flex-col lg:flex-row lg:items-center lg:justify-start'>
+          <>
+            <Tippy
+              content={isMobileTablet ? '' : messages.firstName}
+              disabled={messages.firstName && !isMobileTablet ? false : true}
+            >
+              <input
+                onFocus={disableValidation}
+                onBlur={handleValidation}
+                onChange={handleChange}
+                className={`bg-input-color border border-solid outline-none rounded-md py-2 px-4 mb-4 lg:mr-4 lg:mb-0 ${
+                  messages.firstName ? 'border-red-600 text-red-600' : 'border-border-input-color'
+                }`}
+                type='text'
+                name='firstName'
+                id='firstName'
+                placeholder='Họ lót'
+                value={formData.firstName}
+              />
+            </Tippy>
+            <span className='lg:hidden text-red-600 text-left mt-[-1rem] mb-4'>{messages.firstName}</span>
+          </>
 
-          <Tippy content={messages.lastName} disabled={messages.lastName ? false : true}>
-            <input
-              onFocus={disableValidation}
-              onBlur={handleValidation}
-              onChange={handleChange}
-              className={`bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
-                messages.lastName ? 'border-red-600 text-red-600' : 'border-border-input-color'
-              }`}
-              type='text'
-              name='lastName'
-              id='lastName'
-              placeholder='Tên'
-              value={formData.lastName}
-            />
-          </Tippy>
+          <>
+            <Tippy
+              content={isMobileTablet ? '' : messages.lastName}
+              disabled={messages.lastName && !isMobileTablet ? false : true}
+            >
+              <input
+                onFocus={disableValidation}
+                onBlur={handleValidation}
+                onChange={handleChange}
+                className={`bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
+                  messages.lastName ? 'border-red-600 text-red-600' : 'border-border-input-color'
+                }`}
+                type='text'
+                name='lastName'
+                id='lastName'
+                placeholder='Tên'
+                value={formData.lastName}
+              />
+            </Tippy>
+            <span className='lg:hidden text-red-600 text-left'>{messages.lastName}</span>
+          </>
         </div>
-        <div className='mb-4'>
-          <Tippy content={messages.email} disabled={messages.email ? false : true} placement='left'>
+        <div className='mb-4 flex flex-col'>
+          <Tippy
+            content={isMobileTablet ? '' : messages.email}
+            disabled={messages.email && !isMobileTablet ? false : true}
+            placement='left'
+          >
             <input
               onFocus={disableValidation}
               onBlur={handleValidation}
@@ -146,9 +178,14 @@ export default function RegisterForm() {
               value={formData.email}
             />
           </Tippy>
+          <span className='lg:hidden text-red-600 text-left'>{messages.email}</span>
         </div>
-        <div className='mb-4'>
-          <Tippy content={messages.password} disabled={messages.password ? false : true} placement='left'>
+        <div className='mb-4 flex flex-col'>
+          <Tippy
+            content={isMobileTablet ? '' : messages.password}
+            disabled={messages.password && !isMobileTablet ? false : true}
+            placement='left'
+          >
             <input
               onFocus={disableValidation}
               onBlur={handleValidation}
@@ -164,12 +201,17 @@ export default function RegisterForm() {
               value={formData.password}
             />
           </Tippy>
+          <span className='lg:hidden text-red-600 text-left'>{messages.password}</span>
         </div>
         <div className='mb-4 flex flex-col items-start justify-start text-left'>
           <label htmlFor='birthDay' className={`mb-2 ${messages.birthDay ? 'text-red-600' : 'text-black'}`}>
             Ngày sinh
           </label>
-          <Tippy content={messages.birthDay} disabled={messages.birthDay ? false : true} placement='left'>
+          <Tippy
+            content={isMobileTablet ? '' : messages.birthDay}
+            disabled={messages.birthDay && !isMobileTablet ? false : true}
+            placement='left'
+          >
             <input
               onBlur={handleValidation}
               onFocus={disableValidation}
@@ -184,6 +226,7 @@ export default function RegisterForm() {
               value={formData.birthDay}
             />
           </Tippy>
+          <span className='lg:hidden text-red-600 text-left'>{messages.birthDay}</span>
         </div>
         <div className='mb-4 text-left'>
           <label htmlFor='gender'>Giới tính</label>
@@ -206,7 +249,7 @@ export default function RegisterForm() {
           type='submit'
           value='Đăng ký'
           id='submitBtn'
-          className='mt-4 rounded-md bg-gradient-to-br from-primary-color to-secondary-color text-white font-bold py-2 px-16'
+          className='w-full mt-4 rounded-md bg-gradient-to-br from-primary-color to-secondary-color text-white font-bold py-2 px-16 lg:w-auto'
         />
       </form>
     </div>

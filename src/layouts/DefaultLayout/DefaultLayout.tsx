@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Header from '~/components/Header'
+import Navigation from '~/components/Navigation'
 import useCookie from '~/hooks/useCookie'
 
 interface Props {
@@ -8,17 +10,25 @@ interface Props {
 
 export default function DefaultLayout(props: Props) {
   const { children } = props
-  const [isLogin, setLogin] = useState<boolean>(false)
   const { getCookie } = useCookie()
+  const refreshToken = getCookie('refreshToken')
+  const [isLogin] = useState<boolean>(!!refreshToken)
   const navigate = useNavigate()
 
   useEffect(() => {
-    const refreshToken = getCookie('refreshToken')
-    if (refreshToken) {
-      setLogin(true)
-    } else {
+    if (!refreshToken) {
       navigate('/login')
     }
-  }, [getCookie, navigate])
-  return <>{isLogin && <div>DefaultLayout {children} </div>}</>
+  }, [refreshToken, navigate])
+  return (
+    <>
+      {isLogin && (
+        <div className='font-inter'>
+          <Header />
+          <Navigation />
+          {children}
+        </div>
+      )}
+    </>
+  )
 }
