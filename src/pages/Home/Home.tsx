@@ -13,10 +13,12 @@ export default function Home() {
 
   return (
     <DefaultLayout>
-      <div>
-        <h1>Home Page</h1>
-        <button onClick={handleLogout}>Đăng xuất</button>
-      </div>
+      <main>
+        <div className='h-[2000px] pt-32'>
+          <h1>Home Page</h1>
+          <button onClick={handleLogout}>Đăng xuất</button>
+        </div>
+      </main>
     </DefaultLayout>
   )
 }

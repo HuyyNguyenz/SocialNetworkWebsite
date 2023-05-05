@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '~/components/Header'
-import Navigation from '~/components/Navigation'
 import useCookie from '~/hooks/useCookie'
 
 interface Props {
@@ -23,9 +22,9 @@ export default function DefaultLayout(props: Props) {
   return (
     <>
       {isLogin && (
-        <div className='font-inter'>
+        <div className='font-inter bg-bg-input-color '>
           <Header />
-          <Navigation />
+
           {children}
         </div>
       )}

@@ -10,9 +10,12 @@ export default {
         'primary-color': '#4661EA',
         'secondary-color': '#9F18F2',
         'title-color': '#000000',
+        'text-color': '#7f7f7f',
         'eeeeee-color': '#EEEEEE',
         'input-color': '#F5F6F7',
-        'border-input-color': '#CCD0D5'
+        'border-color': '#dedede',
+        'border-input-color': '#CCD0D5',
+        'bg-input-color': '#f9f9f9'
       },
       fontSize: {
         14: '14px',
@@ -24,6 +27,15 @@ export default {
         26: '26px',
         28: '28px',
         32: '32px'
+      },
+      keyframes: {
+        fade: {
+          '0%': { 'margin-top': '-10px', opacity: '0' },
+          '100%': { 'margin-top': '0px', opacity: '1' }
+        }
+      },
+      animation: {
+        fade: 'fade .3s ease-in-out'
       }
     }
   },

@@ -10,4 +10,16 @@
   .animation-btn {
     @apply bg-gradient-to-br from-secondary-color to-primary-color opacity-90 transition-all ease-in duration-200;
   }
+
+  .active {
+    @apply font-bold text-primary-color;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.active > li > div {
+  display: inline-block !important;
 }
