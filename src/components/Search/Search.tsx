@@ -4,16 +4,13 @@ import Tippy from '@tippyjs/react/headless'
 import { useState, useEffect } from 'react'
 import useDebounce from '~/hooks/useDebounce'
 import SectionPreview from '../SectionPreview'
-
-const data = {
-  avatar:
-    'https://scontent.fsgn5-15.fna.fbcdn.net/v/t39.30808-1/313098022_1067778310586156_8504627334683099446_n.jpg?stp=cp0_dst-jpg_p80x80&_nc_cat=108&ccb=1-7&_nc_sid=7206a8&_nc_ohc=B3zLGM1jW60AX-iM6QX&_nc_ht=scontent.fsgn5-15.fna&oh=00_AfDFN_mUYH8q0G9nRniqfrQLE0o7bs-l1jBI92xqt2sbUQ&oe=645966BB',
-  firstName: 'Nguyễn Quang',
-  lastName: 'Huy'
-}
+import fetchApi from '~/utils/fetchApi'
+import { User } from '~/types'
 
 export default function Search() {
   const [searchValue, setSearchValue] = useState<string>('')
+  const [searchData, setSearchData] = useState<User[]>([])
+  const [isLoading, setLoading] = useState<boolean>(false)
   const [visible, setVisible] = useState<boolean>(false)
   const debounceValue = useDebounce(searchValue)
 
@@ -22,27 +19,50 @@ export default function Search() {
   }
 
   const handleClearText = () => {
+    const searchInput = document.getElementById('search')
+    searchInput?.focus()
     setSearchValue('')
   }
+
+  useEffect(() => {
+    if (debounceValue.length > 0) {
+      setLoading(true)
+      const loading = setTimeout(() => {
+        const getData = async () => {
+          try {
+            const result = (await fetchApi.post('search', { searchValue: debounceValue })).data
+            setSearchData(result)
+          } catch (error: any) {
+            setSearchData([])
+          }
+        }
+        getData()
+        setLoading(false)
+      }, 700)
+
+      return () => {
+        clearTimeout(loading)
+      }
+    } else {
+      setSearchData([])
+    }
+  }, [debounceValue])
 
   return (
     <div>
       <Tippy
         onClickOutside={() => setVisible(false)}
-        visible={visible}
+        visible={visible && searchValue.length > 0}
         interactive
         render={(attrs) => (
           <div className='overflow-hidden shadow-lg rounded-md animate-fade' tabIndex={-1} {...attrs}>
             <div className='w-[25rem] text-14 p-2 bg-white border border-solid border-border-color min-h-[6.25rem] max-h-[25rem] overflow-y-scroll'>
               <h2 className='text-title-color font-semibold mb-2'>Kết quả tìm kiếm {`'${searchValue}'`}</h2>
-              <SectionPreview data={data} />
-              <SectionPreview data={data} />
-              <SectionPreview data={data} />
-              <SectionPreview data={data} />
-              <SectionPreview data={data} />
-              <SectionPreview data={data} />
-              <SectionPreview data={data} />
-              <SectionPreview data={data} />
+              {searchData.length > 0 ? (
+                searchData.map((data) => <SectionPreview key={data.id} data={data} />)
+              ) : (
+                <span>Không tìm thấy</span>
+              )}
             </div>
           </div>
         )}
@@ -55,14 +75,18 @@ export default function Search() {
             name='search'
             id='search'
             placeholder='Tìm kiếm bạn bè...'
+            spellCheck={false}
             className='w-full h-full py-2 bg-bg-input-color outline-none'
             onChange={handleChange}
             value={searchValue}
           />
-          {searchValue.length > 1 && (
-            <FontAwesomeIcon icon={faTimes} className='px-4 cursor-pointer' onClick={handleClearText} />
+          {isLoading ? (
+            <FontAwesomeIcon icon={faSpinner} className='px-4 animate-spin' />
+          ) : (
+            searchValue.length > 0 && (
+              <FontAwesomeIcon icon={faTimes} className='px-4 cursor-pointer' onClick={handleClearText} />
+            )
           )}
-          {/* <FontAwesomeIcon icon={faSpinner} className='px-4 animate-spin' /> */}
         </div>
       </Tippy>
     </div>

@@ -10,7 +10,7 @@ export default function LoginForm() {
     password: '',
     remember: false
   })
-  const { setCookie, getCookie } = useCookie()
+  const { setCookie } = useCookie()
   const navigate = useNavigate()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,79 +19,29 @@ export default function LoginForm() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const accountNameInput = document.getElementById('accountName')
-    const passwordInput = document.getElementById('password')
-
     if (formData.accountName === '') {
       toast('Mời bạn nhập email hoặc username', { position: 'top-right', type: 'warning', autoClose: 2000 })
     } else if (formData.password === '') {
       toast('Mời bạn nhập mật khẩu', { position: 'top-right', type: 'warning', autoClose: 2000 })
     } else {
-      const handleLogin = () => {
+      const handleLogin = async () => {
         const { remember, ...data } = formData
-        fetchApi
-          .post('login', data)
-          .then((res) => {
-            if (accountNameInput?.classList.contains('border-red-600')) {
-              accountNameInput?.classList.remove('border-red-600', 'text-red-600')
-              accountNameInput?.classList.add('border-border-input-color')
-            }
-            if (passwordInput?.classList.contains('border-red-600')) {
-              passwordInput?.classList.remove('border-red-600', 'text-red-600')
-              passwordInput?.classList.add('border-border-input-color')
-            }
-            const expireDay = remember ? 7 : 0
-            setCookie('refreshToken', res.data.refreshToken, expireDay)
-            localStorage.setItem('accessToken', res.data.accessToken)
-            localStorage.setItem('remember', formData.remember + '')
-            navigate('/')
-          })
-          .catch((error) => {
-            if (error.response) {
-              const message: string = error.response.data.message
-              const errorType: string = error.response.data.errorType
-              toast(message, { position: 'top-right', type: 'error', autoClose: 2000 })
-              if (errorType === 'accountName') {
-                accountNameInput?.classList.remove('border-border-input-color')
-                accountNameInput?.classList.add('border-red-600', 'text-red-600')
-              } else {
-                passwordInput?.classList.remove('border-border-input-color')
-                passwordInput?.classList.add('border-red-600', 'text-red-600')
-              }
-            } else {
-              toast(error.message, { position: 'top-right', type: 'error', autoClose: 2000 })
-            }
-          })
-      }
-      handleLogin()
-    }
-  }
-
-  const handleGetUsers = () => {
-    const accessToken = localStorage.getItem('accessToken')
-    const getUser = async () => {
-      try {
-        const result = (await fetchApi.get('users', { headers: { token: `Bearer ${accessToken}` } })).data
-        console.log(result)
-      } catch (error: any) {
-        if (error.response.data === 'Token is expired') {
-          handleRefreshToken()
+        try {
+          const result = (await fetchApi.post('login', data)).data
+          const expireDay = remember ? 7 : 0
+          setCookie('refreshToken', result.refreshToken, expireDay)
+          localStorage.setItem('accessToken', result.accessToken)
+          localStorage.setItem('remember', formData.remember + '')
+          navigate('/')
+        } catch (error: any) {
+          if (error.response) {
+            toast(error.response.data.message, { position: 'top-right', type: 'error', autoClose: 2000 })
+          } else {
+            toast(error.code, { position: 'top-right', type: 'error', autoClose: 2000 })
+          }
         }
       }
-    }
-    getUser()
-  }
-
-  const handleRefreshToken = async () => {
-    try {
-      const refreshToken = getCookie('refreshToken')
-      const result = (await fetchApi.post('refresh', { refreshToken })).data
-      const remember = localStorage.getItem('remember')
-      localStorage.setItem('accessToken', result.accessToken)
-      setCookie('refreshToken', result.refreshToken, remember ? 7 : 0)
-      handleGetUsers()
-    } catch (error) {
-      console.log(error)
+      handleLogin()
     }
   }
 

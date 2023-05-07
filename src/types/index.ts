@@ -1,6 +1,4 @@
 export interface User {
-  id?: string
-  username?: string
   email: string
   password: string
   firstName: string
@@ -8,9 +6,12 @@ export interface User {
   birthDay: string
   gender: string
   dateCreated: string
+  id?: string
+  username?: string
+  token?: string
   avatar?: string
   backgroundImage?: string
-  slogan?: string
+  introduce?: string
 }
 
 export interface MessageValidation {

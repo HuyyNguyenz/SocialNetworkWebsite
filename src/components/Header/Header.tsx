@@ -1,9 +1,9 @@
 import { faMessage, faBell, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import logo from '~/assets/images/logo.png'
-import userImg from '~/assets/images/user.png'
 import Search from '../Search'
 import Navigation from '../Navigation'
+import UserSetting from '../UserSetting'
 
 export default function Header() {
   return (
@@ -14,7 +14,7 @@ export default function Header() {
         <div className='flex items-center justify-start text-text-color'>
           <FontAwesomeIcon icon={faMessage} className='w-5 h-5 px-4 mx-2 cursor-pointer' />
           <FontAwesomeIcon icon={faBell} className='w-5 h-5 px-4 mx-2 cursor-pointer' />
-          <img src={userImg} alt='userImg' className='w-8 h-8 ml-4 rounded-full cursor-pointer' />
+          <UserSetting />
         </div>
       </div>
       <nav>
