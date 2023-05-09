@@ -12,7 +12,7 @@ export default function SectionPreview(props: Props) {
       <img
         src={data.avatar ? data.avatar : userImg}
         alt='user_avatar'
-        className='w-9 h-9 object-cover rounded-full mr-2'
+        className='w-8 h-8 object-cover rounded-full mr-2'
       />
       <span>
         {data.firstName} {data.lastName}

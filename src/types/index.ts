@@ -26,3 +26,13 @@ export interface Router {
   path: string
   component: () => JSX.Element
 }
+
+export interface Post {
+  content: string
+  dateCreated: string
+  accountId: string
+  communityId: string
+  id?: string
+  images?: string
+  video?: string
+}

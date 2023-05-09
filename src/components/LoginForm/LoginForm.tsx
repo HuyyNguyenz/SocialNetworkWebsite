@@ -29,9 +29,9 @@ export default function LoginForm() {
         try {
           const result = (await fetchApi.post('login', data)).data
           const expireDay = remember ? 7 : 0
+          localStorage.setItem('remember', remember + '')
+          setCookie('accessToken', result.accessToken, expireDay)
           setCookie('refreshToken', result.refreshToken, expireDay)
-          localStorage.setItem('accessToken', result.accessToken)
-          localStorage.setItem('remember', formData.remember + '')
           navigate('/')
         } catch (error: any) {
           if (error.response) {
