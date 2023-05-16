@@ -4,8 +4,9 @@ import Header from '~/components/Header'
 import useCookie from '~/hooks/useCookie'
 import fetchApi from '~/utils/fetchApi'
 import useRefreshToken from '~/hooks/useRefreshToken'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setUserData } from '~/features/userData/userDataSlice'
+import { RootState } from '~/store'
 
 interface Props {
   children: React.ReactNode
@@ -13,10 +14,11 @@ interface Props {
 
 export default function DefaultLayout(props: Props) {
   const { children } = props
-  const { getCookie } = useCookie()
+  const [, getCookie] = useCookie()
   const [isLogin] = useState<boolean>(() => !!getCookie('refreshToken'))
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const userData = useSelector((state: RootState) => state.userData)
   const handleRefreshToken = useRefreshToken
 
   useEffect(() => {
@@ -41,11 +43,13 @@ export default function DefaultLayout(props: Props) {
         }
       }
     }
-    handleGetUserData()
+    if (userData.email === '') {
+      handleGetUserData()
+    }
     return () => {
       controller.abort()
     }
-  }, [dispatch, getCookie, handleRefreshToken])
+  }, [dispatch, getCookie, handleRefreshToken, userData])
 
   return (
     <>

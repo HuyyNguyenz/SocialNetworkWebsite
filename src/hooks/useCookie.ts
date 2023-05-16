@@ -1,4 +1,8 @@
-const useCookie = () => {
+const useCookie = (): [
+  (name: string, value: string, days: number) => void,
+  (name: string) => string | null,
+  (name: string) => void
+] => {
   const setCookie = (name: string, value: string, days: number) => {
     let expires = ''
     if (days) {
@@ -24,7 +28,7 @@ const useCookie = () => {
     document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
   }
 
-  return { setCookie, getCookie, removeCookie }
+  return [setCookie, getCookie, removeCookie]
 }
 
 export default useCookie

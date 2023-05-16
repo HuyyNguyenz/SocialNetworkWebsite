@@ -2,7 +2,7 @@ import fetchApi from '~/utils/fetchApi'
 import useCookie from './useCookie'
 
 const useRefreshToken = async (callback: () => Promise<void>, refreshToken: string) => {
-  const { setCookie } = useCookie()
+  const [setCookie] = useCookie()
   const remember = localStorage.getItem('remember')
   try {
     const result = (await fetchApi.post('refresh', { refreshToken })).data

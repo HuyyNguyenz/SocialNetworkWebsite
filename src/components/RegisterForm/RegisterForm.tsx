@@ -5,6 +5,7 @@ import 'tippy.js/dist/tippy.css'
 import useFormValidation from '~/hooks/useFormValidation'
 import fetchApi from '~/utils/fetchApi'
 import { toast } from 'react-toastify'
+import useResize from '~/hooks/useResize'
 
 export default function RegisterForm() {
   const initialData = {
@@ -17,8 +18,8 @@ export default function RegisterForm() {
     dateCreated: ''
   }
   const [formData, setFormData] = useState<User>(initialData)
-  const [messages, handleValidation, disableValidation] = useFormValidation(formData)
-  const [isMobileTablet, setMobileTablet] = useState<boolean>(false)
+  const [messages, handleValidation, disableValidation, checkFormError] = useFormValidation(formData)
+  const isMobileTablet = useResize()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const date = new Date()
@@ -27,25 +28,31 @@ export default function RegisterForm() {
     const year = date.getFullYear()
     const dateCreated = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`
 
-    setFormData((prev) => ({ ...prev, [event.target.name]: event.target.value, dateCreated }))
+    setFormData((prev) => {
+      switch (event.target.name) {
+        case 'firstName':
+          return {
+            ...prev,
+            [event.target.name]: prev.firstName === '' ? event.target.value.trim() : event.target.value,
+            dateCreated
+          }
+        case 'lastName':
+          return {
+            ...prev,
+            [event.target.name]: prev.lastName === '' ? event.target.value.trim() : event.target.value,
+            dateCreated
+          }
+        default:
+          return { ...prev, [event.target.name]: event.target.value, dateCreated }
+      }
+    })
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const isFormNull =
-      formData.email === '' ||
-      formData.password === '' ||
-      formData.firstName === '' ||
-      formData.lastName === '' ||
-      formData.birthDay === ''
-    const isFormError =
-      messages.email !== '' ||
-      messages.password !== '' ||
-      messages.firstName !== '' ||
-      messages.lastName !== '' ||
-      messages.birthDay !== ''
-    if (!(isFormNull || isFormError)) {
-      const stringArray = formData.birthDay.split('-')
+    const isFormError = checkFormError()
+    if (!isFormError) {
+      const stringArray = formData.birthDay?.split('-') as string[]
       const birthDay = `${stringArray[2]}/${stringArray[1]}/${stringArray[0]}`
       const data = { ...formData, birthDay }
       const createAccount = async () => {
@@ -72,42 +79,15 @@ export default function RegisterForm() {
 
   useEffect(() => {
     const submitBtn = document.getElementById('submitBtn')
-    const isFormNull =
-      formData.email === '' ||
-      formData.password === '' ||
-      formData.firstName === '' ||
-      formData.lastName === '' ||
-      formData.birthDay === ''
-    const isFormError =
-      messages.email !== '' ||
-      messages.password !== '' ||
-      messages.firstName !== '' ||
-      messages.lastName !== '' ||
-      messages.birthDay !== ''
-
-    if (isFormNull || isFormError) {
+    const isFormError = checkFormError()
+    if (isFormError) {
       submitBtn?.classList.add('cursor-not-allowed', 'opacity-50')
       submitBtn?.classList.remove('cursor-pointer', 'hover:animation-btn')
     } else {
       submitBtn?.classList.remove('cursor-not-allowed', 'opacity-50')
       submitBtn?.classList.add('cursor-pointer', 'hover:animation-btn')
     }
-  }, [formData, messages])
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (document.body.clientWidth < 1024) {
-        setMobileTablet(true)
-      } else {
-        setMobileTablet(false)
-      }
-    }
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
+  }, [checkFormError])
 
   return (
     <div className='p-8 w-[22.5rem] max-h-[32.5rem] overflow-y-scroll md:w-[32.5rem] lg:w-full lg:h-full lg:overflow-y-hidden'>

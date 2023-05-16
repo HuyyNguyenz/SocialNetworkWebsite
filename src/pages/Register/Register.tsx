@@ -6,7 +6,7 @@ import useCookie from '~/hooks/useCookie'
 import { useEffect, useState } from 'react'
 
 export default function Register() {
-  const { getCookie } = useCookie()
+  const [, getCookie] = useCookie()
   const refreshToken = getCookie('refreshToken')
   const [isLogout] = useState<boolean>(!refreshToken)
   const navigate = useNavigate()

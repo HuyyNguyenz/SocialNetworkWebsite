@@ -11,7 +11,7 @@ import { RootState } from '~/store'
 
 export default function UserSetting() {
   const [isOpen, setOpen] = useState<boolean>(false)
-  const { removeCookie } = useCookie()
+  const [, , removeCookie] = useCookie()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const userData = useSelector((state: RootState) => state.userData)

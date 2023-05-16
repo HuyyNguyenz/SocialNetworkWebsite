@@ -6,11 +6,13 @@ const useFormValidation = (
 ): [
   messages: MessageValidation,
   handleValidation: (event: React.FocusEvent<HTMLInputElement, Element>) => void,
-  disableValidation: (event: React.FocusEvent<HTMLInputElement, Element>) => void
+  disableValidation: (event: React.FocusEvent<HTMLInputElement, Element>) => void,
+  checkFormError: () => boolean
 ] => {
   const [messages, setMessages] = useState<MessageValidation>({
     email: '',
     password: '',
+    rePassword: '',
     firstName: '',
     lastName: '',
     birthDay: ''
@@ -21,11 +23,11 @@ const useFormValidation = (
     const regexEmail = new RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
     const regexPassword = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,32}$/)
     const currentYear = new Date().getFullYear()
-    const birthDayYear = Number(formData.birthDay.split('-')[0])
+    const birthDayYear = Number(formData.birthDay?.split('-')[0])
 
     switch (event.target.name) {
       case 'email':
-        if (!formData.email.match(regexEmail)) {
+        if (!formData.email?.match(regexEmail)) {
           const errorMessage = formData.email === '' ? 'Email không được bỏ trống' : 'Email chưa chính xác!'
           setMessages((prev) => ({ ...prev, email: errorMessage }))
         } else {
@@ -33,7 +35,7 @@ const useFormValidation = (
         }
         break
       case 'password':
-        if (!formData.password.match(regexPassword)) {
+        if (!formData.password?.match(regexPassword)) {
           const errorMessage =
             formData.password === ''
               ? 'Mật khẩu không được bỏ trống'
@@ -44,6 +46,18 @@ const useFormValidation = (
           }))
         } else {
           setMessages((prev) => ({ ...prev, password: '' }))
+        }
+        break
+      case 'rePassword':
+        if (formData.rePassword !== formData.password) {
+          const errorMessage =
+            formData.rePassword === '' ? 'Nhập lại mật khẩu không được trống' : 'Mật khẩu không trùng khớp'
+          setMessages((prev) => ({
+            ...prev,
+            rePassword: errorMessage
+          }))
+        } else {
+          setMessages((prev) => ({ ...prev, rePassword: '' }))
         }
         break
       case 'firstName':
@@ -84,6 +98,9 @@ const useFormValidation = (
       case 'password':
         setMessages((prev) => ({ ...prev, password: '' }))
         break
+      case 'rePassword':
+        setMessages((prev) => ({ ...prev, rePassword: '' }))
+        break
       case 'firstName':
         setMessages((prev) => ({ ...prev, firstName: '' }))
         break
@@ -98,7 +115,30 @@ const useFormValidation = (
     }
   }
 
-  return [messages, handleValidation, disableValidation]
+  const checkFormError = () => {
+    const isFormNull =
+      formData.email === '' ||
+      formData.password === '' ||
+      formData.firstName === '' ||
+      formData.lastName === '' ||
+      formData.birthDay === '' ||
+      formData.rePassword === ''
+    const isFormError =
+      messages.email !== '' ||
+      messages.password !== '' ||
+      messages.firstName !== '' ||
+      messages.lastName !== '' ||
+      messages.birthDay !== '' ||
+      messages.rePassword !== ''
+
+    if (isFormNull || isFormError) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  return [messages, handleValidation, disableValidation, checkFormError]
 }
 
 export default useFormValidation
