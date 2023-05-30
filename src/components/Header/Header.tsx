@@ -7,7 +7,7 @@ import UserSetting from '../UserSetting'
 
 export default function Header() {
   return (
-    <header className='fixed top-0 left-0 w-full'>
+    <header className='fixed top-0 left-0 w-full z-50'>
       <div className='flex items-center justify-between bg-white h-14 max-h-14 py-2 px-4 border border-solid border-border-color'>
         <img src={logo} alt='logo' className='h-full object-cover' />
         <Search />

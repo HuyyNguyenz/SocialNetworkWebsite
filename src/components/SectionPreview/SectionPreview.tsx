@@ -1,22 +1,55 @@
-import userImg from '~/assets/images/user.png'
-import { User } from '~/types'
+import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FilePreview } from '~/types'
 
 interface Props {
-  data: User
+  data: FilePreview[] | FilePreview
+  deleteItem: (id: string) => void
 }
 
 export default function SectionPreview(props: Props) {
   const { data } = props
+
+  const handleDeleteImage = (id: string) => {
+    props.deleteItem(id)
+  }
+
   return (
-    <div className='flex items-center justify-start text-14 mb-4 hover:bg-bg-input-color rounded-md cursor-pointer'>
-      <img
-        src={data.avatar ? data.avatar : userImg}
-        alt='user_avatar'
-        className='w-8 h-8 object-cover rounded-full mr-2'
-      />
-      <span>
-        {data.firstName} {data.lastName}
-      </span>
+    <div
+      className={`${
+        (data as FilePreview[]).length === 1 || (data as FilePreview).name ? 'my-2' : 'grid grid-cols-2 gap-4 my-2'
+      }`}
+    >
+      {(data as FilePreview[]).length > 0 &&
+        (data as FilePreview[]).map((image) => {
+          return (
+            <div
+              key={image.id}
+              className={`${(data as FilePreview[]).length === 1 ? 'w-full h-[20rem] relative' : 'w-80 h-52 relative'}`}
+            >
+              <img src={image.src} alt={image.name} className='rounded-md w-full h-full object-cover' />
+              <button onClick={() => handleDeleteImage(image.id)}>
+                <FontAwesomeIcon
+                  icon={faTimes}
+                  className='bg-black p-2 text-white text-14 rounded-full absolute top-2 left-2 cursor-pointer hover:opacity-80'
+                />
+              </button>
+            </div>
+          )
+        })}
+      {(data as FilePreview).name && (
+        <div className='w-full h-[25rem] relative overflow-hidden'>
+          <video src={(data as FilePreview).src} controls className='rounded-md'>
+            <track src={(data as FilePreview).src} kind='captions' srcLang='en' label='English' />
+          </video>
+          <button onClick={() => handleDeleteImage((data as FilePreview).id)}>
+            <FontAwesomeIcon
+              icon={faTimes}
+              className='bg-black p-2 text-white text-14 rounded-full absolute top-2 left-2 cursor-pointer hover:opacity-80'
+            />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

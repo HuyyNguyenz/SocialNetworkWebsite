@@ -29,16 +29,20 @@ export default function RecoveryForm() {
     const isFormError = checkFormError()
     if (!isFormError) {
       const { password } = formData
-      const email = sessionStorage.getItem('recovery')
+      const { userEmail } = JSON.parse(sessionStorage.getItem('recovery') as string)
       try {
-        const result = (await fetchApi.put('/recovery', { password, email })).data
+        const result = (await fetchApi.put('recovery', { password, userEmail })).data
         toast(result.message, { type: 'success', autoClose: 2000, position: 'top-right' })
         setTimeout(() => {
           sessionStorage.removeItem('recovery')
+          setRecoveryValue({
+            password: '',
+            rePassword: ''
+          })
           navigate('/login')
         }, 2500)
-      } catch (error) {
-        console.log(error)
+      } catch (error: any) {
+        toast(error.code, { type: 'error', autoClose: 2000, position: 'top-right' })
       }
     }
   }
@@ -74,7 +78,7 @@ export default function RecoveryForm() {
               id='password'
               placeholder='Nhập mật khẩu mới'
               className={`min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
-                messages.password ? 'border-red-600 text-red-600' : 'border-border-input-color'
+                messages.password ? 'border-red-600 text-red-600' : 'border-border-color'
               }`}
             />
           </Tippy>
@@ -96,7 +100,7 @@ export default function RecoveryForm() {
               id='rePassword'
               placeholder='Nhập lại mật khẩu'
               className={`min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
-                messages.rePassword ? 'border-red-600 text-red-600' : 'border-border-input-color'
+                messages.rePassword ? 'border-red-600 text-red-600' : 'border-border-color'
               }`}
             />
           </Tippy>

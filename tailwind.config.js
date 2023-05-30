@@ -7,15 +7,13 @@ export default {
     },
     extend: {
       colors: {
-        'primary-color': '#4661EA',
+        'primary-color': '#425DE8',
         'secondary-color': '#9F18F2',
-        'title-color': '#000000',
-        'text-color': '#7f7f7f',
+        'title-color': '#474747',
+        'text-color': '#3E3E3E',
         'eeeeee-color': '#EEEEEE',
-        'input-color': '#F5F6F7',
-        'border-color': '#dedede',
-        'border-input-color': '#CCD0D5',
-        'bg-input-color': '#f9f9f9'
+        'input-color': '#F9F9F9',
+        'border-color': '#DADADA'
       },
       fontSize: {
         14: '14px',

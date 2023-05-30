@@ -30,6 +30,7 @@ export default function UserSetting() {
 
   return (
     <Tippy
+      onClickOutside={() => setOpen(false)}
       visible={isOpen}
       interactive
       placement='bottom-start'
@@ -40,25 +41,25 @@ export default function UserSetting() {
           {...attrs}
         >
           <ul className='text-14'>
-            <li className='flex items-center justify-start py-2 px-4 my-2 cursor-pointer hover:bg-bg-input-color'>
+            <li className='flex items-center justify-start py-2 px-4 my-2 cursor-pointer'>
               <img
                 className='w-8 h-8'
                 src={userData.avatar ? userData.avatar : userImg}
-                alt={userData.firstName + userData.lastName}
+                alt={userData.firstName + ' ' + userData.lastName}
               />
               <span className='text-18 font-semibold ml-2 line-clamp-1'>{`${userData.firstName} ${userData.lastName}`}</span>
             </li>
-            <li className='flex items-center justify-start py-2 px-4 my-2 cursor-pointer hover:bg-bg-input-color'>
+            <li className='flex items-center justify-start py-2 px-4 my-2 cursor-pointer hover:bg-input-color'>
               <FontAwesomeIcon icon={faGear} />
               <span className='ml-2'>Cài đặt chung</span>
             </li>
-            <li className='py-2 px-4 my-2 cursor-pointer hover:bg-bg-input-color'>
+            <li className='py-2 px-4 my-2 cursor-pointer hover:bg-input-color'>
               <button className='flex items-center justify-start w-full'>
                 <FontAwesomeIcon icon={faMoon} />
                 <span className='ml-2'>Chế độ tối</span>
               </button>
             </li>
-            <li className='py-2 px-4 my-2 cursor-pointer hover:bg-bg-input-color'>
+            <li className='py-2 px-4 my-2 cursor-pointer hover:bg-input-color'>
               <button onClick={handleLogout} className='flex items-center justify-start w-full'>
                 <FontAwesomeIcon icon={faRightFromBracket} />
                 <span className='ml-2'>Đăng xuất</span>

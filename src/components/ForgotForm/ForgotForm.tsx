@@ -11,7 +11,6 @@ interface Props {
 
 export default function ForgotPassword(props: Props) {
   const [email, setEmail] = useState<string>('')
-  const [otpCode, setOtpCode] = useState<string>('')
   const [otpValue, setOtpValue] = useState<string>('')
   const [counter, setCounter] = useState<number>(60)
   const navigate = useNavigate()
@@ -28,33 +27,37 @@ export default function ForgotPassword(props: Props) {
     }
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (otpValue === otpCode) {
-      setOtpCode('')
-      sessionStorage.setItem('recovery', email)
+    try {
+      const result = (await fetchApi.post('verifyOtp', { otpCode: otpValue, userEmail: email })).data
+      const userOtp = JSON.stringify(result.userOtp)
+      sessionStorage.setItem('recovery', userOtp)
       navigate('/recovery')
-    } else {
-      toast('Mã xác nhận không chính xác', { type: 'error', autoClose: 2000, position: 'top-right' })
+    } catch (error: any) {
+      if (error.response) {
+        toast(error.response.data.message, { type: 'error', autoClose: 2000, position: 'top-right' })
+      } else {
+        toast(error.code, { type: 'error', autoClose: 2000, position: 'top-right' })
+      }
     }
   }
 
-  const handleSendCodeResetPassword = async () => {
+  const handleRequestResetPassword = async () => {
     if (email === '') {
       toast('Vui lòng nhập email', { autoClose: 2000, position: 'top-right', type: 'warning' })
     } else {
       try {
-        const result = (await fetchApi.post('verifyEmail', { email })).data
-        toast(result.message, { autoClose: 2000, position: 'top-right', type: 'success' })
-        setOtpCode(result.otpCode)
+        setCounter((prev) => prev - 1)
         const interval = setInterval(() => {
           setCounter((prev) => prev - 1)
         }, 1000)
-
         setTimeout(() => {
           clearInterval(interval)
           setCounter(60)
         }, 60000)
+        const result = (await fetchApi.post('verifyEmail', { email })).data
+        toast(result.message, { autoClose: 2000, position: 'top-right', type: 'success' })
       } catch (error: any) {
         toast(error.response.data.message, { autoClose: 2000, position: 'top-right', type: 'error' })
       }
@@ -78,7 +81,7 @@ export default function ForgotPassword(props: Props) {
           name='email'
           id='email'
           placeholder='Nhập email'
-          className='min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 mb-4 border-border-input-color '
+          className='min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 mb-4 border-border-color '
         />
         <div className='flex items-center justify-start min-w-[18.75rem] md:min-w-[25rem]'>
           <input
@@ -90,7 +93,7 @@ export default function ForgotPassword(props: Props) {
             name='otpCode'
             id='otpCode'
             placeholder='Nhập mã xác nhận'
-            className='w-[70%] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-input-color'
+            className='w-[70%] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-color'
           />
           {counter < 60 ? (
             <button type='button' className='w-[30%] px-4 py-2 bg-secondary-color text-white rounded-md ml-4'>
@@ -98,7 +101,7 @@ export default function ForgotPassword(props: Props) {
             </button>
           ) : (
             <button
-              onClick={handleSendCodeResetPassword}
+              onClick={handleRequestResetPassword}
               type='button'
               id='sendCode'
               className='w-[30%] px-4 py-2 bg-primary-color text-white rounded-md ml-4'

@@ -15,7 +15,7 @@ export default function RegisterForm() {
     lastName: '',
     birthDay: '',
     gender: 'male',
-    dateCreated: ''
+    createdAt: ''
   }
   const [formData, setFormData] = useState<User>(initialData)
   const [messages, handleValidation, disableValidation, checkFormError] = useFormValidation(formData)
@@ -26,7 +26,7 @@ export default function RegisterForm() {
     const day = date.getDate()
     const month = date.getMonth() + 1
     const year = date.getFullYear()
-    const dateCreated = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`
+    const createdAt = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`
 
     setFormData((prev) => {
       switch (event.target.name) {
@@ -34,16 +34,16 @@ export default function RegisterForm() {
           return {
             ...prev,
             [event.target.name]: prev.firstName === '' ? event.target.value.trim() : event.target.value,
-            dateCreated
+            createdAt
           }
         case 'lastName':
           return {
             ...prev,
             [event.target.name]: prev.lastName === '' ? event.target.value.trim() : event.target.value,
-            dateCreated
+            createdAt
           }
         default:
-          return { ...prev, [event.target.name]: event.target.value, dateCreated }
+          return { ...prev, [event.target.name]: event.target.value, createdAt }
       }
     })
   }
@@ -104,7 +104,7 @@ export default function RegisterForm() {
                 onBlur={handleValidation}
                 onChange={handleChange}
                 className={`bg-input-color border border-solid outline-none rounded-md py-2 px-4 mb-4 lg:mr-4 lg:mb-0 ${
-                  messages.firstName ? 'border-red-600 text-red-600' : 'border-border-input-color'
+                  messages.firstName ? 'border-red-600 text-red-600' : 'border-border-color'
                 }`}
                 type='text'
                 name='firstName'
@@ -126,7 +126,7 @@ export default function RegisterForm() {
                 onBlur={handleValidation}
                 onChange={handleChange}
                 className={`bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
-                  messages.lastName ? 'border-red-600 text-red-600' : 'border-border-input-color'
+                  messages.lastName ? 'border-red-600 text-red-600' : 'border-border-color'
                 }`}
                 type='text'
                 name='lastName'
@@ -149,7 +149,7 @@ export default function RegisterForm() {
               onBlur={handleValidation}
               onChange={handleChange}
               className={`w-full bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
-                messages.email ? 'border-red-600 text-red-600' : 'border-border-input-color'
+                messages.email ? 'border-red-600 text-red-600' : 'border-border-color'
               }`}
               type='email'
               name='email'
@@ -171,7 +171,7 @@ export default function RegisterForm() {
               onBlur={handleValidation}
               onChange={handleChange}
               className={`w-full bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
-                messages.password ? 'border-red-600 text-red-600' : 'border-border-input-color'
+                messages.password ? 'border-red-600 text-red-600' : 'border-border-color'
               }`}
               type='password'
               name='password'
@@ -197,7 +197,7 @@ export default function RegisterForm() {
               onFocus={disableValidation}
               onChange={handleChange}
               className={`w-full bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
-                messages.birthDay ? 'border-red-600 text-red-600' : 'border-border-input-color'
+                messages.birthDay ? 'border-red-600 text-red-600' : 'border-border-color'
               }`}
               type='date'
               name='birthDay'
@@ -211,13 +211,13 @@ export default function RegisterForm() {
         <div className='mb-4 text-left'>
           <label htmlFor='gender'>Giới tính</label>
           <div className='flex items-start justify-start mt-2'>
-            <div className='flex items-center justify-start bg-input-color border border-solid border-border-input-color outline-none rounded-md py-2 px-4 mr-4'>
+            <div className='flex items-center justify-start bg-input-color border border-solid border-border-color outline-none rounded-md py-2 px-4 mr-4'>
               <label htmlFor='male' className='mr-2'>
                 Nam
               </label>
               <input onChange={handleChange} defaultChecked type='radio' name='gender' id='male' value='male' />
             </div>
-            <div className='flex items-center justify-start bg-input-color border border-solid border-border-input-color outline-none rounded-md py-2 px-4'>
+            <div className='flex items-center justify-start bg-input-color border border-solid border-border-color outline-none rounded-md py-2 px-4'>
               <label htmlFor='female' className='mr-2'>
                 Nữ
               </label>

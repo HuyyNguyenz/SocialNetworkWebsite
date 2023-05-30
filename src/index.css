@@ -24,3 +24,7 @@ html {
 .active > li > div {
   display: inline-block !important;
 }
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}

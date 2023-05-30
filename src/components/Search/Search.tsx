@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react/headless'
 import { useState, useEffect } from 'react'
 import useDebounce from '~/hooks/useDebounce'
-import SectionPreview from '../SectionPreview'
+import UserPreview from '../UserPreview'
 import fetchApi from '~/utils/fetchApi'
 import { User } from '~/types'
 
@@ -27,13 +27,15 @@ export default function Search() {
   useEffect(() => {
     if (debounceValue.length > 0) {
       setLoading(true)
+      const controller = new AbortController()
+      const { signal } = controller
       const loading = setTimeout(() => {
         const getData = async () => {
           try {
-            const result = (await fetchApi.post('search', { searchValue: debounceValue })).data
+            const result = (await fetchApi.post('search', { searchValue: debounceValue }, { signal })).data
             setSearchData(result)
           } catch (error: any) {
-            setSearchData([])
+            throw error.response
           }
         }
         getData()
@@ -42,6 +44,7 @@ export default function Search() {
 
       return () => {
         clearTimeout(loading)
+        controller.abort()
       }
     } else {
       setSearchData([])
@@ -56,10 +59,10 @@ export default function Search() {
         interactive
         render={(attrs) => (
           <div className='overflow-hidden shadow-lg rounded-md animate-fade' tabIndex={-1} {...attrs}>
-            <div className='w-[25rem] text-14 p-2 bg-white border border-solid border-border-color min-h-[6.25rem] max-h-[25rem] overflow-y-scroll'>
+            <div className='w-[30rem] text-14 p-2 bg-white border border-solid border-border-color min-h-[6.25rem] max-h-[25rem] overflow-y-scroll'>
               <h2 className='text-title-color font-semibold mb-2'>Kết quả tìm kiếm {`'${searchValue}'`}</h2>
               {searchData.length > 0 ? (
-                searchData.map((data) => <SectionPreview key={data.id} data={data} />)
+                searchData.map((data) => <UserPreview key={data.id} data={data} />)
               ) : (
                 <span>Không tìm thấy</span>
               )}
@@ -67,7 +70,7 @@ export default function Search() {
           </div>
         )}
       >
-        <div className='w-[25rem] h-9 flex items-center justify-start text-text-color text-14 rounded-md border border-solid border-border-input-color bg-bg-input-color overflow-hidden'>
+        <div className='w-[30rem] h-9 flex ml-16 items-center justify-start text-text-color text-14 rounded-md border border-solid border-border-color bg-input-color overflow-hidden'>
           <FontAwesomeIcon icon={faSearch} className='px-4' />
           <input
             onFocus={() => setVisible(true)}
@@ -76,7 +79,7 @@ export default function Search() {
             id='search'
             placeholder='Tìm kiếm bạn bè...'
             spellCheck={false}
-            className='w-full h-full py-2 bg-bg-input-color outline-none'
+            className='w-full h-full py-2 bg-input-color outline-none'
             onChange={handleChange}
             value={searchValue}
           />

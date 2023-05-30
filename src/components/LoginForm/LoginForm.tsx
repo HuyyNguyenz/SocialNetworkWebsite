@@ -75,7 +75,7 @@ export default function LoginForm() {
               <input
                 onChange={handleChange}
                 value={formData.accountName}
-                className='min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-input-color'
+                className='min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-color'
                 type='text'
                 name='accountName'
                 id='accountName'
@@ -86,7 +86,7 @@ export default function LoginForm() {
               <input
                 onChange={handleChange}
                 value={formData.password}
-                className='min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-input-color'
+                className='min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-color'
                 type='password'
                 name='password'
                 id='password'

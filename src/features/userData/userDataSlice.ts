@@ -8,7 +8,7 @@ const initialState: User = {
   lastName: '',
   birthDay: '',
   gender: '',
-  dateCreated: ''
+  createdAt: ''
 }
 
 const userDataSlice = createSlice({

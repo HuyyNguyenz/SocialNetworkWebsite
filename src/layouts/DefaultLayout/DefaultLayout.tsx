@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import Header from '~/components/Header'
 import useCookie from '~/hooks/useCookie'
 import fetchApi from '~/utils/fetchApi'
-import useRefreshToken from '~/hooks/useRefreshToken'
 import { useDispatch, useSelector } from 'react-redux'
 import { setUserData } from '~/features/userData/userDataSlice'
 import { RootState } from '~/store'
+import { ToastContainer } from 'react-toastify'
 
 interface Props {
   children: React.ReactNode
@@ -19,7 +19,6 @@ export default function DefaultLayout(props: Props) {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const userData = useSelector((state: RootState) => state.userData)
-  const handleRefreshToken = useRefreshToken
 
   useEffect(() => {
     if (!isLogin) {
@@ -29,35 +28,32 @@ export default function DefaultLayout(props: Props) {
 
   useEffect(() => {
     const controller = new AbortController()
+    const { signal } = controller
     const handleGetUserData = async () => {
-      const accessToken = getCookie('accessToken') as string
-      const refreshToken = getCookie('refreshToken') as string
       try {
-        const result = (
-          await fetchApi.get('user', { headers: { token: `Bearer ${accessToken}` }, signal: controller.signal })
-        ).data
+        const result = (await fetchApi.get('user', { signal })).data
         dispatch(setUserData(result))
       } catch (error: any) {
-        if (error.response.data === 'Token is not valid') {
-          handleRefreshToken(handleGetUserData, refreshToken)
-        }
+        throw error.response
       }
     }
+
     if (userData.email === '') {
       handleGetUserData()
     }
+
     return () => {
       controller.abort()
     }
-  }, [dispatch, getCookie, handleRefreshToken, userData])
+  }, [dispatch, userData])
 
   return (
     <>
       {isLogin && (
-        <div className='font-inter bg-bg-input-color '>
+        <div className='font-inter bg-input-color'>
           <Header />
-
           {children}
+          <ToastContainer />
         </div>
       )}
     </>

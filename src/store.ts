@@ -3,7 +3,7 @@ import postsReducer from './features/posts/postsSlice'
 import userDataReducer from './features/userData/userDataSlice'
 
 export const store = configureStore({
-  reducer: { userData: userDataReducer, posts: postsReducer }
+  reducer: { userData: userDataReducer, postsList: postsReducer }
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

@@ -5,7 +5,6 @@ import Login from '~/pages/Login'
 import NotFound from '~/pages/NotFound'
 import Recovery from '~/pages/Recovery'
 import Register from '~/pages/Register'
-import WatchVideos from '~/pages/WatchVideos'
 import { Router } from '~/types'
 
 const publicRoutes: Router[] = [
@@ -14,7 +13,6 @@ const publicRoutes: Router[] = [
   { path: '/login', component: Login },
   { path: '/friends', component: Friends },
   { path: '/communities', component: Communities },
-  { path: '/videos', component: WatchVideos },
   { path: '/recovery', component: Recovery },
   { path: '/*', component: NotFound }
 ]

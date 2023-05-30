@@ -5,8 +5,8 @@ export interface User {
   lastName?: string
   birthDay?: string
   gender?: string
-  dateCreated?: string
-  id?: string
+  createdAt?: string
+  id?: number
   username?: string
   token?: string
   avatar?: string
@@ -29,12 +29,22 @@ export interface Router {
   component: () => JSX.Element
 }
 
-export interface Post {
+export interface Posts {
   content: string
-  dateCreated: string
-  accountId: string
-  communityId: string
-  id?: string
-  images?: string
-  video?: string
+  createdAt: string
+  userId: number
+  communityId: number
+  type: string
+  id?: number
+  modifiedAt?: string
+  images?: FilePreview[]
+  video?: FilePreview
+}
+
+export interface FilePreview {
+  id: string
+  name: string
+  src: string
+  origin?: File
+  url?: string
 }
