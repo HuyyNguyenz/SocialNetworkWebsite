@@ -11,7 +11,7 @@ export default {
         'secondary-color': '#9F18F2',
         'title-color': '#474747',
         'text-color': '#3E3E3E',
-        'eeeeee-color': '#EEEEEE',
+        'hover-color': '#EEEEEE',
         'input-color': '#F9F9F9',
         'border-color': '#DADADA'
       },

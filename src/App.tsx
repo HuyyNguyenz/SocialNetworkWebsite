@@ -3,6 +3,7 @@ import { publicRoutes } from './routes/index.ts'
 import { Router } from './types/index.ts'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-loading-skeleton/dist/skeleton.css'
+import 'react-confirm-alert/src/react-confirm-alert.css'
 
 function App() {
   return (

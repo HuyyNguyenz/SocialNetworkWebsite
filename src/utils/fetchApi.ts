@@ -43,6 +43,9 @@ class Http {
   put = (url: string, body: object, config?: object) => {
     return this.instance.put(url, body, config)
   }
+  delete = (url: string, config?: object) => {
+    return this.instance.delete(url, config)
+  }
 }
 
 const handleRefreshToken = async () => {
