@@ -29,7 +29,7 @@ export interface Router {
   component: () => JSX.Element
 }
 
-export interface Posts {
+export interface Post {
   content: string
   createdAt: string
   userId: number
@@ -39,6 +39,19 @@ export interface Posts {
   modifiedAt?: string
   images?: FilePreview[]
   video?: FilePreview
+  deleted?: number
+}
+
+export interface Comment {
+  content: string
+  createdAt: string
+  userId: number
+  postId: number
+  id?: number
+  modifiedAt?: string
+  images?: FilePreview[]
+  video?: FilePreview
+  deleted?: number
 }
 
 export interface FilePreview {

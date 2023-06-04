@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { getDownloadURL, getStorage, ref, uploadBytes, deleteObject } from 'firebase/storage'
 import { v4 } from 'uuid'
 
 const firebaseConfig = {
@@ -14,10 +14,20 @@ const app = initializeApp(firebaseConfig)
 const storage = getStorage(app)
 export const uploadFile = async (file: File, type: string) => {
   try {
-    const fileRef = ref(storage, `${type}/${file.name + v4()}`)
+    const pathName = `${type}/${file.name + v4()}`
+    const fileRef = ref(storage, pathName)
     const result = await uploadBytes(fileRef, file)
     const url = await getDownloadURL(result.ref)
-    return url
+    return { url, pathName }
+  } catch (error: any) {
+    throw error.response
+  }
+}
+
+export const deleteFile = async (pathName: string) => {
+  try {
+    const fileRef = ref(storage, pathName)
+    deleteObject(fileRef)
   } catch (error: any) {
     throw error.response
   }

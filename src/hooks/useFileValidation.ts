@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FilePreview } from '~/types'
+import { v4 } from 'uuid'
 
 const useFileValidation = (): [
   images: FilePreview[],
@@ -27,9 +28,9 @@ const useFileValidation = (): [
             }
           }
           if (newArray.length > 0) {
-            newArray.forEach((image, index) => {
+            newArray.forEach((image) => {
               const src = URL.createObjectURL(image)
-              imagePreviewArray.push({ id: index + '', name: image.name, src, origin: image })
+              imagePreviewArray.push({ id: v4() + '', name: image.name, src, origin: image })
             })
           }
           setImages(imagePreviewArray)

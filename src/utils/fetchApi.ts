@@ -8,7 +8,7 @@ class Http {
   constructor() {
     this.requestRefreshToken = null
     this.instance = axios.create({
-      baseURL: 'http://localhost:3001/api/',
+      baseURL: 'http://localhost:3105/api/',
       timeout: 10000
     })
     this.instance.interceptors.request.use(
@@ -29,8 +29,9 @@ class Http {
             ? this.requestRefreshToken
             : handleRefreshToken().finally(() => (this.requestRefreshToken = null))
           return this.requestRefreshToken.then(() => this.instance(error.response.config))
+        } else {
+          return Promise.reject(error)
         }
-        return Promise.reject(error)
       }
     )
   }

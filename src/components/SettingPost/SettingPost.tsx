@@ -5,22 +5,23 @@ import { faBookmark, faEllipsis, faPencil, faTrash } from '@fortawesome/free-sol
 import { confirmAlert } from 'react-confirm-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '~/store'
-import { deletePosts } from '~/features/posts/postsSlice'
+import { deletePost, startEditing } from '~/features/post/postSlice'
 import fetchApi from '~/utils/fetchApi'
 import { toast } from 'react-toastify'
-import { Posts } from '~/types'
+import { FilePreview, Post } from '~/types'
+import { deleteFile } from '~/utils/firebase'
 
 interface Props {
-  posts: Posts
+  post: Post
 }
 
-export default function SettingPosts(props: Props) {
-  const { posts } = props
+export default function SettingPost(props: Props) {
+  const { post } = props
   const userData = useSelector((state: RootState) => state.userData)
   const [isOpenSetting, setOpenSetting] = useState<boolean>(false)
   const dispatch = useDispatch()
 
-  const handleDeletePosts = () => {
+  const handleDeletePost = () => {
     confirmAlert({
       title: 'Xác nhận để xoá bài viết',
       message: 'Bạn có chắc là muốn xoá bài viết ?',
@@ -28,9 +29,19 @@ export default function SettingPosts(props: Props) {
         {
           label: 'Đồng ý',
           onClick: async () => {
-            dispatch(deletePosts(posts.id as number))
-            const result = (await fetchApi.delete(`posts/${posts.id}`)).data
+            const postDeleted = { ...post }
+            postDeleted.deleted = 1
+            dispatch(deletePost(postDeleted))
+            const result = (await fetchApi.delete(`post/${post.id}`)).data
             toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+            if ((post.images?.length as number) > 0) {
+              for await (const image of post.images as FilePreview[]) {
+                await deleteFile(image.name)
+              }
+            }
+            if (post.video?.name) {
+              await deleteFile(post.video.name)
+            }
           }
         },
         {
@@ -38,6 +49,11 @@ export default function SettingPosts(props: Props) {
         }
       ]
     })
+  }
+
+  const handleEditingPost = () => {
+    dispatch(startEditing(post))
+    setOpenSetting(false)
   }
 
   return (
@@ -56,20 +72,23 @@ export default function SettingPosts(props: Props) {
           >
             <button
               className={`w-full flex items-center justify-start px-4 py-2 hover:bg-input-color ${
-                userData.id === posts.id ? 'mb-2' : ''
+                userData.id === post.userId ? 'mb-2' : ''
               }`}
             >
               <FontAwesomeIcon icon={faBookmark} />
               <span className='ml-2'>Lưu bài viết</span>
             </button>
-            {userData.id === posts?.userId && (
+            {userData.id === post?.userId && (
               <>
-                <button className='w-full flex items-center justify-start px-4 py-2 mb-2 hover:bg-input-color'>
+                <button
+                  onClick={handleEditingPost}
+                  className='w-full flex items-center justify-start px-4 py-2 mb-2 hover:bg-input-color'
+                >
                   <FontAwesomeIcon icon={faPencil} />
                   <span className='ml-2'>Chỉnh sửa bài viết</span>
                 </button>
                 <button
-                  onClick={handleDeletePosts}
+                  onClick={handleDeletePost}
                   className='w-full flex items-center justify-start px-4 py-2 hover:bg-input-color'
                 >
                   <FontAwesomeIcon icon={faTrash} />

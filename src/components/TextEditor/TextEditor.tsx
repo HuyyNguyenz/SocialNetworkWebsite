@@ -5,18 +5,27 @@ import userImg from '~/assets/images/user.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faImage } from '@fortawesome/free-regular-svg-icons'
 import { faC, faFileVideo } from '@fortawesome/free-solid-svg-icons'
-import Skeleton from 'react-loading-skeleton'
-import { FilePreview, Posts } from '~/types'
+import { Comment, FilePreview, Post } from '~/types'
 import SectionPreview from '../SectionPreview'
 import { toast } from 'react-toastify'
 import useFileValidation from '~/hooks/useFileValidation'
-import { uploadFile } from '~/utils/firebase'
+import { deleteFile, uploadFile } from '~/utils/firebase'
 import fetchApi from '~/utils/fetchApi'
-import { setPostsList } from '~/features/posts/postsSlice'
+import { cancelEditing, setPostList } from '~/features/post/postSlice'
+import { useParams } from 'react-router-dom'
+import { setCommentList } from '~/features/comment/commentSlice'
+import Loading from '../Loading'
 
-export default function TextEditor() {
+interface Props {
+  comment: boolean
+}
+
+export default function TextEditor(props: Props) {
+  const { comment } = props
+  const { postId } = useParams()
   const userData = useSelector((state: RootState) => state.userData)
-  const initialPosts: Posts = {
+  const editingPost = useSelector((state: RootState) => state.postList.editingPost)
+  const initialPost: Post = {
     content: '',
     createdAt: '',
     userId: 0,
@@ -25,41 +34,54 @@ export default function TextEditor() {
     images: undefined,
     video: undefined
   }
-  const [posts, setPosts] = useState<Posts>(initialPosts)
+  const [post, setPost] = useState<Post>(initialPost)
   const [isLoading, setLoading] = useState<boolean>(false)
   const dispatch = useDispatch()
   const [images, video, error, handleValidation] = useFileValidation()
   const textInput = document.getElementById('textInput')
+  const errorTextInput = document.querySelector('.error-text-input') as HTMLSpanElement
   const btnSubmit = document.getElementById('btnSubmit')
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPosts((prev) => ({ ...prev, content: prev.content === '' ? event.target.value.trim() : event.target.value }))
+    setPost((prev) => ({ ...prev, content: prev.content === '' ? event.target.value.trim() : event.target.value }))
     if (event.target.value.length > 100) {
       textInput?.classList.add('h-[10rem]')
+      if (event.target.value.length === 400) {
+        errorTextInput.innerText = `${comment ? 'Bình luận' : 'Bài viết'} đã đạt tối đa 400 ký tự`
+      } else {
+        errorTextInput.innerText = ''
+      }
     } else {
       textInput?.classList.remove('h-[10rem]')
+      errorTextInput.innerText = ''
     }
   }
 
   const handleSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setPosts((prev) => ({ ...prev, type: event.target.value }))
+    setPost((prev) => ({ ...prev, type: event.target.value }))
   }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     handleValidation(event)
   }
 
-  const handleDeleteImage = (id: string) => {
+  const handleDelete = (id: string) => {
     if (id === '') {
       URL.revokeObjectURL(video.src)
       video.name = ''
       video.src = ''
-      setPosts((prev) => ({ ...prev, video }))
+      video.url = ''
+      setPost((prev) => ({ ...prev, video }))
     } else {
-      const index = images.findIndex((item) => item.id === id)
-      URL.revokeObjectURL(images[index].src)
-      images.splice(index, 1)
-      setPosts((prev) => ({ ...prev, images }))
+      if (editingPost !== null) {
+        const images = Array.from(post.images as FilePreview[]).filter((image) => image.id !== id)
+        setPost((prev) => ({ ...prev, images }))
+      } else {
+        const index = images.findIndex((item) => item.id === id)
+        URL.revokeObjectURL(images[index].src)
+        images.splice(index, 1)
+        setPost((prev) => ({ ...prev, images }))
+      }
     }
   }
 
@@ -70,22 +92,49 @@ export default function TextEditor() {
 
   const handleUploadFile = async () => {
     setLoading(true)
-    if (posts.images) {
-      for await (const image of posts.images) {
-        const url = await uploadFile(image.origin as File, 'images')
-        image.url = url
+    if (images.length > 0) {
+      for await (const image of images) {
+        const result = await uploadFile(image.origin as File, 'images')
+        image.url = result.url
+        image.name = result.pathName
+        image.src = ''
       }
     }
-    if (posts.video?.name) {
-      const url = await uploadFile(posts.video?.origin as File, 'videos')
-      video.url = url
+    if (video.name) {
+      const result = await uploadFile(video.origin as File, 'videos')
+      video.url = result.url
+      video.name = result.pathName
+      video.src = ''
     }
-    setPosts((prev) => ({ ...prev, images, video }))
+    setPost((prev) => ({ ...prev, images, video }))
+  }
+
+  const handleGetPostList = async () => {
+    const result: Post[] = (await fetchApi.get('posts')).data
+    dispatch(setPostList(result))
+  }
+
+  const handleCancelEditing = () => {
+    dispatch(cancelEditing())
+    textInput?.classList.remove('h-[10rem]')
+    errorTextInput.innerText = ''
+    video.name = ''
+    video.src = ''
+    delete video.url
+    delete video.origin
+    images.splice(0, images.length)
+    setPost(initialPost)
+    setLoading(false)
+  }
+
+  const handleGetCommentList = async () => {
+    const result: Comment[] = (await fetchApi.get('comments')).data
+    dispatch(setCommentList(result))
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (posts.content || (posts.images?.length as number) > 0 || posts.video?.name) {
+    if (post.content || (post.images?.length as number) > 0 || post.video?.name) {
       const date = new Date()
       const createdAt = `${date.getDate() < 10 ? '0' + date.getDate() : date.getDate()}/${
         date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
@@ -94,43 +143,57 @@ export default function TextEditor() {
       }`
       const userId = userData.id
       try {
-        await handleUploadFile()
-        const result = (await fetchApi.post('posts', { ...posts, createdAt, userId })).data
-        toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
-        video.name = ''
-        video.src = ''
-        delete video.url
-        delete video.origin
-        images.splice(0, images.length)
-        setPosts(initialPosts)
-        setLoading(false)
-        handleGetPostsList()
+        if (editingPost !== null) {
+          setLoading(true)
+          if (images.length > 0 || video.name) {
+            if (images.length > 0 && (editingPost.images?.length as number) > 0) {
+              for await (const image of editingPost.images as FilePreview[]) {
+                await deleteFile(image.name)
+              }
+            }
+            if (video.name && editingPost.video?.name) {
+              await deleteFile(editingPost.video?.name)
+            }
+            await handleUploadFile()
+          }
+          const result = (await fetchApi.put(`post/${post.id}`, { ...post, modifiedAt: createdAt, userId })).data
+          toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+        } else {
+          await handleUploadFile()
+          if (comment) {
+            const { type, communityId, ...data } = post
+            const comment = { ...data, postId }
+            const result = (await fetchApi.post('comment', { ...comment, createdAt, userId })).data
+            toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+          } else {
+            const result = (await fetchApi.post('post', { ...post, createdAt, userId })).data
+            toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+          }
+        }
+        handleCancelEditing()
+        handleGetPostList()
+        handleGetCommentList()
       } catch (error: any) {
         throw error.response
       }
     }
   }
 
-  const handleGetPostsList = async () => {
-    const result: Posts[] = (await fetchApi.get('posts')).data
-    dispatch(setPostsList(result))
-  }
-
   useEffect(() => {
-    if ((posts.images?.length as number) > 0 || posts.content || posts.video?.name) {
+    if ((post.images?.length as number) > 0 || post.content || post.video?.name) {
       btnSubmit?.classList.remove('cursor-not-allowed', 'opacity-20')
       btnSubmit?.classList.add('hover:opacity-90')
     } else {
       btnSubmit?.classList.remove('hover:opacity-90')
       btnSubmit?.classList.add('cursor-not-allowed', 'opacity-20')
     }
-  }, [posts, btnSubmit])
+  }, [post, btnSubmit])
 
   useEffect(() => {
     if (error.image) {
       toast(error.image, { type: 'info', autoClose: 2000, position: 'bottom-center' })
     } else {
-      setPosts((prev) => ({ ...prev, images }))
+      setPost((prev) => ({ ...prev, images }))
     }
   }, [error.image, images])
 
@@ -138,29 +201,40 @@ export default function TextEditor() {
     if (error.video) {
       toast(error.video, { type: 'info', autoClose: 2000, position: 'bottom-center' })
     } else {
-      setPosts((prev) => ({ ...prev, video }))
+      setPost((prev) => ({ ...prev, video }))
     }
   }, [error.video, video])
 
   useEffect(() => {
     return () => {
-      if (posts.images) {
-        posts.images.length > 0 && posts.images.forEach((image) => URL.revokeObjectURL(image.src))
+      if (post.images) {
+        post.images.length > 0 && post.images.forEach((image) => URL.revokeObjectURL(image.src))
       }
     }
-  }, [posts.images])
+  }, [post.images])
 
   useEffect(() => {
     return () => {
-      if (posts.video) {
-        posts.video.name && URL.revokeObjectURL(posts.video.src)
+      if (post.video) {
+        post.video.name && URL.revokeObjectURL(post.video.src)
       }
     }
-  }, [posts.video])
+  }, [post.video])
+
+  useEffect(() => {
+    if (editingPost !== null) {
+      setPost(editingPost)
+      window.scrollTo(0, 0)
+    }
+  }, [editingPost])
 
   return (
     <>
-      <div className='flex items-start justify-start bg-white border border-solid border-border-color rounded-md py-4 px-8 text-14'>
+      <div
+        className={`${
+          comment ? '' : 'py-4 px-8 border border-solid border-border-color rounded-md'
+        } flex items-start justify-start bg-white text-14`}
+      >
         <button className='mr-4'>
           <img
             className='w-8 h-8 object-cover rounded-full'
@@ -169,33 +243,38 @@ export default function TextEditor() {
           />
         </button>
         <div className='w-full'>
-          <form onSubmit={handleSubmit}>
-            <select
-              onChange={handleSelect}
-              value={posts.type}
-              name='typePosts'
-              id='typePosts'
-              className='outline-none pr-2 mb-2 text-primary-color font-bold cursor-pointer'
-            >
-              <option value='public'>Công khai</option>
-              <option value='private'>Riêng tư</option>
-            </select>
+          <form method='POST' onSubmit={handleSubmit} onReset={handleCancelEditing}>
+            {comment ? (
+              ''
+            ) : (
+              <select
+                onChange={handleSelect}
+                value={post.type}
+                name='typePost'
+                id='typePost'
+                className='outline-none pr-2 mb-2 text-primary-color font-bold cursor-pointer'
+              >
+                <option value='public'>Công khai</option>
+                <option value='private'>Riêng tư</option>
+              </select>
+            )}
 
             <textarea
               maxLength={400}
               onChange={handleChange}
-              value={posts.content}
+              value={post.content}
               spellCheck={false}
               name='textInput'
               id='textInput'
               className='w-full rounded-md border border-solid border-border-color outline-none px-4 pt-2 resize-none scroll-hidden text-left'
-              placeholder='Bạn đang cảm thấy như thế nào ?'
+              placeholder={comment ? 'Hãy nêu cảm nghĩ của bạn' : 'Bạn đang cảm thấy như thế nào ?'}
             />
+            <span className='text-red-600 error-text-input'></span>
 
-            {(posts.images?.length as number) > 0 && (
-              <SectionPreview data={posts.images as FilePreview[]} deleteItem={handleDeleteImage} />
+            {(post.images?.length as number) > 0 && (
+              <SectionPreview data={post.images as FilePreview[]} deleteItem={handleDelete} />
             )}
-            {posts.video?.name && <SectionPreview data={posts.video as FilePreview} deleteItem={handleDeleteImage} />}
+            {post.video?.name && <SectionPreview data={post.video as FilePreview} deleteItem={handleDelete} />}
 
             <div className='flex items-center justify-end text-primary-color text-16 font-semibold'>
               <div className='flex items-center justify-start'>
@@ -206,7 +285,7 @@ export default function TextEditor() {
                   <FontAwesomeIcon icon={faImage} />
                 </label>
                 <input
-                  multiple
+                  multiple={comment ? false : true}
                   onChange={handleFileChange}
                   onClick={handleClearPreValue}
                   type='file'
@@ -231,6 +310,11 @@ export default function TextEditor() {
                   className='hidden'
                 />
               </div>
+              {editingPost && (
+                <button type='reset' id='btnReset' className='ml-8 px-2 py-1'>
+                  Huỷ
+                </button>
+              )}
               {isLoading ? (
                 <button
                   disabled
@@ -244,19 +328,14 @@ export default function TextEditor() {
                   id='btnSubmit'
                   className='ml-8 text-white bg-gradient-to-r from-primary-color to-secondary-color rounded-md px-6 py-1 opacity-20 cursor-not-allowed'
                 >
-                  Đăng bài
+                  {editingPost ? 'Cập nhật' : comment ? 'Bình luận' : 'Đăng bài'}
                 </button>
               )}
             </div>
           </form>
         </div>
       </div>
-      {isLoading && (
-        <div className='flex items-start justify-start w-full py-4 px-8'>
-          <Skeleton circle className='w-8 h-8 mr-4' />
-          <Skeleton count={5} className='w-[41rem]' />
-        </div>
-      )}
+      {!comment && isLoading && <Loading quantity={1} />}
     </>
   )
 }

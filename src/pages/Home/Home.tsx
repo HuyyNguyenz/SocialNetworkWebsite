@@ -1,40 +1,51 @@
 import { Suspense, lazy, useEffect } from 'react'
-import Skeleton from 'react-loading-skeleton'
 import { useDispatch, useSelector } from 'react-redux'
+import Loading from '~/components/Loading'
 import TextEditor from '~/components/TextEditor'
-import { setPostsList } from '~/features/posts/postsSlice'
 import DefaultLayout from '~/layouts/DefaultLayout'
 import { RootState } from '~/store'
+import { setPostList } from '~/features/post/postSlice'
 import fetchApi from '~/utils/fetchApi'
+import { setCommentList } from '~/features/comment/commentSlice'
 
-const Posts = lazy(() => import('~/components/Posts'))
+const PostList = lazy(() => import('~/components/PostList'))
 
 export default function Home() {
-  const postsList = useSelector((state: RootState) => state.postsList)
+  const postList = useSelector((state: RootState) => state.postList.data)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (postsList.length === 0) {
-      const controller = new AbortController()
-      fetchApi.get('posts', { signal: controller.signal }).then((res) => {
-        dispatch(setPostsList(res.data))
-      })
-      return () => {
-        controller.abort()
-      }
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchApi.get('posts', { signal: controller.signal }).then((res) => {
+      dispatch(setPostList(res.data))
+    })
+    return () => {
+      controller.abort()
     }
-  }, [postsList, dispatch])
+  }, [dispatch])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchApi.get('comments', { signal: controller.signal }).then((res) => {
+      dispatch(setCommentList(res.data))
+    })
+    return () => {
+      controller.abort()
+    }
+  }, [dispatch])
 
   return (
     <DefaultLayout>
       <main>
         <div className='relative w-[48rem] max-w-3xl my-0 mx-auto pt-36 pb-10'>
-          <TextEditor />
-          {postsList.length > 0 && (
-            <Suspense fallback={<Skeleton className='h-[25rem] mt-8' />}>
-              <Posts postsList={postsList} />
-            </Suspense>
-          )}
+          <TextEditor comment={false} />
+          <Suspense fallback={<Loading quantity={3} />}>
+            <PostList postList={postList} />
+          </Suspense>
         </div>
       </main>
     </DefaultLayout>
