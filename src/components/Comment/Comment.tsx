@@ -1,20 +1,21 @@
 import { useEffect } from 'react'
-import { faEllipsis, faReply, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
+import { faCrown, faReply, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import moment from 'moment'
 import userImg from '~/assets/images/user.png'
 import { Comment, User } from '~/types'
 import { useSelector } from 'react-redux'
 import { RootState } from '~/store'
-import Tippy from '@tippyjs/react/headless'
+import SettingComment from '../SettingComment'
 
 interface Props {
   comment: Comment
   author: User
+  authorPostId: number
 }
 
 export default function Comment(props: Props) {
-  const { comment, author } = props
+  const { comment, author, authorPostId } = props
   const userData = useSelector((state: RootState) => state.userData)
   const createdAt = moment(comment.createdAt, 'DD/MM/YYYY hh:mm').fromNow()
   const modifiedAt = moment(comment.modifiedAt, 'DD/MM/YYYY hh:mm').fromNow()
@@ -37,8 +38,9 @@ export default function Comment(props: Props) {
               <span className='text-primary-color font-bold'>
                 {author.firstName} {author.lastName}
               </span>
+              {author.id === authorPostId && <FontAwesomeIcon icon={faCrown} className='ml-2 text-crown-color' />}
               <span className='ml-2'>{createdAt}</span>
-              {comment.modifiedAt && <span className='ml-2'>| Edited {modifiedAt}</span>}
+              {comment.modifiedAt && <span className='ml-2 opacity-60'>| Edited {modifiedAt}</span>}
             </div>
             <p className='break-all'>{comment.content}</p>
           </div>
@@ -67,19 +69,7 @@ export default function Comment(props: Props) {
               <FontAwesomeIcon icon={faReply} className='hover:bg-hover-color rounded-full p-2' />
               <span className='ml-2 text-14'>0</span>
             </button>
-            {userData.id === comment.userId && (
-              <Tippy
-                render={(attrs) => (
-                  <div className='box' tabIndex={-1} {...attrs}>
-                    My tippy box
-                  </div>
-                )}
-              >
-                <button className='flex items-center justify-start'>
-                  <FontAwesomeIcon icon={faEllipsis} className='hover:bg-hover-color rounded-full p-2' />
-                </button>
-              </Tippy>
-            )}
+            {userData.id === comment.userId && <SettingComment comment={comment} />}
           </div>
         </div>
       </div>

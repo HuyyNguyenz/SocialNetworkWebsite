@@ -13,7 +13,8 @@ export default {
         'text-color': '#3E3E3E',
         'hover-color': '#EEEEEE',
         'input-color': '#F9F9F9',
-        'border-color': '#DADADA'
+        'border-color': '#DADADA',
+        'crown-color': '#FBAB17'
       },
       fontSize: {
         14: '14px',

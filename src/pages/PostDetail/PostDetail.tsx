@@ -22,14 +22,16 @@ export default function PostDetail() {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    const controller = new AbortController()
-    fetchApi.get('posts', { signal: controller.signal }).then((res) => {
-      dispatch(setPostList(res.data))
-    })
-    return () => {
-      controller.abort()
+    if (postList.length === 0) {
+      const controller = new AbortController()
+      fetchApi.get('posts', { signal: controller.signal }).then((res) => {
+        dispatch(setPostList(res.data))
+      })
+      return () => {
+        controller.abort()
+      }
     }
-  }, [dispatch])
+  }, [postList, dispatch])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -75,9 +77,9 @@ export default function PostDetail() {
   return (
     <DefaultLayout>
       <main>
-        <div className='relative w-[48rem] max-w-3xl my-0 mx-auto pt-28 pb-10'>
+        <div className='w-[48rem] max-w-3xl my-0 mx-auto pt-28 pb-10'>
           {authorData && post && <PostItem post={post} author={authorData} detail={true} />}
-          <CommentList commentList={comments} users={users} />
+          <CommentList commentList={comments} users={users} authorPostId={Number(post?.userId)} />
         </div>
       </main>
     </DefaultLayout>

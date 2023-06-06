@@ -5,7 +5,7 @@ export default function NotFound() {
     <div className='w-full relative min-h-screen bg-gradient-to-br from-primary-color to-secondary-color'>
       <div className='center text-white text-center text-32'>
         <div>
-          <h1 className='font-black'>Lỗi 404</h1>
+          <h1 className='font-black uppercase'>Lỗi 404</h1>
           <span className='text-28'>Không tìm thấy trang</span>
         </div>
         <NavLink to='/'>

@@ -13,8 +13,9 @@ import { deleteFile, uploadFile } from '~/utils/firebase'
 import fetchApi from '~/utils/fetchApi'
 import { cancelEditing, setPostList } from '~/features/post/postSlice'
 import { useParams } from 'react-router-dom'
-import { setCommentList } from '~/features/comment/commentSlice'
+import { cancelEditingComment, setCommentList } from '~/features/comment/commentSlice'
 import Loading from '../Loading'
+import Skeleton from 'react-loading-skeleton'
 
 interface Props {
   comment: boolean
@@ -25,6 +26,7 @@ export default function TextEditor(props: Props) {
   const { postId } = useParams()
   const userData = useSelector((state: RootState) => state.userData)
   const editingPost = useSelector((state: RootState) => state.postList.editingPost)
+  const editingComment = useSelector((state: RootState) => state.commentList.editingComment)
   const initialPost: Post = {
     content: '',
     createdAt: '',
@@ -115,7 +117,7 @@ export default function TextEditor(props: Props) {
   }
 
   const handleCancelEditing = () => {
-    dispatch(cancelEditing())
+    dispatch(comment ? cancelEditingComment() : cancelEditing())
     textInput?.classList.remove('h-[10rem]')
     errorTextInput.innerText = ''
     video.name = ''
@@ -157,6 +159,26 @@ export default function TextEditor(props: Props) {
             await handleUploadFile()
           }
           const result = (await fetchApi.put(`post/${post.id}`, { ...post, modifiedAt: createdAt, userId })).data
+          toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+        }
+        if (editingComment !== null && comment) {
+          setLoading(true)
+          if (images.length > 0 || video.name) {
+            if (images.length > 0 && (editingComment.images?.length as number) > 0) {
+              for await (const image of editingComment.images as FilePreview[]) {
+                await deleteFile(image.name)
+              }
+            }
+            if (video.name && editingComment.video?.name) {
+              await deleteFile(editingComment.video?.name)
+            }
+            await handleUploadFile()
+          }
+          const { type, communityId, ...data } = post
+          const comment = { ...data, postId }
+          const result = (
+            await fetchApi.put(`comment/${editingComment.id}`, { ...comment, modifiedAt: createdAt, userId })
+          ).data
           toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
         } else {
           await handleUploadFile()
@@ -228,6 +250,13 @@ export default function TextEditor(props: Props) {
     }
   }, [editingPost])
 
+  useEffect(() => {
+    if (comment && editingComment !== null) {
+      setPost({ ...editingComment, communityId: 0, type: '' })
+      window.scrollTo(0, 9999)
+    }
+  }, [editingComment, comment])
+
   return (
     <>
       <div
@@ -271,46 +300,58 @@ export default function TextEditor(props: Props) {
             />
             <span className='text-red-600 error-text-input'></span>
 
-            {(post.images?.length as number) > 0 && (
-              <SectionPreview data={post.images as FilePreview[]} deleteItem={handleDelete} />
+            {isLoading ? (
+              <Skeleton className='h-[25rem] mb-2' />
+            ) : (
+              <>
+                {(post.images?.length as number) > 0 && (
+                  <SectionPreview data={post.images as FilePreview[]} deleteItem={handleDelete} />
+                )}
+                {post.video?.name && <SectionPreview data={post.video as FilePreview} deleteItem={handleDelete} />}
+              </>
             )}
-            {post.video?.name && <SectionPreview data={post.video as FilePreview} deleteItem={handleDelete} />}
 
             <div className='flex items-center justify-end text-primary-color text-16 font-semibold'>
-              <div className='flex items-center justify-start'>
-                <label
-                  htmlFor='images'
-                  className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color to-secondary-color hover:text-white cursor-pointer'
-                >
-                  <FontAwesomeIcon icon={faImage} />
-                </label>
-                <input
-                  multiple={comment ? false : true}
-                  onChange={handleFileChange}
-                  onClick={handleClearPreValue}
-                  type='file'
-                  name='images'
-                  id='images'
-                  className='hidden'
-                />
-              </div>
-              <div className='ml-8 flex items-center justify-start'>
-                <label
-                  htmlFor='video'
-                  className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color to-secondary-color hover:text-white cursor-pointer'
-                >
-                  <FontAwesomeIcon icon={faFileVideo} />
-                </label>
-                <input
-                  onChange={handleFileChange}
-                  onClick={handleClearPreValue}
-                  type='file'
-                  name='video'
-                  id='video'
-                  className='hidden'
-                />
-              </div>
-              {editingPost && (
+              {isLoading ? (
+                ''
+              ) : (
+                <>
+                  <div className='flex items-center justify-start'>
+                    <label
+                      htmlFor='images'
+                      className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color to-secondary-color hover:text-white cursor-pointer'
+                    >
+                      <FontAwesomeIcon icon={faImage} />
+                    </label>
+                    <input
+                      multiple={comment ? false : true}
+                      onChange={handleFileChange}
+                      onClick={handleClearPreValue}
+                      type='file'
+                      name='images'
+                      id='images'
+                      className='hidden'
+                    />
+                  </div>
+                  <div className='ml-8 flex items-center justify-start'>
+                    <label
+                      htmlFor='video'
+                      className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color to-secondary-color hover:text-white cursor-pointer'
+                    >
+                      <FontAwesomeIcon icon={faFileVideo} />
+                    </label>
+                    <input
+                      onChange={handleFileChange}
+                      onClick={handleClearPreValue}
+                      type='file'
+                      name='video'
+                      id='video'
+                      className='hidden'
+                    />
+                  </div>
+                </>
+              )}
+              {(editingPost || editingComment) && !isLoading && (
                 <button type='reset' id='btnReset' className='ml-8 px-2 py-1'>
                   Huỷ
                 </button>
@@ -328,7 +369,7 @@ export default function TextEditor(props: Props) {
                   id='btnSubmit'
                   className='ml-8 text-white bg-gradient-to-r from-primary-color to-secondary-color rounded-md px-6 py-1 opacity-20 cursor-not-allowed'
                 >
-                  {editingPost ? 'Cập nhật' : comment ? 'Bình luận' : 'Đăng bài'}
+                  {editingPost || editingComment ? 'Cập nhật' : comment ? 'Bình luận' : 'Đăng bài'}
                 </button>
               )}
             </div>

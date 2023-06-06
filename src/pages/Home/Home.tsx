@@ -41,7 +41,7 @@ export default function Home() {
   return (
     <DefaultLayout>
       <main>
-        <div className='relative w-[48rem] max-w-3xl my-0 mx-auto pt-36 pb-10'>
+        <div className='w-[48rem] max-w-3xl my-0 mx-auto pt-36 pb-10'>
           <TextEditor comment={false} />
           <Suspense fallback={<Loading quantity={3} />}>
             <PostList postList={postList} />

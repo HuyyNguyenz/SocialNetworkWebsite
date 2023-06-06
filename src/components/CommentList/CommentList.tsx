@@ -1,22 +1,51 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useState, Fragment } from 'react'
 import { Comment as CommentType, User } from '~/types'
 import TextEditor from '../TextEditor'
 import Loading from '../Loading'
-// import Comment from '../Comment'
 
 interface Props {
   commentList: CommentType[]
   users: User[]
+  authorPostId: number
 }
 
 const Comment = lazy(() => import('../Comment'))
 
 export default function CommentList(props: Props) {
-  const { commentList, users } = props
+  const { commentList, users, authorPostId } = props
+  const [typeSort, setTypeSort] = useState<string>('new')
+  const quantityComment = commentList.filter((comment) => comment.deleted === 0)
+
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setTypeSort(event.target.value)
+  }
 
   const handleFindAuthor = (id: number) => {
     return users.find((user) => user.id === id) as User
   }
+
+  const handleSortNewDate = (commentList: CommentType[]) => {
+    const newCommentList = commentList
+      .slice()
+      .sort((a, b) => {
+        const createdAt1 = a.createdAt.split(' ')[0]
+        const createdAt2 = b.createdAt.split(' ')[0]
+        return new Date(createdAt1).getTime() - new Date(createdAt2).getTime()
+      })
+      .reverse()
+    return newCommentList
+  }
+
+  const handleSortOldDate = (commentList: CommentType[]) => {
+    const newCommentList = commentList.slice().sort((a, b) => {
+      const createdAt1 = a.createdAt.split(' ')[0]
+      const createdAt2 = b.createdAt.split(' ')[0]
+      return new Date(createdAt1).getTime() - new Date(createdAt2).getTime()
+    })
+    return newCommentList
+  }
+
+  const commentListSorted = typeSort === 'new' ? handleSortNewDate(commentList) : handleSortOldDate(commentList)
 
   return (
     <section>
@@ -24,9 +53,11 @@ export default function CommentList(props: Props) {
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center justify-start text-18 text-title-color'>
             <h2 className='font-bold'>Bình luận</h2>
-            <span className='ml-2'>({commentList.length})</span>
+            <span className='ml-2'>({quantityComment.length})</span>
           </div>
           <select
+            onChange={handleChange}
+            value={typeSort}
             name='sortByDate'
             id='sortByDate'
             className='text-primary-color font-bold pr-2 outline-none cursor-pointer'
@@ -37,12 +68,16 @@ export default function CommentList(props: Props) {
         </div>
         {commentList.length > 0 &&
           users.length > 0 &&
-          commentList.map((comment) => {
+          commentListSorted.map((comment) => {
             const author = handleFindAuthor(comment.userId)
             return (
-              <Suspense fallback={<Loading quantity={1} />} key={comment.id}>
-                <Comment comment={comment} author={author} />
-              </Suspense>
+              <Fragment key={comment.id}>
+                {comment.deleted === 0 && (
+                  <Suspense fallback={<Loading quantity={1} />}>
+                    <Comment comment={comment} author={author} authorPostId={authorPostId} />
+                  </Suspense>
+                )}
+              </Fragment>
             )
           })}
         <TextEditor comment={true} />

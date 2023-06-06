@@ -71,7 +71,7 @@ export default function SettingPost(props: Props) {
             {...attrs}
           >
             <button
-              className={`w-full flex items-center justify-start px-4 py-2 hover:bg-input-color ${
+              className={`w-full flex items-center justify-start px-4 py-2 hover:bg-hover-color ${
                 userData.id === post.userId ? 'mb-2' : ''
               }`}
             >
@@ -82,14 +82,14 @@ export default function SettingPost(props: Props) {
               <>
                 <button
                   onClick={handleEditingPost}
-                  className='w-full flex items-center justify-start px-4 py-2 mb-2 hover:bg-input-color'
+                  className='w-full flex items-center justify-start px-4 py-2 mb-2 hover:bg-hover-color'
                 >
                   <FontAwesomeIcon icon={faPencil} />
                   <span className='ml-2'>Chỉnh sửa bài viết</span>
                 </button>
                 <button
                   onClick={handleDeletePost}
-                  className='w-full flex items-center justify-start px-4 py-2 hover:bg-input-color'
+                  className='w-full flex items-center justify-start px-4 py-2 hover:bg-hover-color'
                 >
                   <FontAwesomeIcon icon={faTrash} />
                   <span className='ml-2'>Xoá bài viết</span>

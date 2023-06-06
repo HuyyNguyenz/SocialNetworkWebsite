@@ -6,6 +6,7 @@ import NotFound from '~/pages/NotFound'
 import PostDetail from '~/pages/PostDetail'
 import Recovery from '~/pages/Recovery'
 import Register from '~/pages/Register'
+import UserProfile from '~/pages/UserProfile'
 import { Router } from '~/types'
 
 const publicRoutes: Router[] = [
@@ -16,6 +17,7 @@ const publicRoutes: Router[] = [
   { path: '/communities', component: Communities },
   { path: '/recovery', component: Recovery },
   { path: '/:author/post/:postId', component: PostDetail },
+  { path: '/profile', component: UserProfile },
   { path: '/*', component: NotFound }
 ]
 

@@ -19,7 +19,8 @@ export default function PostItem(props: Props) {
   const comments = useSelector((state: RootState) => state.commentList.data)
   const createdAt = moment(post.createdAt, 'DD/MM/YYYY hh:mm').fromNow()
   const modifiedAt = moment(post.modifiedAt, 'DD/MM/YYYY hh:mm').fromNow()
-  const quantityComment = comments.length > 0 && comments.filter((comment) => comment.postId === post.id)
+  const quantityComment =
+    comments.length > 0 && comments.filter((comment) => comment.postId === post.id && comment.deleted === 0)
 
   return (
     <div

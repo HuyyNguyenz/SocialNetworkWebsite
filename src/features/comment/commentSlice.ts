@@ -23,16 +23,16 @@ const commentSlice = createSlice({
       const newCommentList = current(state.data).filter((comment) => comment.id !== id)
       state.data = [...newCommentList, action.payload]
     },
-    startEditing: (state, action: PayloadAction<Comment>) => {
+    startEditingComment: (state, action: PayloadAction<Comment>) => {
       const comment = action.payload
       state.editingComment = comment
     },
-    cancelEditing: (state) => {
+    cancelEditingComment: (state) => {
       state.editingComment = null
     }
   }
 })
 
-export const { setCommentList, deleteComment, startEditing, cancelEditing } = commentSlice.actions
+export const { setCommentList, deleteComment, startEditingComment, cancelEditingComment } = commentSlice.actions
 const commentReducer = commentSlice.reducer
 export default commentReducer
