@@ -17,7 +17,7 @@ const publicRoutes: Router[] = [
   { path: '/communities', component: Communities },
   { path: '/recovery', component: Recovery },
   { path: '/:author/post/:postId', component: PostDetail },
-  { path: '/profile', component: UserProfile },
+  { path: '/profile/:userId/posts', component: UserProfile },
   { path: '/*', component: NotFound }
 ]
 

@@ -160,8 +160,7 @@ export default function TextEditor(props: Props) {
           }
           const result = (await fetchApi.put(`post/${post.id}`, { ...post, modifiedAt: createdAt, userId })).data
           toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
-        }
-        if (editingComment !== null && comment) {
+        } else if (editingComment !== null && comment) {
           setLoading(true)
           if (images.length > 0 || video.name) {
             if (images.length > 0 && (editingComment.images?.length as number) > 0) {
@@ -262,11 +261,11 @@ export default function TextEditor(props: Props) {
       <div
         className={`${
           comment ? '' : 'py-4 px-8 border border-solid border-border-color rounded-md'
-        } flex items-start justify-start bg-white text-14`}
+        } flex items-start justify-start bg-white text-14 ${comment ? '' : 'mb-8'}`}
       >
         <button className='mr-4'>
           <img
-            className='w-8 h-8 object-cover rounded-full'
+            className='w-8 h-8 object-cover rounded-md'
             src={userData.avatar ? userData.avatar : userImg}
             alt={`${userData.firstName} ${userData.lastName}`}
           />

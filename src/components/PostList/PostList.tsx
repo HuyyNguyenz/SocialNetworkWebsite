@@ -2,14 +2,20 @@ import { Fragment, useEffect, useState } from 'react'
 import { Post, User } from '~/types'
 import fetchApi from '~/utils/fetchApi'
 import PostItem from '../PostItem'
+import { useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { RootState } from '~/store'
 
 interface Props {
   postList: Post[]
+  profile: boolean
 }
 
 export default function PostList(props: Props) {
-  const { postList } = props
+  const { postList, profile } = props
   const [users, setUsers] = useState<User[]>([])
+  const { userId } = useParams()
+  const userData = useSelector((state: RootState) => state.userData)
 
   useEffect(() => {
     if (users.length === 0) {
@@ -43,7 +49,17 @@ export default function PostList(props: Props) {
         const author = handleFindAuthor(post.userId) as User
         return (
           <Fragment key={post.id}>
-            {post.type === 'public' && post.deleted === 0 && <PostItem post={post} author={author} detail={false} />}
+            {!profile && post.type === 'public' && post.deleted === 0 && (
+              <PostItem post={post} author={author} detail={false} />
+            )}
+            {profile && userId === author?.username && post.deleted === 0 && post.type === 'public' && (
+              <PostItem post={post} author={author} detail={false} />
+            )}
+            {profile &&
+              userId === author?.username &&
+              post.deleted === 0 &&
+              post.type === 'private' &&
+              userData.username === userId && <PostItem post={post} author={author} detail={false} />}
           </Fragment>
         )
       })}

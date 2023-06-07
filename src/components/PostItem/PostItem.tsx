@@ -24,19 +24,23 @@ export default function PostItem(props: Props) {
 
   return (
     <div
-      className={`w-full px-8 py-4 bg-white rounded-md text-14 text-text-color border border-solid border-border-color mt-8 ${
-        detail ? 'rounded-br-none rounded-bl-none' : ''
+      className={`w-full px-8 py-4 bg-white rounded-md text-14 text-text-color border border-solid border-border-color ${
+        detail ? 'rounded-br-none rounded-bl-none mt-8' : 'mb-8'
       }`}
     >
       <div className='flex items-center justify-between'>
         <div className='flex items-center justify-start'>
-          <img
-            className='w-8 h-8 rounded-full object-cover'
-            src={author?.avatar ? author?.avatar : userImg}
-            alt={author?.firstName + ' ' + author?.lastName}
-          />
+          <Link to={`/profile/${author && author.username}/posts`}>
+            <img
+              className='w-8 h-8 rounded-md object-cover'
+              src={author?.avatar ? author?.avatar : userImg}
+              alt={author?.firstName + ' ' + author?.lastName}
+            />
+          </Link>
           <div className='flex flex-col items-start justify-start ml-4'>
-            <span className='font-bold text-primary-color text-16'>{author?.firstName + ' ' + author?.lastName}</span>
+            <Link to={`/profile/${author && author.username}/posts`}>
+              <span className='font-bold text-primary-color text-16'>{author?.firstName + ' ' + author?.lastName}</span>
+            </Link>
             <div className='flex items-center justify-start'>
               <span className='mr-2'>{createdAt}</span>
               {post.type === 'public' ? (
@@ -65,7 +69,7 @@ export default function PostItem(props: Props) {
         </div>
 
         {post.video?.name && (
-          <div className='w-full h-[25rem]'>
+          <div className='w-full'>
             <video className='rounded-md' src={post.video?.url} controls>
               <track src={post.video?.url} kind='captions' srcLang='en' label='English' />
             </video>

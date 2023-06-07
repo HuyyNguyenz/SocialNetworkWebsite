@@ -41,10 +41,10 @@ export default function UserSetting() {
           {...attrs}
         >
           <ul className='text-14'>
-            <Link to={'/profile'}>
+            <Link to={`/profile/${userData.username}/posts`}>
               <li className='flex items-center justify-start py-2 px-4 my-2 cursor-pointer'>
                 <img
-                  className='w-8 h-8'
+                  className='w-8 h-8 object-cover rounded-md'
                   src={userData.avatar ? userData.avatar : userImg}
                   alt={userData.firstName + ' ' + userData.lastName}
                 />
@@ -72,7 +72,7 @@ export default function UserSetting() {
       )}
     >
       <button onClick={handleOpenMenu}>
-        <img src={userImg} alt='userImg' className='w-9 h-9 ml-4 rounded-full cursor-pointer' />
+        <img src={userImg} alt='userImg' className='w-9 h-9 ml-4 rounded-md object-cover cursor-pointer' />
       </button>
     </Tippy>
   )

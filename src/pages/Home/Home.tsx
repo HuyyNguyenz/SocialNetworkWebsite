@@ -44,7 +44,7 @@ export default function Home() {
         <div className='w-[48rem] max-w-3xl my-0 mx-auto pt-36 pb-10'>
           <TextEditor comment={false} />
           <Suspense fallback={<Loading quantity={3} />}>
-            <PostList postList={postList} />
+            <PostList postList={postList} profile={false} />
           </Suspense>
         </div>
       </main>

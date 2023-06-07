@@ -30,7 +30,7 @@ export default function Comment(props: Props) {
         <img
           src={author.avatar ? author.avatar : userImg}
           alt={author.firstName + ' ' + author.lastName}
-          className='w-8 h-8 object-cover rounded-full'
+          className='w-8 h-8 object-cover rounded-md'
         />
         <div className='ml-4'>
           <div className='flex flex-col items-start justify-start bg-input-color rounded-md border border-solid border-border-color py-2 px-4'>

@@ -43,7 +43,7 @@ export default function SectionPreview(props: Props) {
           )
         })}
       {(data as FilePreview).name && (
-        <div className='w-full h-[25rem] relative overflow-hidden'>
+        <div className='w-full relative overflow-hidden'>
           <video
             src={(data as FilePreview).src ? (data as FilePreview).src : (data as FilePreview).url}
             controls

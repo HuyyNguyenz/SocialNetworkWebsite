@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { faMessage, faBell, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import logo from '~/assets/images/logo.png'
@@ -6,8 +7,16 @@ import Navigation from '../Navigation'
 import UserSetting from '../UserSetting'
 
 export default function Header() {
+  useEffect(() => {
+    const headerElement = document.getElementById('header')
+    const handleScroll = () => {
+      window.scrollY > 200 ? headerElement?.classList.add('shadow-md') : headerElement?.classList.remove('shadow-md')
+    }
+    window.addEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <header className='fixed top-0 left-0 w-full z-50'>
+    <header id='header' className='fixed top-0 left-0 w-full z-50'>
       <div className='flex items-center justify-between bg-white h-14 max-h-14 py-2 px-4 border border-solid border-border-color'>
         <img src={logo} alt='logo' className='h-full object-cover' />
         <Search />
