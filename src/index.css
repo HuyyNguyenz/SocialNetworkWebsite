@@ -10,6 +10,10 @@
   .animation-btn {
     @apply bg-gradient-to-br from-secondary-color to-primary-color opacity-90 transition-all ease-in duration-200;
   }
+
+  .overlay {
+    @apply fixed top-0 left-0 w-screen h-screen bg-[rgba(0,0,0,.5)] z-50;
+  }
 }
 
 html {

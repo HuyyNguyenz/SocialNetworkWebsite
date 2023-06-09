@@ -265,8 +265,9 @@ export default function TextEditor(props: Props) {
       >
         <button className='mr-4'>
           <img
+            loading='lazy'
             className='w-8 h-8 object-cover rounded-md'
-            src={userData.avatar ? userData.avatar : userImg}
+            src={userData.avatar ? userData.avatar.url : userImg}
             alt={`${userData.firstName} ${userData.lastName}`}
           />
         </button>

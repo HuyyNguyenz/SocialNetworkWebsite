@@ -32,8 +32,9 @@ export default function PostItem(props: Props) {
         <div className='flex items-center justify-start'>
           <Link to={`/profile/${author && author.username}/posts`}>
             <img
+              loading='lazy'
               className='w-8 h-8 rounded-md object-cover'
-              src={author?.avatar ? author?.avatar : userImg}
+              src={author?.avatar ? author?.avatar.url : userImg}
               alt={author?.firstName + ' ' + author?.lastName}
             />
           </Link>
@@ -60,6 +61,7 @@ export default function PostItem(props: Props) {
           {(post.images as FilePreview[]).length > 0 &&
             post.images?.map((image, index) => (
               <img
+                loading='lazy'
                 key={index}
                 className={`${post.images?.length === 1 ? 'h-[25rem]' : 'h-52'} w-full rounded-md object-cover`}
                 src={image.url}

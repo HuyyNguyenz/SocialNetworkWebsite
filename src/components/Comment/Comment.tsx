@@ -7,6 +7,7 @@ import { Comment, User } from '~/types'
 import { useSelector } from 'react-redux'
 import { RootState } from '~/store'
 import SettingComment from '../SettingComment'
+import { Link } from 'react-router-dom'
 
 interface Props {
   comment: Comment
@@ -27,17 +28,22 @@ export default function Comment(props: Props) {
   return (
     <div className='my-4'>
       <div className='flex items-start justify-start'>
-        <img
-          src={author.avatar ? author.avatar : userImg}
-          alt={author.firstName + ' ' + author.lastName}
-          className='w-8 h-8 object-cover rounded-md'
-        />
+        <Link to={`/profile/${author.username}/posts`}>
+          <img
+            loading='lazy'
+            src={author.avatar ? author.avatar.url : userImg}
+            alt={author.firstName + ' ' + author.lastName}
+            className='w-8 h-8 object-cover rounded-md'
+          />
+        </Link>
         <div className='ml-4'>
           <div className='flex flex-col items-start justify-start bg-input-color rounded-md border border-solid border-border-color py-2 px-4'>
             <div className='mb-1 flex items-center justify-start'>
-              <span className='text-primary-color font-bold'>
-                {author.firstName} {author.lastName}
-              </span>
+              <Link to={`/profile/${author.username}/posts`}>
+                <span className='text-primary-color font-bold'>
+                  {author.firstName} {author.lastName}
+                </span>
+              </Link>
               {author.id === authorPostId && <FontAwesomeIcon icon={faCrown} className='ml-2 text-crown-color' />}
               <span className='ml-2'>{createdAt}</span>
               {comment.modifiedAt && <span className='ml-2 opacity-60'>| Edited {modifiedAt}</span>}
@@ -47,6 +53,7 @@ export default function Comment(props: Props) {
           {comment.images && (
             <div className='mt-4 w-[16rem] h-[16rem]'>
               <img
+                loading='lazy'
                 className='rounded-md object-cover w-full h-full'
                 src={comment.images[0].url}
                 alt={comment.images[0].name}

@@ -1,10 +1,12 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, lazy, Suspense } from 'react'
 import { Post, User } from '~/types'
 import fetchApi from '~/utils/fetchApi'
-import PostItem from '../PostItem'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { RootState } from '~/store'
+import Loading from '../Loading'
+
+const PostItem = lazy(() => import('~/components/PostItem'))
 
 interface Props {
   postList: Post[]
@@ -50,16 +52,24 @@ export default function PostList(props: Props) {
         return (
           <Fragment key={post.id}>
             {!profile && post.type === 'public' && post.deleted === 0 && (
-              <PostItem post={post} author={author} detail={false} />
+              <Suspense fallback={<Loading quantity={1} />}>
+                <PostItem post={post} author={author} detail={false} />
+              </Suspense>
             )}
             {profile && userId === author?.username && post.deleted === 0 && post.type === 'public' && (
-              <PostItem post={post} author={author} detail={false} />
+              <Suspense fallback={<Loading quantity={1} />}>
+                <PostItem post={post} author={author} detail={false} />
+              </Suspense>
             )}
             {profile &&
               userId === author?.username &&
               post.deleted === 0 &&
               post.type === 'private' &&
-              userData.username === userId && <PostItem post={post} author={author} detail={false} />}
+              userData.username === userId && (
+                <Suspense fallback={<Loading quantity={1} />}>
+                  <PostItem post={post} author={author} detail={false} />
+                </Suspense>
+              )}
           </Fragment>
         )
       })}

@@ -14,7 +14,8 @@ export default {
         'hover-color': '#EEEEEE',
         'input-color': '#F9F9F9',
         'border-color': '#DADADA',
-        'crown-color': '#FBAB17'
+        'crown-color': '#FBAB17',
+        'bg-dark-color': '#242526'
       },
       fontSize: {
         14: '14px',

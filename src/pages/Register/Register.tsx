@@ -25,7 +25,7 @@ export default function Register() {
             <div className='bg-white center flex flex-col-reverse rounded-2xl overflow-hidden lg:flex-row lg:items-start lg:justify-start'>
               <div className='bg-white lg:bg-hover-color'>
                 <div className='min-w-[28.125rem] min-h-[28.125rem] hidden lg:block'>
-                  <img src={logo} alt='logo_social' />
+                  <img loading='lazy' src={logo} alt='logo_social' />
                 </div>
                 <div className='flex flex-col items-start justify-start mb-8 ml-8 text-14'>
                   <span>Đã có tài khoản ?</span>

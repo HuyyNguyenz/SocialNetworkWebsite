@@ -29,6 +29,7 @@ export default function SectionPreview(props: Props) {
               className={`${(data as FilePreview[]).length === 1 ? 'w-full h-[20rem] relative' : 'w-80 h-52 relative'}`}
             >
               <img
+                loading='lazy'
                 src={image.src ? image.src : image.url}
                 alt={image.name}
                 className='rounded-md w-full h-full object-cover'

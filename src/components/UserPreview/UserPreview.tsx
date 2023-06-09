@@ -12,8 +12,9 @@ export default function UserPreview(props: Props) {
     <Link to={`/profile/${data.username}/posts`}>
       <div className='flex items-center justify-start text-14 mb-4 hover:bg-input-color rounded-md cursor-pointer'>
         <img
-          src={data.avatar ? data.avatar : userImg}
-          alt='user_avatar'
+          loading='lazy'
+          src={data.avatar ? data.avatar.url : userImg}
+          alt={data.firstName + ' ' + data.lastName}
           className='w-8 h-8 object-cover rounded-full mr-2'
         />
         <span>

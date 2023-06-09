@@ -9,8 +9,8 @@ export interface User {
   id?: number
   username?: string
   token?: string
-  avatar?: string
-  backgroundImage?: string
+  avatar?: { name: string; url: string }
+  backgroundImage?: { name: string; url: string }
   introduce?: string
   rePassword?: string
 }
