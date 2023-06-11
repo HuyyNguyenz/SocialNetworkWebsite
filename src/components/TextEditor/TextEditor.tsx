@@ -271,7 +271,7 @@ export default function TextEditor(props: Props) {
             alt={`${userData.firstName} ${userData.lastName}`}
           />
         </button>
-        <div className='w-full'>
+        <div className='w-full flex-1'>
           <form method='POST' onSubmit={handleSubmit} onReset={handleCancelEditing}>
             {comment ? (
               ''
@@ -283,8 +283,12 @@ export default function TextEditor(props: Props) {
                 id='typePost'
                 className='outline-none pr-2 mb-2 text-primary-color font-bold cursor-pointer'
               >
-                <option value='public'>Công khai</option>
-                <option value='private'>Riêng tư</option>
+                <option className='font-bold' value='public'>
+                  Công khai
+                </option>
+                <option className='font-bold' value='private'>
+                  Riêng tư
+                </option>
               </select>
             )}
 

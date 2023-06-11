@@ -15,7 +15,7 @@ export default function UserPreview(props: Props) {
           loading='lazy'
           src={data.avatar ? data.avatar.url : userImg}
           alt={data.firstName + ' ' + data.lastName}
-          className='w-8 h-8 object-cover rounded-full mr-2'
+          className='w-8 h-8 object-cover rounded-md mr-2'
         />
         <span>
           {data.firstName} {data.lastName}

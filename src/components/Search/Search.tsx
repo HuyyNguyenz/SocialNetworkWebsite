@@ -59,7 +59,7 @@ export default function Search() {
         interactive
         render={(attrs) => (
           <div className='overflow-hidden shadow-lg rounded-md animate-fade' tabIndex={-1} {...attrs}>
-            <div className='w-[30rem] text-14 p-2 bg-white border border-solid border-border-color min-h-[6.25rem] max-h-[25rem] overflow-y-scroll'>
+            <div className='w-[26rem] text-14 p-2 bg-white border border-solid border-border-color min-h-[6.25rem] max-h-[25rem] overflow-y-scroll'>
               <h2 className='text-title-color font-semibold mb-2'>Kết quả tìm kiếm {`'${searchValue}'`}</h2>
               {searchData.length > 0 ? (
                 searchData.map((data) => <UserPreview key={data.id} data={data} />)
@@ -70,7 +70,7 @@ export default function Search() {
           </div>
         )}
       >
-        <div className='w-[30rem] h-9 flex ml-16 items-center justify-start text-text-color text-14 rounded-md border border-solid border-border-color bg-input-color overflow-hidden'>
+        <div className='w-[26rem] h-9 flex ml-[5.25rem] items-center justify-start text-text-color text-14 rounded-md border border-solid border-border-color bg-input-color overflow-hidden'>
           <FontAwesomeIcon icon={faSearch} className='px-4' />
           <input
             onFocus={() => setVisible(true)}

@@ -7,6 +7,7 @@ import PostDetail from '~/pages/PostDetail'
 import Recovery from '~/pages/Recovery'
 import Register from '~/pages/Register'
 import UserProfile from '~/pages/UserProfile'
+import VerifyRegister from '~/pages/VerifyRegister'
 import { Router } from '~/types'
 
 const publicRoutes: Router[] = [
@@ -18,6 +19,8 @@ const publicRoutes: Router[] = [
   { path: '/recovery', component: Recovery },
   { path: '/:author/post/:postId', component: PostDetail },
   { path: '/profile/:userId/posts', component: UserProfile },
+  { path: '/verify/register/:username', component: VerifyRegister },
+
   { path: '/*', component: NotFound }
 ]
 

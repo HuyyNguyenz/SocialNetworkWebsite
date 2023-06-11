@@ -6,8 +6,8 @@ import fetchApi from '~/utils/fetchApi'
 import ForgotForm from '../ForgotForm'
 
 export default function LoginForm() {
-  const [formData, setFormData] = useState<{ accountName: string; password: string; remember: boolean }>({
-    accountName: '',
+  const [formData, setFormData] = useState<{ email: string; password: string; remember: boolean }>({
+    email: '',
     password: '',
     remember: false
   })
@@ -21,8 +21,8 @@ export default function LoginForm() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (formData.accountName === '') {
-      toast('Mời bạn nhập email hoặc username', { position: 'top-right', type: 'warning', autoClose: 2000 })
+    if (formData.email === '') {
+      toast('Mời bạn nhập email', { position: 'top-right', type: 'warning', autoClose: 2000 })
     } else if (formData.password === '') {
       toast('Mời bạn nhập mật khẩu', { position: 'top-right', type: 'warning', autoClose: 2000 })
     } else {
@@ -74,12 +74,12 @@ export default function LoginForm() {
             <div className='mb-4'>
               <input
                 onChange={handleChange}
-                value={formData.accountName}
+                value={formData.email}
                 className='min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 border-border-color'
                 type='text'
-                name='accountName'
-                id='accountName'
-                placeholder='Email hoặc Username'
+                name='email'
+                id='email'
+                placeholder='Email'
               />
             </div>
             <div className='mb-4'>

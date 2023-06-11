@@ -62,8 +62,12 @@ export default function CommentList(props: Props) {
             id='sortByDate'
             className='text-primary-color font-bold pr-2 outline-none cursor-pointer'
           >
-            <option value='new'>Gần đây nhất</option>
-            <option value='old'>Cũ nhất</option>
+            <option className='font-bold' value='new'>
+              Gần đây nhất
+            </option>
+            <option className='font-bold' value='old'>
+              Cũ nhất
+            </option>
           </select>
         </div>
         {commentList.length > 0 &&

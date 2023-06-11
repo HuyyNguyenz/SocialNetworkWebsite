@@ -11,7 +11,7 @@ export interface User {
   token?: string
   avatar?: { name: string; url: string }
   backgroundImage?: { name: string; url: string }
-  introduce?: string
+  verify?: string
   rePassword?: string
 }
 

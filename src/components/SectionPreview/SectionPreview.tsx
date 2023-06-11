@@ -1,6 +1,5 @@
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useEffect } from 'react'
 import { FilePreview } from '~/types'
 
 interface Props {

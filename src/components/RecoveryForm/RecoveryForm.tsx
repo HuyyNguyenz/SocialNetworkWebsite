@@ -1,9 +1,7 @@
-import Tippy from '@tippyjs/react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import useFormValidation from '~/hooks/useFormValidation'
-import useResize from '~/hooks/useResize'
 import { User } from '~/types'
 import fetchApi from '~/utils/fetchApi'
 
@@ -16,7 +14,6 @@ export default function RecoveryForm() {
     password: recoveryValue.password,
     rePassword: recoveryValue.rePassword
   }
-  const isMobileTablet = useResize()
   const [messages, handleValidation, disableValidation, checkFormError] = useFormValidation(formData)
   const navigate = useNavigate()
 
@@ -31,7 +28,7 @@ export default function RecoveryForm() {
       const { password } = formData
       const { userEmail } = JSON.parse(sessionStorage.getItem('recovery') as string)
       try {
-        const result = (await fetchApi.put('recovery', { password, userEmail })).data
+        const result = (await fetchApi.put(`recovery/${userEmail}`, { password })).data
         toast(result.message, { type: 'success', autoClose: 2000, position: 'top-right' })
         setTimeout(() => {
           sessionStorage.removeItem('recovery')
@@ -64,47 +61,35 @@ export default function RecoveryForm() {
       <h1 className='text-title-color text-24 text-center font-bold mb-4'>Khôi phục mật khẩu</h1>
       <form className='text-14 text-center' onSubmit={handleSubmit}>
         <div className='mb-4 flex flex-col'>
-          <Tippy
-            content={isMobileTablet ? '' : messages.password}
-            disabled={messages.password && !isMobileTablet ? false : true}
-            placement='left'
-          >
-            <input
-              onBlur={handleValidation}
-              onFocus={disableValidation}
-              onChange={handleChange}
-              type='password'
-              name='password'
-              id='password'
-              placeholder='Nhập mật khẩu mới'
-              className={`min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
-                messages.password ? 'border-red-600 text-red-600' : 'border-border-color'
-              }`}
-            />
-          </Tippy>
-          <span className='lg:hidden text-red-600 text-left'>{messages.password}</span>
+          <input
+            onBlur={handleValidation}
+            onFocus={disableValidation}
+            onChange={handleChange}
+            type='password'
+            name='password'
+            id='password'
+            placeholder='Nhập mật khẩu mới'
+            className={`min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
+              messages.password ? 'border-red-600 text-red-600' : 'border-border-color'
+            }`}
+          />
+          <span className='text-red-600 text-left'>{messages.password}</span>
         </div>
 
         <div className='mb-4 flex flex-col'>
-          <Tippy
-            content={isMobileTablet ? '' : messages.rePassword}
-            disabled={messages.rePassword && !isMobileTablet ? false : true}
-            placement='left'
-          >
-            <input
-              onBlur={handleValidation}
-              onFocus={disableValidation}
-              onChange={handleChange}
-              type='password'
-              name='rePassword'
-              id='rePassword'
-              placeholder='Nhập lại mật khẩu'
-              className={`min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
-                messages.rePassword ? 'border-red-600 text-red-600' : 'border-border-color'
-              }`}
-            />
-          </Tippy>
-          <span className='lg:hidden text-red-600 text-left'>{messages.rePassword}</span>
+          <input
+            onBlur={handleValidation}
+            onFocus={disableValidation}
+            onChange={handleChange}
+            type='password'
+            name='rePassword'
+            id='rePassword'
+            placeholder='Nhập lại mật khẩu'
+            className={`min-w-[18.75rem] md:min-w-[25rem] bg-input-color border border-solid outline-none rounded-md py-2 px-4 ${
+              messages.rePassword ? 'border-red-600 text-red-600' : 'border-border-color'
+            }`}
+          />
+          <span className='text-red-600 text-left'>{messages.rePassword}</span>
         </div>
 
         <input

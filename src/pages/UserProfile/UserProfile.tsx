@@ -12,33 +12,28 @@ import fetchApi from '~/utils/fetchApi'
 export default function UserProfile() {
   const userData = useSelector((state: RootState) => state.userData)
   const postList = useSelector((state: RootState) => state.postList.data)
-  const commentList = useSelector((state: RootState) => state.commentList.data)
   const { userId } = useParams()
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (postList.length === 0) {
-      const controller = new AbortController()
-      fetchApi.get('posts', { signal: controller.signal }).then((res) => {
-        dispatch(setPostList(res.data))
-      })
-      return () => {
-        controller.abort()
-      }
+    const controller = new AbortController()
+    fetchApi.get('posts', { signal: controller.signal }).then((res) => {
+      dispatch(setPostList(res.data))
+    })
+    return () => {
+      controller.abort()
     }
-  }, [postList, dispatch])
+  }, [dispatch])
 
   useEffect(() => {
-    if (commentList.length === 0) {
-      const controller = new AbortController()
-      fetchApi.get('comments', { signal: controller.signal }).then((res) => {
-        dispatch(setCommentList(res.data))
-      })
-      return () => {
-        controller.abort()
-      }
+    const controller = new AbortController()
+    fetchApi.get('comments', { signal: controller.signal }).then((res) => {
+      dispatch(setCommentList(res.data))
+    })
+    return () => {
+      controller.abort()
     }
-  }, [commentList, dispatch])
+  }, [dispatch])
 
   return (
     <UserProfileLayout>
