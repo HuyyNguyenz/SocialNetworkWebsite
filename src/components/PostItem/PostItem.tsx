@@ -92,7 +92,7 @@ export default function PostItem(props: Props) {
               icon={faCommentDots}
               className='text-title-color text-20 rounded-full p-2 hover:bg-hover-color'
             />
-            <span className='ml-2'>{quantityComment && quantityComment.length}</span>
+            <span className='ml-2'>{quantityComment ? quantityComment.length : 0}</span>
           </button>
         </Link>
         <button className='flex items-center justify-start'>

@@ -61,3 +61,18 @@ export interface FilePreview {
   origin?: File
   url?: string
 }
+
+export interface Friend {
+  id?: string
+  status?: string
+  friendId?: number
+  userId?: number
+}
+
+export interface Notify {
+  id?: string
+  status?: string
+  type?: string
+  typeId?: number
+  receiverId?: number
+}

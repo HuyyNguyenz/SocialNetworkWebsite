@@ -22,16 +22,14 @@ export default function PostDetail() {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (postList.length === 0) {
-      const controller = new AbortController()
-      fetchApi.get('posts', { signal: controller.signal }).then((res) => {
-        dispatch(setPostList(res.data))
-      })
-      return () => {
-        controller.abort()
-      }
+    const controller = new AbortController()
+    fetchApi.get('posts', { signal: controller.signal }).then((res) => {
+      dispatch(setPostList(res.data))
+    })
+    return () => {
+      controller.abort()
     }
-  }, [postList, dispatch])
+  }, [dispatch])
 
   useEffect(() => {
     const controller = new AbortController()

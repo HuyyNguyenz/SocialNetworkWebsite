@@ -36,7 +36,7 @@ export default function UserSetting() {
       placement='bottom-start'
       render={(attrs) => (
         <div
-          className='bg-white shadow-lg w-[18.75rem] rounded-md animate-fade overflow-hidden'
+          className='bg-white border border-solid border-border-color shadow-lg w-[18.75rem] rounded-md animate-fade overflow-hidden'
           tabIndex={-1}
           {...attrs}
         >

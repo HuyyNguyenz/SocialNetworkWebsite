@@ -5,7 +5,7 @@ import userImg from '~/assets/images/user.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faImage } from '@fortawesome/free-regular-svg-icons'
 import { faC, faFileVideo } from '@fortawesome/free-solid-svg-icons'
-import { Comment, FilePreview, Post } from '~/types'
+import { Comment, FilePreview, Friend, Post } from '~/types'
 import SectionPreview from '../SectionPreview'
 import { toast } from 'react-toastify'
 import useFileValidation from '~/hooks/useFileValidation'
@@ -112,8 +112,19 @@ export default function TextEditor(props: Props) {
   }
 
   const handleGetPostList = async () => {
-    const result: Post[] = (await fetchApi.get('posts')).data
-    dispatch(setPostList(result))
+    const friends: Friend[] = (await fetchApi.get('friends')).data
+    const posts: Post[] = (await fetchApi.get('posts')).data
+    if (posts.length > 0) {
+      const postList: Post[] = []
+      posts.filter((post) => {
+        post.userId === userData.id && postList.push(post)
+        friends.length > 0 &&
+          friends.forEach((friend) => {
+            post.userId === friend.friendId && friend.userId === userData.id && postList.push(post)
+          })
+      })
+      dispatch(setPostList(postList))
+    }
   }
 
   const handleCancelEditing = () => {

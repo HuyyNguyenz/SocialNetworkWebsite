@@ -25,7 +25,9 @@ export default function SectionPreview(props: Props) {
           return (
             <div
               key={image.id}
-              className={`${(data as FilePreview[]).length === 1 ? 'w-full h-[20rem] relative' : 'w-80 h-52 relative'}`}
+              className={`${
+                (data as FilePreview[]).length === 1 ? 'w-full h-[20rem] relative' : 'w-full h-52 relative'
+              }`}
             >
               <img
                 loading='lazy'

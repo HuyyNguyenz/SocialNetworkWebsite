@@ -1,15 +1,16 @@
 import { NavLink, useParams } from 'react-router-dom'
 import DefaultLayout from '~/layouts/DefaultLayout'
 import userImg from '~/assets/images/user.png'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import backgroundDefault from '~/assets/images/background_default.jpg'
-import { User } from '~/types'
+import { Friend, User } from '~/types'
 import fetchApi from '~/utils/fetchApi'
 import { useSelector } from 'react-redux'
 import { RootState } from '~/store'
 import EditProfile from '~/components/EditProfile'
 import Skeleton from 'react-loading-skeleton'
 import Loading from '~/components/Loading'
+import { toast } from 'react-toastify'
 
 interface Props {
   children: React.ReactNode
@@ -22,9 +23,45 @@ export default function UserProfileLayout(props: Props) {
   const [user, setUser] = useState<User>()
   const [isLoading, setLoading] = useState<boolean>(false)
   const [isOpenEditProfile, setOpenEditProfile] = useState<boolean>(false)
+  const [friend, setFriend] = useState<Friend>()
+
+  const handleMakeFriend = async () => {
+    await fetchApi.post('friend', { status: 'pending', friendId: user?.id, userId: userData.id })
+    handleCheckStatus()
+  }
+
+  const handleDeleteFriend = async () => {
+    const friends: Friend[] = (await fetchApi.get('friends')).data
+    const friendDetail = friends.find(
+      (friend) =>
+        (friend.friendId === user?.id && friend.userId === userData.id) ||
+        (friend.friendId === userData.id && friend.userId === user?.id)
+    )
+    await fetchApi.delete(`friend/${friendDetail?.id}`)
+    setFriend({})
+  }
+
+  const handleAcceptFriend = async () => {
+    await fetchApi.put(`friend/${friend?.id}`, {})
+    handleCheckStatus()
+  }
+
+  const handleCheckStatus = useCallback(async () => {
+    const result: Friend[] = (await fetchApi.get('friends')).data
+    result.find(
+      (friend) =>
+        (friend.friendId === user?.id && friend.userId === userData.id && setFriend(friend)) ||
+        (friend.friendId === userData.id && friend.userId === user?.id && setFriend(friend))
+    )
+  }, [user?.id, userData.id])
+
+  useEffect(() => {
+    handleCheckStatus()
+  }, [handleCheckStatus])
 
   useEffect(() => {
     if (userId) {
+      setFriend({})
       setLoading(true)
       const controller = new AbortController()
       fetchApi.get(`user/${userId}`, { signal: controller.signal }).then((res) => {
@@ -89,12 +126,51 @@ export default function UserProfileLayout(props: Props) {
                 </button>
               ) : (
                 <div className='flex items-center justify-start text-14 font-semibold'>
-                  <button className='border border-solid border-border-color rounded-md bg-input-color py-2 px-4 hover:bg-hover-color'>
-                    Kết bạn
-                  </button>
-                  <button className='border border-solid border-border-color rounded-md bg-primary-color text-white py-2 px-4 ml-4 hover:opacity-90'>
-                    Nhắn tin
-                  </button>
+                  {friend && friend.friendId !== userData.id && friend.status === 'pending' ? (
+                    <>
+                      <button
+                        onClick={handleDeleteFriend}
+                        className='border border-solid border-border-color rounded-md bg-input-color py-2 px-4 hover:bg-hover-color'
+                      >
+                        Huỷ lời mời kết bạn
+                      </button>
+                      <span className='opacity-50 ml-4'>Đang theo dõi</span>
+                    </>
+                  ) : friend && friend.userId !== userData.id && friend.status === 'pending' ? (
+                    <>
+                      <button
+                        onClick={handleAcceptFriend}
+                        className='border border-solid border-border-color rounded-md bg-primary-color text-white py-2 px-4 hover:opacity-90'
+                      >
+                        Phản hồi
+                      </button>
+                      <button
+                        onClick={handleDeleteFriend}
+                        className='ml-4 border border-solid border-border-color rounded-md bg-input-color py-2 px-4 hover:bg-hover-color'
+                      >
+                        Từ chối
+                      </button>
+                    </>
+                  ) : friend && friend.status === 'accept' ? (
+                    <>
+                      <button
+                        onClick={handleDeleteFriend}
+                        className='border border-solid border-border-color rounded-md bg-input-color py-2 px-4 hover:bg-hover-color'
+                      >
+                        Huỷ kết bạn
+                      </button>
+                      <button className='ml-4 border border-solid border-border-color rounded-md bg-primary-color text-white py-2 px-4 ml-4 hover:opacity-90'>
+                        Nhắn tin
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={handleMakeFriend}
+                      className='border border-solid border-border-color rounded-md bg-input-color py-2 px-4 hover:bg-hover-color'
+                    >
+                      Kết bạn
+                    </button>
+                  )}
                 </div>
               )}
             </div>
