@@ -46,6 +46,8 @@ export default function ForgotPassword(props: Props) {
   const handleRequestResetPassword = async () => {
     if (email === '') {
       toast('Vui lòng nhập email', { autoClose: 2000, position: 'top-right', type: 'warning' })
+    } else if (!(email.includes('@') && email.includes('.'))) {
+      toast('Email chưa đúng định dạng', { autoClose: 2000, position: 'top-right', type: 'warning' })
     } else {
       try {
         setCounter((prev) => prev - 1)
@@ -87,7 +89,7 @@ export default function ForgotPassword(props: Props) {
           <input
             maxLength={6}
             onChange={handleChange}
-            value={otpValue}
+            value={otpValue.toLowerCase()}
             required
             type='text'
             name='otpCode'

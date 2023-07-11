@@ -62,7 +62,6 @@ export default function RegisterForm() {
             autoClose: 2000
           })
           setFormData(initialData)
-          setLoading(false)
         } catch (error: any) {
           if (error.response) {
             const message: string = error.response.data.message
@@ -73,6 +72,7 @@ export default function RegisterForm() {
         }
       }
       createAccount()
+      setLoading(false)
     }
   }
 
@@ -89,7 +89,7 @@ export default function RegisterForm() {
   }, [checkFormError])
 
   return (
-    <div className='p-8 w-[22.5rem] max-h-[32.5rem] overflow-y-scroll md:w-[32.5rem] lg:w-full lg:h-full'>
+    <div className='p-8 w-[22.5rem] max-h-[32.5rem] overflow-y-auto md:w-[32.5rem] lg:w-full lg:h-full'>
       <h1 className='text-title-color text-24 font-bold text-center mb-8'>Đăng ký tài khoản</h1>
       <form className='text-14 text-center' onSubmit={handleSubmit} autoComplete='off'>
         <div className='mb-4 flex flex-col lg:flex-row lg:items-center lg:justify-start text-left'>

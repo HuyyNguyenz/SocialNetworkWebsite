@@ -5,10 +5,11 @@ import { FilePreview } from '~/types'
 interface Props {
   data: FilePreview[] | FilePreview
   deleteItem: (id: string) => void
+  chatUserId?: number
 }
 
 export default function SectionPreview(props: Props) {
-  const { data } = props
+  const { data, chatUserId } = props
 
   const handleDelete = (id: string) => {
     props.deleteItem(id)
@@ -26,7 +27,9 @@ export default function SectionPreview(props: Props) {
             <div
               key={image.id}
               className={`${
-                (data as FilePreview[]).length === 1 ? 'w-full h-[20rem] relative' : 'w-full h-52 relative'
+                (data as FilePreview[]).length === 1
+                  ? `${chatUserId ? 'w-40 h-w-40' : 'w-full h-[20rem]'} relative`
+                  : 'w-full h-52 relative'
               }`}
             >
               <img
@@ -45,7 +48,7 @@ export default function SectionPreview(props: Props) {
           )
         })}
       {(data as FilePreview).name && (
-        <div className='w-full relative overflow-hidden'>
+        <div className={`${chatUserId ? 'w-[40%]' : 'w-full'} relative overflow-hidden`}>
           <video
             src={(data as FilePreview).src ? (data as FilePreview).src : (data as FilePreview).url}
             controls

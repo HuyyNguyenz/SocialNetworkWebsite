@@ -3,15 +3,17 @@ import { getDownloadURL, getStorage, ref, uploadBytes, deleteObject } from 'fire
 import { v4 } from 'uuid'
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyC9dH5QIrgtJMzBRBlKGHWlPjmYPXOkeL4',
+  apiKey: import.meta.env.VITE_API_KEY,
   authDomain: 'social-technology.firebaseapp.com',
   projectId: 'social-technology',
   storageBucket: 'social-technology.appspot.com',
   messagingSenderId: '113556276183',
-  appId: '1:113556276183:web:7c5f3b190fefd4f528c192'
+  appId: '1:113556276183:web:7c5f3b190fefd4f528c192',
+  measurementId: 'G-L8MZS9HGC2'
 }
 const app = initializeApp(firebaseConfig)
 const storage = getStorage(app)
+
 export const uploadFile = async (file: File, type: string) => {
   try {
     const pathName = `${type}/${file.name + v4()}`

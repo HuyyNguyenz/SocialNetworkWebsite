@@ -26,9 +26,9 @@ export default function Comment(props: Props) {
   }, [])
 
   return (
-    <div className='my-4'>
+    <div className={`my-4 ${comment.deleted === 1 && 'opacity-60'}`}>
       <div className='flex items-start justify-start'>
-        <Link to={`/profile/${author.username}/posts`}>
+        <Link to={`/${author.username}/profile/${author.id}/posts`}>
           <img
             loading='lazy'
             src={author.avatar ? author.avatar.url : userImg}
@@ -37,20 +37,24 @@ export default function Comment(props: Props) {
           />
         </Link>
         <div className='ml-4'>
-          <div className='flex flex-col items-start justify-start bg-input-color rounded-md border border-solid border-border-color py-2 px-4'>
+          <div className='flex flex-col items-start justify-start bg-input-color dark:bg-dark-input-color rounded-md border border-solid border-border-color dark:border-dark-border-color py-2 px-4'>
             <div className='mb-1 flex items-center justify-start'>
-              <Link to={`/profile/${author.username}/posts`}>
-                <span className='text-primary-color font-bold'>
+              <Link to={`/${author.username}/profile/${author.id}/posts`}>
+                <span className='text-primary-color dark:text-dark-primary-color font-bold'>
                   {author.firstName} {author.lastName}
                 </span>
               </Link>
               {author.id === authorPostId && <FontAwesomeIcon icon={faCrown} className='ml-2 text-crown-color' />}
-              <span className='ml-2'>{createdAt}</span>
-              {comment.modifiedAt && <span className='ml-2 opacity-60'>| Edited {modifiedAt}</span>}
+              <span className='ml-2 text-xs'>{createdAt}</span>
+              {comment.modifiedAt && <span className='ml-2 opacity-60 text-xs'>| Đã chỉnh sửa {modifiedAt}</span>}
             </div>
-            <p className='break-all'>{comment.content}</p>
+            {comment.deleted === 0 ? (
+              <p className='break-all'>{comment.content}</p>
+            ) : (
+              <del className='dark:text-dark-text-color'>Bình luận này đã bị xoá</del>
+            )}
           </div>
-          {comment.images && (
+          {comment.images && comment.deleted === 0 && (
             <div className='mt-4 w-[16rem] h-[16rem]'>
               <img
                 loading='lazy'
@@ -60,24 +64,32 @@ export default function Comment(props: Props) {
               />
             </div>
           )}
-          {comment.video?.name && (
+          {comment.video?.name && comment.deleted === 0 && (
             <div className='mt-4 w-[26rem]'>
               <video className='rounded-md w-full h-full' src={comment.video.url} controls>
                 <track src={comment.video.url} kind='captions' srcLang='en' label='English' />
               </video>
             </div>
           )}
-          <div className='flex items-center justify-start py-2 px-4 text-16'>
-            <button className='flex items-center justify-start mr-8'>
-              <FontAwesomeIcon icon={faThumbsUp} className='hover:bg-hover-color rounded-full p-2' />
-              <span className='ml-2 text-14'>0</span>
-            </button>
-            <button className='flex items-center justify-start mr-8'>
-              <FontAwesomeIcon icon={faReply} className='hover:bg-hover-color rounded-full p-2' />
-              <span className='ml-2 text-14'>0</span>
-            </button>
-            {userData.id === comment.userId && <SettingComment comment={comment} />}
-          </div>
+          {comment.deleted === 0 && (
+            <div className='flex items-center justify-start py-2 px-4 text-16'>
+              <button className='flex items-center justify-start mr-8'>
+                <FontAwesomeIcon
+                  icon={faThumbsUp}
+                  className='hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-full p-2'
+                />
+                <span className='ml-2 text-14'>0</span>
+              </button>
+              <button className='flex items-center justify-start mr-8'>
+                <FontAwesomeIcon
+                  icon={faReply}
+                  className='hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-full p-2'
+                />
+                <span className='ml-2 text-14'>0</span>
+              </button>
+              {userData.id === comment.userId && <SettingComment comment={comment} />}
+            </div>
+          )}
         </div>
       </div>
     </div>

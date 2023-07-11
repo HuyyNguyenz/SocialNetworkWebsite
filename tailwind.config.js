@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  darkMode: 'class',
   theme: {
     fontFamily: {
       inter: ['Inter', 'sans-serif']
@@ -8,14 +9,21 @@ export default {
     extend: {
       colors: {
         'primary-color': '#425DE8',
+        'dark-primary-color': '#0f90f2',
         'secondary-color': '#9F18F2',
+        'bg-light': '#FFFFFF',
+        'bg-dark': '#323741',
         'title-color': '#474747',
+        'dark-title-color': '#b8bbbf',
         'text-color': '#3E3E3E',
+        'dark-text-color': '#e4e6eb',
         'hover-color': '#EEEEEE',
+        'dark-hover-color': '#2a2e35',
         'input-color': '#F9F9F9',
+        'dark-input-color': '#22242a',
         'border-color': '#DADADA',
-        'crown-color': '#FBAB17',
-        'bg-dark-color': '#242526'
+        'dark-border-color': '#242526',
+        'crown-color': '#FBAB17'
       },
       fontSize: {
         14: '14px',

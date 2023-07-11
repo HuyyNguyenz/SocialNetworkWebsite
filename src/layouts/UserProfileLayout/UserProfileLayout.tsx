@@ -1,4 +1,4 @@
-import { NavLink, useParams } from 'react-router-dom'
+import { Link, NavLink, useParams } from 'react-router-dom'
 import DefaultLayout from '~/layouts/DefaultLayout'
 import userImg from '~/assets/images/user.png'
 import { useState, useEffect, useCallback } from 'react'
@@ -10,7 +10,7 @@ import { RootState } from '~/store'
 import EditProfile from '~/components/EditProfile'
 import Skeleton from 'react-loading-skeleton'
 import Loading from '~/components/Loading'
-import { toast } from 'react-toastify'
+import socket from '~/socket'
 
 interface Props {
   children: React.ReactNode
@@ -18,16 +18,18 @@ interface Props {
 
 export default function UserProfileLayout(props: Props) {
   const { children } = props
-  const { userId } = useParams()
+  const { username, userId } = useParams()
   const userData = useSelector((state: RootState) => state.userData)
   const [user, setUser] = useState<User>()
   const [isLoading, setLoading] = useState<boolean>(false)
   const [isOpenEditProfile, setOpenEditProfile] = useState<boolean>(false)
   const [friend, setFriend] = useState<Friend>()
+  const [friends, setFriends] = useState<Friend[]>([])
 
   const handleMakeFriend = async () => {
     await fetchApi.post('friend', { status: 'pending', friendId: user?.id, userId: userData.id })
-    handleCheckStatus()
+    await handleCheckStatus()
+    socket.emit('sendRequestClient', { status: 'pending', friendId: user?.id, userId: userData.id })
   }
 
   const handleDeleteFriend = async () => {
@@ -39,21 +41,39 @@ export default function UserProfileLayout(props: Props) {
     )
     await fetchApi.delete(`friend/${friendDetail?.id}`)
     setFriend({})
+    socket.emit('sendRequestRemoveClient', {
+      userId: userData.id === friendDetail?.friendId ? friendDetail?.userId : friendDetail?.friendId
+    })
   }
 
   const handleAcceptFriend = async () => {
     await fetchApi.put(`friend/${friend?.id}`, {})
-    handleCheckStatus()
+    await handleCheckStatus()
+    socket.emit('sendRequestClient', { id: friend?.id })
   }
+
+  const handleFilterFriend = useCallback(
+    (friendList: Friend[]) => {
+      const friendArray: Friend[] = []
+      friendList.filter(
+        (friend) =>
+          (friend.friendId === Number(userId) && friend.status === 'accept' && friendArray.push(friend)) ||
+          (friend.userId === Number(userId) && friend.status === 'accept' && friendArray.push(friend))
+      )
+      setFriends(friendArray)
+    },
+    [userId]
+  )
 
   const handleCheckStatus = useCallback(async () => {
     const result: Friend[] = (await fetchApi.get('friends')).data
+    handleFilterFriend(result)
     result.find(
       (friend) =>
         (friend.friendId === user?.id && friend.userId === userData.id && setFriend(friend)) ||
         (friend.friendId === userData.id && friend.userId === user?.id && setFriend(friend))
     )
-  }, [user?.id, userData.id])
+  }, [user?.id, userData.id, handleFilterFriend])
 
   useEffect(() => {
     handleCheckStatus()
@@ -82,13 +102,27 @@ export default function UserProfileLayout(props: Props) {
     setUser(userData)
   }, [userData])
 
+  useEffect(() => {
+    socket.on('sendInviteFriendNotify', (res: any) => {
+      res.message !== '' && res.userId === userData.id && handleCheckStatus()
+    })
+
+    socket.on('sendAcceptFriendNotify', (res: any) => {
+      res.message !== '' && res.userId === userData.id && handleCheckStatus()
+    })
+
+    socket.on('sendRemoveInviteFriendNotify', (res: any) => {
+      res.userId === userData.id && setFriend({})
+    })
+  }, [handleCheckStatus, userData.id])
+
   return (
     <DefaultLayout>
       <main>
         <div className='w-[48rem] max-w-3xl my-0 mx-auto pb-10'>
-          <div className='flex flex-col items-start justify-start bg-white border-b border-solid border-border-color'>
+          <div className='flex flex-col items-start justify-start bg-bg-light dark:bg-bg-dark border-b border-solid border-border-color dark:border-dark-border-color'>
             {isLoading ? (
-              <Skeleton className='w-full h-[25rem] rounded-md object-cover' />
+              <Skeleton className='w-[48rem] h-[25rem] rounded-md object-cover dark:bg-bg-dark' />
             ) : (
               <img
                 loading='lazy'
@@ -100,7 +134,7 @@ export default function UserProfileLayout(props: Props) {
             <div className='mt-4 flex items-center justify-between w-full'>
               <div className='flex items-center justify-start flex-1'>
                 {isLoading ? (
-                  <Skeleton className='w-28 h-28 rounded-md object-cover' />
+                  <Skeleton className='w-28 h-28 rounded-md object-cover dark:bg-bg-dark' />
                 ) : (
                   <img
                     loading='lazy'
@@ -110,8 +144,20 @@ export default function UserProfileLayout(props: Props) {
                   />
                 )}
                 <div className='flex flex-col items-start justify-start font-bold ml-4 flex-1'>
-                  <h1 className='text-24 text-title-color line-clamp-1'>{user?.firstName + ' ' + user?.lastName}</h1>
-                  <span className='text-14 text-text-color opacity-60'>69 bạn bè</span>
+                  {isLoading ? (
+                    <Skeleton className='w-52 h-6 dark:bg-bg-dark' />
+                  ) : (
+                    <h1 className='text-24 text-title-color dark:text-dark-title-color line-clamp-1'>
+                      {user?.firstName + ' ' + user?.lastName}
+                    </h1>
+                  )}
+                  {isLoading ? (
+                    <Skeleton className='w-20 h-5 dark:bg-bg-dark' />
+                  ) : (
+                    <span className='text-14 text-text-color dark:text-dark-text-color opacity-60'>
+                      {friends.length} bạn bè
+                    </span>
+                  )}
                 </div>
               </div>
               {userData.username === user?.username ? (
@@ -120,7 +166,7 @@ export default function UserProfileLayout(props: Props) {
                     setOpenEditProfile(true)
                     document.body.classList.add('overflow-y-hidden')
                   }}
-                  className='bg-gradient-to-r from-primary-color to-secondary-color text-white font-semibold text-14 rounded-md p-2 hover:opacity-90'
+                  className='bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color text-white font-semibold text-14 rounded-md p-2 hover:opacity-90'
                 >
                   Chỉnh sửa trang cá nhân
                 </button>
@@ -130,7 +176,7 @@ export default function UserProfileLayout(props: Props) {
                     <>
                       <button
                         onClick={handleDeleteFriend}
-                        className='border border-solid border-border-color rounded-md bg-input-color py-2 px-4 hover:bg-hover-color'
+                        className='border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color py-2 px-4 hover:bg-hover-color dark:hover:bg-dark-hover-color'
                       >
                         Huỷ lời mời kết bạn
                       </button>
@@ -140,13 +186,13 @@ export default function UserProfileLayout(props: Props) {
                     <>
                       <button
                         onClick={handleAcceptFriend}
-                        className='border border-solid border-border-color rounded-md bg-primary-color text-white py-2 px-4 hover:opacity-90'
+                        className='border border-solid border-border-color dark:border-dark-border-color rounded-md bg-primary-color dark:bg-dark-primary-color text-white py-2 px-4 hover:opacity-90'
                       >
                         Phản hồi
                       </button>
                       <button
                         onClick={handleDeleteFriend}
-                        className='ml-4 border border-solid border-border-color rounded-md bg-input-color py-2 px-4 hover:bg-hover-color'
+                        className='dark:text-dark-text-color ml-4 border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color py-2 px-4 hover:bg-hover-color dark:hover:bg-dark-hover-color'
                       >
                         Từ chối
                       </button>
@@ -155,18 +201,20 @@ export default function UserProfileLayout(props: Props) {
                     <>
                       <button
                         onClick={handleDeleteFriend}
-                        className='border border-solid border-border-color rounded-md bg-input-color py-2 px-4 hover:bg-hover-color'
+                        className='border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color py-2 px-4 hover:bg-hover-color dark:hover:bg-dark-hover-color dark:text-dark-text-color'
                       >
                         Huỷ kết bạn
                       </button>
-                      <button className='ml-4 border border-solid border-border-color rounded-md bg-primary-color text-white py-2 px-4 ml-4 hover:opacity-90'>
-                        Nhắn tin
-                      </button>
+                      <Link to={`/message/${user?.id}`}>
+                        <button className='ml-4 border border-solid border-border-color dark:border-dark-border-color rounded-md bg-primary-color dark:bg-dark-primary-color text-white py-2 px-4 ml-4 hover:opacity-90'>
+                          Nhắn tin
+                        </button>
+                      </Link>
                     </>
                   ) : (
                     <button
                       onClick={handleMakeFriend}
-                      className='border border-solid border-border-color rounded-md bg-input-color py-2 px-4 hover:bg-hover-color'
+                      className='dark:text-dark-text-color border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color py-2 px-4 hover:bg-hover-color dark:hover:bg-dark-hover-color'
                     >
                       Kết bạn
                     </button>
@@ -176,20 +224,20 @@ export default function UserProfileLayout(props: Props) {
             </div>
           </div>
           <div className='mt-10 flex items-start justify-start'>
-            <div className='bg-white rounded-md border border-solid border-border-color font-semibold text-14 text-title-color'>
+            <div className='bg-bg-light dark:bg-bg-dark rounded-md border border-solid border-border-color dark:border-dark-border-color font-semibold text-14 text-title-color dark:text-dark-title-color'>
               <ul>
-                <NavLink to={`/profile/${userId}/posts`}>
-                  <li className='px-10 py-2 my-2 hover:text-primary-color transition-all ease-linear duration-200 cursor-pointer'>
+                <NavLink to={`/${username}/profile/${userId}/posts`}>
+                  <li className='px-10 py-2 my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
                     Bài viết
                   </li>
                 </NavLink>
-                <li className='px-10 py-2 my-2 hover:text-primary-color transition-all ease-linear duration-200 cursor-pointer'>
+                <li className='px-10 py-2 my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
                   Bạn bè
                 </li>
-                <li className='px-10 py-2 my-2 hover:text-primary-color transition-all ease-linear duration-200 cursor-pointer'>
+                <li className='px-10 py-2 my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
                   Ảnh
                 </li>
-                <li className='px-10 py-2 my-2 hover:text-primary-color transition-all ease-linear duration-200 cursor-pointer'>
+                <li className='px-10 py-2 my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
                   Video
                 </li>
               </ul>

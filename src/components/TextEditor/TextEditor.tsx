@@ -5,28 +5,33 @@ import userImg from '~/assets/images/user.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faImage } from '@fortawesome/free-regular-svg-icons'
 import { faC, faFileVideo } from '@fortawesome/free-solid-svg-icons'
-import { Comment, FilePreview, Friend, Post } from '~/types'
+import { Comment, FilePreview, Message, Post } from '~/types'
 import SectionPreview from '../SectionPreview'
 import { toast } from 'react-toastify'
 import useFileValidation from '~/hooks/useFileValidation'
 import { deleteFile, uploadFile } from '~/utils/firebase'
 import fetchApi from '~/utils/fetchApi'
-import { cancelEditing, setPostList } from '~/features/post/postSlice'
+import { cancelEditing, setNewPost } from '~/features/post/postSlice'
 import { useParams } from 'react-router-dom'
 import { cancelEditingComment, setCommentList } from '~/features/comment/commentSlice'
 import Loading from '../Loading'
 import Skeleton from 'react-loading-skeleton'
+import socket from '~/socket'
+import { cancelEditingMessage, setMessageList } from '~/features/message/messageSlice'
 
 interface Props {
   comment: boolean
+  chatUserId?: number
+  communityId?: number
 }
 
 export default function TextEditor(props: Props) {
-  const { comment } = props
+  const { comment, chatUserId, communityId } = props
   const { postId } = useParams()
   const userData = useSelector((state: RootState) => state.userData)
   const editingPost = useSelector((state: RootState) => state.postList.editingPost)
   const editingComment = useSelector((state: RootState) => state.commentList.editingComment)
+  const editingMessage = useSelector((state: RootState) => state.messageList.editingMessage)
   const initialPost: Post = {
     content: '',
     createdAt: '',
@@ -111,38 +116,34 @@ export default function TextEditor(props: Props) {
     setPost((prev) => ({ ...prev, images, video }))
   }
 
-  const handleGetPostList = async () => {
-    const friends: Friend[] = (await fetchApi.get('friends')).data
-    const posts: Post[] = (await fetchApi.get('posts')).data
-    if (posts.length > 0) {
-      const postList: Post[] = []
-      posts.filter((post) => {
-        post.userId === userData.id && postList.push(post)
-        friends.length > 0 &&
-          friends.forEach((friend) => {
-            post.userId === friend.friendId && friend.userId === userData.id && postList.push(post)
-          })
-      })
-      dispatch(setPostList(postList))
-    }
-  }
-
   const handleCancelEditing = () => {
-    dispatch(comment ? cancelEditingComment() : cancelEditing())
+    dispatch(chatUserId ? cancelEditingMessage() : comment ? cancelEditingComment() : cancelEditing())
     textInput?.classList.remove('h-[10rem]')
     errorTextInput.innerText = ''
-    video.name = ''
-    video.src = ''
-    delete video.url
-    delete video.origin
-    images.splice(0, images.length)
+    // video.name = ''
+    // video.src = ''
+    // delete video.url
+    // delete video.origin
+    // while (images.length > 0) {
+    //   images.pop()
+    // }
     setPost(initialPost)
     setLoading(false)
   }
 
   const handleGetCommentList = async () => {
-    const result: Comment[] = (await fetchApi.get('comments')).data
+    const result: Comment[] = (await fetchApi.get(`commentsPost/${postId}/0/0`)).data
     dispatch(setCommentList(result))
+  }
+
+  const handleGetMessageList = async () => {
+    const result: Message[] = (await fetchApi.get('messages')).data
+    const messageList: Message[] = []
+    result.forEach((message) => {
+      message.friendId === userData.id && message.userId === chatUserId && messageList.push(message)
+      message.friendId === chatUserId && message.userId === userData.id && messageList.push(message)
+    })
+    dispatch(setMessageList(messageList))
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -170,7 +171,11 @@ export default function TextEditor(props: Props) {
             await handleUploadFile()
           }
           const result = (await fetchApi.put(`post/${post.id}`, { ...post, modifiedAt: createdAt, userId })).data
+          const postUpdated = { ...post, modifiedAt: createdAt, userId: userId as number }
+          postUpdated.images && postUpdated.images?.forEach((image) => (image.origin = {} as File))
+          postUpdated.video?.origin && (postUpdated.video.origin = {} as File)
           toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+          dispatch(setNewPost(postUpdated))
         } else if (editingComment !== null && comment) {
           setLoading(true)
           if (images.length > 0 || video.name) {
@@ -190,21 +195,49 @@ export default function TextEditor(props: Props) {
             await fetchApi.put(`comment/${editingComment.id}`, { ...comment, modifiedAt: createdAt, userId })
           ).data
           toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+          handleGetCommentList()
+        } else if (editingMessage !== null && chatUserId) {
+          setLoading(true)
+          if (images.length > 0 || video.name) {
+            if (images.length > 0 && (editingMessage.images?.length as number) > 0) {
+              for await (const image of editingMessage.images as FilePreview[]) {
+                await deleteFile(image.name)
+              }
+            }
+            if (video.name && editingMessage.video?.name) {
+              await deleteFile(editingMessage.video?.name)
+            }
+            await handleUploadFile()
+          }
+          const { type, communityId, ...data } = post
+          const message = { ...data, modifiedAt: createdAt, userId, friendId: chatUserId }
+          const result = (await fetchApi.put(`message/${editingMessage.id}`, { ...message })).data
+          toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+          result.message && socket.emit('sendMessageClient', { friendId: chatUserId })
         } else {
           await handleUploadFile()
           if (comment) {
-            const { type, communityId, ...data } = post
-            const comment = { ...data, postId }
-            const result = (await fetchApi.post('comment', { ...comment, createdAt, userId })).data
-            toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+            if (chatUserId) {
+              const { type, communityId, ...data } = post
+              const message = { ...data, createdAt, userId, friendId: chatUserId }
+              const result = (await fetchApi.post('message', { ...message })).data
+              result.message && socket.emit('sendMessageClient', { friendId: chatUserId })
+            } else {
+              const { type, communityId, ...data } = post
+              const comment = { ...data, postId }
+              const result = (await fetchApi.post('comment', { ...comment, createdAt, userId })).data
+              toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+              handleGetCommentList()
+              socket.emit('sendDataClient', { ...comment, createdAt, userId })
+            }
           } else {
             const result = (await fetchApi.post('post', { ...post, createdAt, userId })).data
             toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+            dispatch(setNewPost(result.post))
           }
         }
         handleCancelEditing()
-        handleGetPostList()
-        handleGetCommentList()
+        handleGetMessageList()
       } catch (error: any) {
         throw error.response
       }
@@ -267,12 +300,19 @@ export default function TextEditor(props: Props) {
     }
   }, [editingComment, comment])
 
+  useEffect(() => {
+    if (chatUserId && editingMessage !== null) {
+      setPost({ ...editingMessage, communityId: 0, type: '' })
+      window.scrollTo(0, 9999)
+    }
+  }, [editingMessage, chatUserId])
+
   return (
     <>
       <div
         className={`${
-          comment ? '' : 'py-4 px-8 border border-solid border-border-color rounded-md'
-        } flex items-start justify-start bg-white text-14 ${comment ? '' : 'mb-8'}`}
+          comment ? '' : 'py-4 px-8 border border-solid border-border-color dark:border-dark-border-color rounded-md'
+        } flex items-start justify-start bg-bg-light dark:bg-bg-dark text-14 ${comment ? '' : 'mb-8'}`}
       >
         <button className='mr-4'>
           <img
@@ -284,7 +324,7 @@ export default function TextEditor(props: Props) {
         </button>
         <div className='w-full flex-1'>
           <form method='POST' onSubmit={handleSubmit} onReset={handleCancelEditing}>
-            {comment ? (
+            {comment || communityId ? (
               ''
             ) : (
               <select
@@ -292,7 +332,7 @@ export default function TextEditor(props: Props) {
                 value={post.type}
                 name='typePost'
                 id='typePost'
-                className='outline-none pr-2 mb-2 text-primary-color font-bold cursor-pointer'
+                className='outline-none pr-2 mb-2 text-primary-color dark:text-dark-primary-color font-bold cursor-pointer dark:bg-bg-dark'
               >
                 <option className='font-bold' value='public'>
                   Công khai
@@ -310,23 +350,35 @@ export default function TextEditor(props: Props) {
               spellCheck={false}
               name='textInput'
               id='textInput'
-              className='w-full rounded-md border border-solid border-border-color outline-none px-4 pt-2 resize-none scroll-hidden text-left'
-              placeholder={comment ? 'Hãy nêu cảm nghĩ của bạn' : 'Bạn đang cảm thấy như thế nào ?'}
+              className='w-full rounded-md border border-solid dark:bg-dark-input-color dark:text-dark-text-color border-border-color dark:border-dark-border-color outline-none px-4 pt-2 resize-none scrollbar-hidden text-left'
+              placeholder={
+                comment && !chatUserId
+                  ? 'Hãy nêu cảm nghĩ của bạn 😊'
+                  : comment && chatUserId
+                  ? 'Nhập nội dung tại đây 🖊️'
+                  : 'Bạn đang cảm thấy như thế nào 🤔'
+              }
             />
             <span className='text-red-600 error-text-input'></span>
 
             {isLoading ? (
-              <Skeleton className='h-[25rem] mb-2' />
+              <Skeleton className={`${chatUserId ? 'h-52 w-72' : 'h-[25rem]'} mb-2 dark:bg-bg-dark`} />
             ) : (
               <>
                 {(post.images?.length as number) > 0 && (
-                  <SectionPreview data={post.images as FilePreview[]} deleteItem={handleDelete} />
+                  <SectionPreview
+                    data={post.images as FilePreview[]}
+                    deleteItem={handleDelete}
+                    chatUserId={chatUserId}
+                  />
                 )}
-                {post.video?.name && <SectionPreview data={post.video as FilePreview} deleteItem={handleDelete} />}
+                {post.video?.name && (
+                  <SectionPreview data={post.video as FilePreview} deleteItem={handleDelete} chatUserId={chatUserId} />
+                )}
               </>
             )}
 
-            <div className='flex items-center justify-end text-primary-color text-16 font-semibold'>
+            <div className='flex items-center justify-end text-primary-color dark:text-dark-primary-color text-16 font-semibold'>
               {isLoading ? (
                 ''
               ) : (
@@ -334,7 +386,7 @@ export default function TextEditor(props: Props) {
                   <div className='flex items-center justify-start'>
                     <label
                       htmlFor='images'
-                      className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color to-secondary-color hover:text-white cursor-pointer'
+                      className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color hover:text-white cursor-pointer'
                     >
                       <FontAwesomeIcon icon={faImage} />
                     </label>
@@ -351,7 +403,7 @@ export default function TextEditor(props: Props) {
                   <div className='ml-8 flex items-center justify-start'>
                     <label
                       htmlFor='video'
-                      className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color to-secondary-color hover:text-white cursor-pointer'
+                      className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color hover:text-white cursor-pointer'
                     >
                       <FontAwesomeIcon icon={faFileVideo} />
                     </label>
@@ -374,7 +426,7 @@ export default function TextEditor(props: Props) {
               {isLoading ? (
                 <button
                   disabled
-                  className='ml-8 text-white bg-gradient-to-r from-primary-color to-secondary-color rounded-md px-6 py-1 opacity-50'
+                  className='ml-8 text-white bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md px-6 py-1 opacity-50'
                 >
                   <FontAwesomeIcon className='animate-spin mr-2' icon={faC} />
                   <span>Đang xử lý</span>
@@ -382,9 +434,15 @@ export default function TextEditor(props: Props) {
               ) : (
                 <button
                   id='btnSubmit'
-                  className='ml-8 text-white bg-gradient-to-r from-primary-color to-secondary-color rounded-md px-6 py-1 opacity-20 cursor-not-allowed'
+                  className='ml-8 text-white bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md px-6 py-1 opacity-20 cursor-not-allowed'
                 >
-                  {editingPost || editingComment ? 'Cập nhật' : comment ? 'Bình luận' : 'Đăng bài'}
+                  {editingPost || editingComment || editingMessage
+                    ? 'Cập nhật'
+                    : comment && !chatUserId
+                    ? 'Bình luận'
+                    : comment && chatUserId
+                    ? 'Gửi'
+                    : 'Đăng bài'}
                 </button>
               )}
             </div>

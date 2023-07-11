@@ -50,7 +50,7 @@ export default function DefaultLayout(props: Props) {
   return (
     <>
       {isLogin && (
-        <div className='font-inter bg-input-color'>
+        <div className='font-inter bg-input-color dark:bg-dark-input-color min-h-screen'>
           <Header />
           {children}
           <ToastContainer />

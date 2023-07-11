@@ -12,6 +12,7 @@ export interface User {
   avatar?: { name: string; url: string }
   backgroundImage?: { name: string; url: string }
   verify?: string
+  isOnline?: string
   rePassword?: string
 }
 
@@ -47,6 +48,18 @@ export interface Comment {
   createdAt: string
   userId: number
   postId: number
+  id?: number
+  modifiedAt?: string
+  images?: FilePreview[]
+  video?: FilePreview
+  deleted?: number
+}
+
+export interface Message {
+  content: string
+  createdAt: string
+  userId: number
+  friendId: number
   id?: number
   modifiedAt?: string
   images?: FilePreview[]

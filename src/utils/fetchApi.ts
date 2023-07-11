@@ -8,7 +8,7 @@ class Http {
   constructor() {
     this.requestRefreshToken = null
     this.instance = axios.create({
-      baseURL: 'http://localhost:3105/api/',
+      baseURL: import.meta.env.VITE_API_URL,
       timeout: 10000
     })
     this.instance.interceptors.request.use(

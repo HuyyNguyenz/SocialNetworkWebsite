@@ -119,8 +119,8 @@ export default function EditProfile(props: Props) {
 
   return (
     <>
-      <div className='text-center fixed center w-[48rem] h-[90%] bg-white border border-solid border-border-color z-[60] rounded-md py-2 text-20 text-text-color overflow-hidden'>
-        <div className='flex item-center justify-between text-title-color border-b border-solid border-border-color py-4 px-6'>
+      <div className='text-center fixed center w-[48rem] h-[90%] bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color z-[60] rounded-md py-2 text-20 text-text-color dark:text-dark-text-color overflow-hidden'>
+        <div className='flex item-center justify-between text-title-color dark:text-dark-title-color border-b border-solid border-border-color dark:border-dark-border-color py-4 px-6'>
           <h2 className='font-bold'>Chỉnh sửa trang cá nhân</h2>
           <button onClick={handleCloseEditProfile} className='hover:opacity-80'>
             <FontAwesomeIcon icon={faTimes} />
@@ -132,7 +132,7 @@ export default function EditProfile(props: Props) {
             <div className='flex items-center justify-start'>
               <label
                 htmlFor='avatar'
-                className='text-16 hover:text-secondary-color hover:font-bold cursor-pointer transition-all ease-linear duration-150'
+                className='text-16 hover:text-primary-color dark:hover:text-dark-primary-color hover:font-bold cursor-pointer transition-all ease-linear duration-150'
               >
                 Chỉnh sửa
               </label>
@@ -148,7 +148,7 @@ export default function EditProfile(props: Props) {
           </div>
           {avatar?.src ? (
             isLoading ? (
-              <Skeleton className='w-28 h-28 object-cover rounded-md my-0 mx-auto' />
+              <Skeleton className='w-28 h-28 object-cover rounded-md my-0 mx-auto dark:bg-bg-dark' />
             ) : (
               <img
                 className='w-28 h-28 object-cover rounded-md my-0 mx-auto'
@@ -172,7 +172,7 @@ export default function EditProfile(props: Props) {
             <div className='flex items-center justify-start'>
               <label
                 htmlFor='coverImage'
-                className='text-16 hover:text-secondary-color hover:font-bold cursor-pointer transition-all ease-linear duration-150'
+                className='text-16 hover:text-primary-color dark:hover:text-dark-primary-color hover:font-bold cursor-pointer transition-all ease-linear duration-150'
               >
                 Chỉnh sửa
               </label>
@@ -188,7 +188,7 @@ export default function EditProfile(props: Props) {
           </div>
           {coverImage?.src ? (
             isLoading ? (
-              <Skeleton className='w-[70%] h-[14rem] object-cover rounded-md my-0 mx-auto' />
+              <Skeleton className='w-[70%] h-[14rem] object-cover rounded-md my-0 mx-auto dark:bg-bg-dark' />
             ) : (
               <img
                 className='w-[70%] h-[14rem] object-cover rounded-md my-0 mx-auto'
@@ -209,7 +209,7 @@ export default function EditProfile(props: Props) {
         {isLoading ? (
           <button
             disabled
-            className='mt-4 bg-gradient-to-r from-primary-color to-secondary-color rounded-md text-white font-semibold w-[30%] py-1 text-16 cursor-not-allowed opacity-50'
+            className='mt-4 bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md text-white font-semibold w-[30%] py-1 text-16 cursor-not-allowed opacity-50'
           >
             <FontAwesomeIcon className='animate-spin mr-2' icon={faC} />
             <span>Đang xử lý</span>
@@ -218,7 +218,7 @@ export default function EditProfile(props: Props) {
           <button
             id='submitBtn'
             onClick={handleClick}
-            className='mt-4 bg-gradient-to-r from-primary-color to-secondary-color rounded-md text-white font-semibold w-[30%] py-1 text-16'
+            className='mt-4 bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md text-white font-semibold w-[30%] py-1 text-16'
           >
             Cập nhật
           </button>

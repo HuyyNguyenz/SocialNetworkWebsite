@@ -1,18 +1,16 @@
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import { RootState } from '~/store'
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import PostItem from '~/components/PostItem'
 import DefaultLayout from '~/layouts/DefaultLayout'
 import { Comment, Post, User } from '~/types'
 import fetchApi from '~/utils/fetchApi'
-import { setCommentList } from '~/features/comment/commentSlice'
-import { setPostList } from '~/features/post/postSlice'
 import CommentList from '~/components/CommentList'
+import { useDispatch, useSelector } from 'react-redux'
+import { setCommentList } from '~/features/comment/commentSlice'
+import { RootState } from '~/store'
 
 export default function PostDetail() {
-  const postList = useSelector((state: RootState) => state.postList.data)
+  const userData = useSelector((state: RootState) => state.userData)
   const commentList = useSelector((state: RootState) => state.commentList.data)
   const [users, setUsers] = useState<User[]>([])
   const [authorData, setAuthorData] = useState<User>()
@@ -20,26 +18,56 @@ export default function PostDetail() {
   const [comments, setComments] = useState<Comment[]>([])
   const { author, postId } = useParams()
   const dispatch = useDispatch()
+  const [offset, setOffset] = useState<number>(0)
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [stopHasMore, setStopHasMore] = useState<boolean>(false)
+  const [isLoading, setLoading] = useState<boolean>(false)
+  const navigate = useNavigate()
+
+  const getComments = useCallback(
+    async (controller?: AbortController) => {
+      const comments: Comment[] = (
+        await fetchApi.get(`commentsPost/${postId}/5/${offset}`, controller && { signal: controller.signal })
+      ).data
+      if (comments.length > 0) {
+        isLoading
+          ? setTimeout(() => {
+              setLoading(false)
+              setComments((prev) => [...prev, ...comments])
+            }, 1000)
+          : setComments((prev) => [...prev, ...comments])
+      } else {
+        setTimeout(() => {
+          setLoading(false)
+        }, 1000)
+        setStopHasMore(true)
+      }
+      setHasMore(false)
+      setOffset((prev) => prev + 5)
+    },
+    [postId, offset, isLoading]
+  )
+
+  useEffect(() => {
+    post && post.type === 'private' && post.userId !== userData.id && navigate('/')
+    post && post.deleted === 1 && navigate(`/${author}/post/${postId}/deleted`)
+  }, [post, userData.id, navigate, author, postId])
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('posts', { signal: controller.signal }).then((res) => {
-      dispatch(setPostList(res.data))
-    })
+    postId && fetchApi.get(`post/${postId}`, { signal: controller.signal }).then((res) => setPost(res.data[0]))
     return () => {
       controller.abort()
     }
-  }, [dispatch])
+  }, [postId])
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('comments', { signal: controller.signal }).then((res) => {
-      dispatch(setCommentList(res.data))
-    })
+    postId && hasMore && getComments(controller)
     return () => {
       controller.abort()
     }
-  }, [dispatch])
+  }, [postId, getComments, hasMore])
 
   useEffect(() => {
     if (author) {
@@ -57,18 +85,20 @@ export default function PostDetail() {
   }, [author])
 
   useEffect(() => {
-    if (postId) {
-      postList.find((post) => {
-        post.id === Number(postId) && setPost(post)
-      })
+    return () => {
+      dispatch(setCommentList([]))
     }
-  }, [postId, postList])
+  }, [dispatch])
 
   useEffect(() => {
-    if (commentList.length > 0) {
-      const newCommentList: Comment[] = []
-      commentList.forEach((comment) => comment.postId === Number(postId) && newCommentList.push(comment))
-      setComments(newCommentList)
+    const controller = new AbortController()
+    commentList.length > 0 &&
+      fetchApi.get(`commentsPost/${postId}/5/0`, { signal: controller.signal }).then((res) => {
+        setComments(res.data)
+        setOffset(5)
+      })
+    return () => {
+      controller.abort()
     }
   }, [commentList, postId])
 
@@ -77,7 +107,17 @@ export default function PostDetail() {
       <main>
         <div className='w-[48rem] max-w-3xl my-0 mx-auto pt-28 pb-10'>
           {authorData && post && <PostItem post={post} author={authorData} detail={true} />}
-          <CommentList commentList={comments} users={users} authorPostId={Number(post?.userId)} />
+          <CommentList
+            loading={isLoading}
+            commentList={comments}
+            users={users}
+            authorPostId={Number(post?.userId)}
+            hasMore={(value) => {
+              setLoading(true)
+              setHasMore(value)
+            }}
+            stopHasMore={stopHasMore}
+          />
         </div>
       </main>
     </DefaultLayout>

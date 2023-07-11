@@ -1,30 +1,45 @@
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import Loading from '~/components/Loading'
 import PostList from '~/components/PostList'
 import TextEditor from '~/components/TextEditor'
+import postGif from '~/assets/images/post.gif'
+import { useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '~/store'
+import { useEffect, useState } from 'react'
+import { setNewPost, setPostList } from '~/features/post/postSlice'
+import fetchApi from '~/utils/fetchApi'
 import { setCommentList } from '~/features/comment/commentSlice'
 import UserProfileLayout from '~/layouts/UserProfileLayout'
-import { RootState } from '~/store'
-import fetchApi from '~/utils/fetchApi'
-import { Post } from '~/types'
 
 export default function UserProfile() {
-  const userData = useSelector((state: RootState) => state.userData)
-  const posts = useSelector((state: RootState) => state.postList.data)
-  const [postList, setPostList] = useState<Post[]>([])
   const { userId } = useParams()
+  const userData = useSelector((state: RootState) => state.userData)
+  const postList = useSelector((state: RootState) => state.postList.data)
+  const newPost = useSelector((state: RootState) => state.postList.newPost)
+  const [offset, setOffset] = useState<number>(0)
+  const [hasMore, setHasMore] = useState<boolean>(true)
   const dispatch = useDispatch()
 
+  const getPostList = async () => {
+    const result = (await fetchApi.get(`postsUser/${userId}/5/${offset}`)).data
+    result.length === 0 ? setHasMore(false) : dispatch(setPostList([...postList, ...result]))
+    setOffset((prev) => prev + 5)
+  }
+
   useEffect(() => {
-    const controller = new AbortController()
-    fetchApi.get('posts', { signal: controller.signal }).then((res) => {
-      setPostList(res.data)
-    })
-    return () => {
-      controller.abort()
+    if (userId || newPost !== null) {
+      const controller = new AbortController()
+      fetchApi.get(`postsUser/${userId}/5/0`, { signal: controller.signal }).then((res) => {
+        dispatch(setPostList(res.data))
+        setHasMore(true)
+        setOffset(5)
+      })
+      return () => {
+        controller.abort()
+      }
     }
-  }, [dispatch])
+  }, [userId, dispatch, newPost])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -37,13 +52,34 @@ export default function UserProfile() {
   }, [dispatch])
 
   useEffect(() => {
-    setPostList(posts)
-  }, [posts])
+    return () => {
+      dispatch(setPostList([]))
+      dispatch(setNewPost(null))
+    }
+  }, [dispatch])
 
   return (
     <UserProfileLayout>
-      {userData.username === userId && <TextEditor comment={false} />}
-      {postList.length > 0 && <PostList postList={postList} profile={true} />}
+      {userData.id === Number(userId) && <TextEditor comment={false} />}
+      {postList.length > 0 ? (
+        <InfiniteScroll
+          dataLength={postList.length}
+          next={getPostList}
+          hasMore={hasMore}
+          loader={<Loading quantity={1} />}
+        >
+          <PostList postList={postList} profile={true} />
+        </InfiniteScroll>
+      ) : (
+        <div>
+          <h2 className='text-18 uppercase font-semibold text-center bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color bg-clip-text text-transparent'>
+            {userData.id === Number(userId)
+              ? 'Hãy cho chúng tôi biết cảm nghĩ của bạn'
+              : 'Người dùng hiện tại chưa có bài viết.'}
+          </h2>
+          <img className='object-cover rounded-md' src={postGif} alt='gif' />
+        </div>
+      )}
     </UserProfileLayout>
   )
 }

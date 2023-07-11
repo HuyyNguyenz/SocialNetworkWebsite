@@ -2,20 +2,23 @@ import { useState } from 'react'
 import Tippy from '@tippyjs/react/headless'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
-import { Comment, FilePreview } from '~/types'
+import { Comment, FilePreview, Message } from '~/types'
 import { confirmAlert } from 'react-confirm-alert'
 import { useDispatch } from 'react-redux'
 import { deleteComment, startEditingComment } from '~/features/comment/commentSlice'
 import fetchApi from '~/utils/fetchApi'
 import { toast } from 'react-toastify'
 import { deleteFile } from '~/utils/firebase'
+import { deleteMessage, startEditingMessage } from '~/features/message/messageSlice'
+import socket from '~/socket'
 
 interface Props {
-  comment: Comment
+  comment?: Comment
+  message?: Message
 }
 
 export default function SettingComment(props: Props) {
-  const { comment } = props
+  const { comment, message } = props
   const [isOpenSetting, setOpenSetting] = useState<boolean>(false)
   const dispatch = useDispatch()
 
@@ -29,15 +32,15 @@ export default function SettingComment(props: Props) {
           onClick: async () => {
             const commentDeleted = { ...comment }
             commentDeleted.deleted = 1
-            dispatch(deleteComment(commentDeleted))
-            const result = (await fetchApi.delete(`comment/${comment.id}`)).data
+            const result = (await fetchApi.delete(`comment/${comment?.id}`)).data
+            dispatch(deleteComment(commentDeleted as Comment))
             toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
-            if ((comment.images?.length as number) > 0) {
-              for await (const image of comment.images as FilePreview[]) {
+            if ((comment?.images?.length as number) > 0) {
+              for await (const image of comment?.images as FilePreview[]) {
                 await deleteFile(image.name)
               }
             }
-            if (comment.video?.name) {
+            if (comment?.video?.name) {
               await deleteFile(comment.video.name)
             }
           }
@@ -49,8 +52,44 @@ export default function SettingComment(props: Props) {
     })
   }
 
+  const handleDeleteMessage = () => {
+    confirmAlert({
+      title: 'Xác nhận để gỡ tin nhắn',
+      message: 'Bạn có chắc là muốn gỡ tin nhắn ?',
+      buttons: [
+        {
+          label: 'Đồng ý',
+          onClick: async () => {
+            const messageDeleted = { ...(message as Message) }
+            messageDeleted.deleted = 1
+            dispatch(deleteMessage(messageDeleted))
+            const result = (await fetchApi.delete(`message/${message?.id}`)).data
+            toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+            if ((message?.images?.length as number) > 0) {
+              for await (const image of message?.images as FilePreview[]) {
+                await deleteFile(image.name)
+              }
+            }
+            if (message?.video?.name) {
+              await deleteFile(message.video.name)
+            }
+            socket.emit('sendMessageClient', { friendId: message?.friendId })
+          }
+        },
+        {
+          label: 'Huỷ'
+        }
+      ]
+    })
+  }
+
   const handleEditingComment = () => {
-    dispatch(startEditingComment(comment))
+    dispatch(startEditingComment(comment as Comment))
+    setOpenSetting(false)
+  }
+
+  const handleEditingMessage = () => {
+    dispatch(startEditingMessage(message as Message))
     setOpenSetting(false)
   }
 
@@ -58,27 +97,36 @@ export default function SettingComment(props: Props) {
     <div>
       <Tippy
         zIndex={10}
-        placement='right-start'
+        placement={message ? 'left-start' : 'right-start'}
         onClickOutside={() => setOpenSetting(false)}
         visible={isOpenSetting}
         interactive
         render={(attrs) => (
           <div
-            className='flex flex-col items-start justify-start bg-white border border-solid border-border-color shadow-md rounded-md py-2 text-14 text-text-color'
+            className='flex flex-col items-start justify-start bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color shadow-md rounded-md py-2 text-14 text-text-color dark:text-dark-text-color'
             tabIndex={-1}
             {...attrs}
           >
-            <button onClick={handleEditingComment} className='w-full px-4 py-2 hover:bg-hover-color'>
+            <button
+              onClick={message ? handleEditingMessage : handleEditingComment}
+              className='w-full px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
+            >
               Chỉnh sửa
             </button>
-            <button onClick={handleDeleteComment} className='w-full px-4 py-2 hover:bg-hover-color'>
-              Xoá
+            <button
+              onClick={message ? handleDeleteMessage : handleDeleteComment}
+              className='w-full px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
+            >
+              {message ? 'Gỡ tin nhắn' : 'Xoá'}
             </button>
           </div>
         )}
       >
         <button onClick={() => setOpenSetting(!isOpenSetting)} className='flex items-center justify-start'>
-          <FontAwesomeIcon icon={faEllipsis} className='hover:bg-hover-color rounded-full p-2' />
+          <FontAwesomeIcon
+            icon={faEllipsis}
+            className='hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-full p-2'
+          />
         </button>
       </Tippy>
     </div>

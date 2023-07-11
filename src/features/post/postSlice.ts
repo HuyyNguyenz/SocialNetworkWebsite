@@ -4,11 +4,13 @@ import { Post } from '~/types'
 interface PostSlice {
   data: Post[]
   editingPost: Post | null
+  newPost: Post | null
 }
 
 const initialState: PostSlice = {
   data: [],
-  editingPost: null
+  editingPost: null,
+  newPost: null
 }
 
 const postSlice = createSlice({
@@ -17,6 +19,9 @@ const postSlice = createSlice({
   reducers: {
     setPostList: (state, action: PayloadAction<Post[]>) => {
       state.data = action.payload
+    },
+    setNewPost: (state, action: PayloadAction<Post | null>) => {
+      state.newPost = action.payload
     },
     deletePost: (state, action: PayloadAction<Post>) => {
       const id = action.payload.id
@@ -33,6 +38,6 @@ const postSlice = createSlice({
   }
 })
 
-export const { setPostList, deletePost, startEditing, cancelEditing } = postSlice.actions
+export const { setPostList, deletePost, startEditing, cancelEditing, setNewPost } = postSlice.actions
 const postReducer = postSlice.reducer
 export default postReducer

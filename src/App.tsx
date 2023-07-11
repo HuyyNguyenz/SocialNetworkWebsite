@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { publicRoutes } from './routes/index.ts'
 import { Router } from './types/index.ts'
+import './locales/vi.ts'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'react-confirm-alert/src/react-confirm-alert.css'

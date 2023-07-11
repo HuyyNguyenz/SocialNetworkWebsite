@@ -66,12 +66,12 @@ export default function SettingPost(props: Props) {
         zIndex={10}
         render={(attrs) => (
           <div
-            className='bg-white rounded-md border border-solid border-border-color text-14 py-4 shadow-md animate-fade'
+            className='bg-bg-light dark:bg-bg-dark rounded-md border border-solid border-border-color dark:border-dark-border-color text-14 py-4 shadow-md animate-fade'
             tabIndex={-1}
             {...attrs}
           >
             <button
-              className={`w-full flex items-center justify-start px-4 py-2 hover:bg-hover-color ${
+              className={`w-full flex items-center justify-start px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color ${
                 userData.id === post.userId ? 'mb-2' : ''
               }`}
             >
@@ -82,14 +82,14 @@ export default function SettingPost(props: Props) {
               <>
                 <button
                   onClick={handleEditingPost}
-                  className='w-full flex items-center justify-start px-4 py-2 mb-2 hover:bg-hover-color'
+                  className='w-full flex items-center justify-start px-4 py-2 mb-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
                 >
                   <FontAwesomeIcon icon={faPencil} />
                   <span className='ml-2'>Chỉnh sửa bài viết</span>
                 </button>
                 <button
                   onClick={handleDeletePost}
-                  className='w-full flex items-center justify-start px-4 py-2 hover:bg-hover-color'
+                  className='w-full flex items-center justify-start px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
                 >
                   <FontAwesomeIcon icon={faTrash} />
                   <span className='ml-2'>Xoá bài viết</span>
@@ -102,7 +102,7 @@ export default function SettingPost(props: Props) {
         <button onClick={() => setOpenSetting(!isOpenSetting)}>
           <FontAwesomeIcon
             icon={faEllipsis}
-            className='text-20 text-title-color rounded-full p-2 hover:bg-hover-color'
+            className='text-20 text-title-color dark:text-dark-title-color rounded-full p-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
           />
         </button>
       </Tippy>

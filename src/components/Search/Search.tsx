@@ -59,27 +59,33 @@ export default function Search() {
         interactive
         render={(attrs) => (
           <div className='overflow-hidden shadow-lg rounded-md animate-fade' tabIndex={-1} {...attrs}>
-            <div className='w-[26.5rem] text-14 p-2 bg-white border border-solid border-border-color min-h-[6.25rem] max-h-[25rem] overflow-y-scroll'>
-              <h2 className='text-title-color font-semibold mb-2'>Kết quả tìm kiếm {`'${searchValue}'`}</h2>
+            <div
+              className={`scrollbar w-[26.5rem] text-14 p-2 bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color min-h-[6.25rem] max-h-[25rem] overflow-y-auto`}
+            >
+              <h2 className='text-title-color dark:text-dark-title-color font-semibold mb-2'>
+                Kết quả tìm kiếm {`'${searchValue}'`}
+              </h2>
               {searchData.length > 0 ? (
                 searchData.map((data) => <UserPreview key={data.id} data={data} />)
               ) : (
-                <span>Không tìm thấy</span>
+                <span className='dark:text-dark-text-color'>Không tìm thấy</span>
               )}
             </div>
           </div>
         )}
       >
-        <div className='w-[26.5rem] h-9 flex ml-[5.25rem] items-center justify-start text-text-color text-14 rounded-md border border-solid border-border-color bg-input-color overflow-hidden'>
+        <div
+          className={`h-9 flex w-[26.5rem] ml-[5.25rem] items-center justify-start text-text-color dark:text-dark-text-color text-14 rounded-md border border-solid border-border-color dark:border-dark-border-color bg-input-color dark:bg-dark-input-color overflow-hidden`}
+        >
           <FontAwesomeIcon icon={faSearch} className='px-4' />
           <input
             onFocus={() => setVisible(true)}
             type='text'
             name='search'
             id='search'
-            placeholder='Tìm kiếm bạn bè...'
+            placeholder='Tìm kiếm ...'
             spellCheck={false}
-            className='w-full h-full py-2 bg-input-color outline-none'
+            className='w-full h-full py-2 bg-input-color dark:bg-dark-input-color outline-none'
             onChange={handleChange}
             value={searchValue}
           />

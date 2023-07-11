@@ -15,9 +15,9 @@ export default function Loading(props: Props) {
     <>
       {loadingArray.length > 0 &&
         loadingArray.map((id) => (
-          <div key={id} className='flex items-start justify-start w-full py-4 px-8'>
-            <Skeleton circle className='w-8 h-8 mr-4' />
-            <Skeleton count={5} className='w-[41rem]' />
+          <div key={id} className='flex items-start justify-start w-full py-4 px-8 '>
+            <Skeleton circle className='w-8 h-8 mr-4 dark:bg-bg-dark' />
+            <Skeleton count={5} className='w-[41rem] dark:bg-bg-dark' />
           </div>
         ))}
     </>
