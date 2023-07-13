@@ -26,24 +26,28 @@ export default function PostDetail() {
 
   const getComments = useCallback(
     async (controller?: AbortController) => {
-      const comments: Comment[] = (
-        await fetchApi.get(`commentsPost/${postId}/5/${offset}`, controller && { signal: controller.signal })
-      ).data
-      if (comments.length > 0) {
-        isLoading
-          ? setTimeout(() => {
-              setLoading(false)
-              setComments((prev) => [...prev, ...comments])
-            }, 1000)
-          : setComments((prev) => [...prev, ...comments])
-      } else {
-        setTimeout(() => {
-          setLoading(false)
-        }, 1000)
-        setStopHasMore(true)
+      try {
+        const comments: Comment[] = (
+          await fetchApi.get(`commentsPost/${postId}/5/${offset}`, controller && { signal: controller.signal })
+        ).data
+        if (comments.length > 0) {
+          isLoading
+            ? setTimeout(() => {
+                setLoading(false)
+                setComments((prev) => [...prev, ...comments])
+              }, 1000)
+            : setComments((prev) => [...prev, ...comments])
+        } else {
+          setTimeout(() => {
+            setLoading(false)
+          }, 1000)
+          setStopHasMore(true)
+        }
+        setHasMore(false)
+        setOffset((prev) => prev + 5)
+      } catch (error: any) {
+        error.name !== 'CanceledError' && console.log(error)
       }
-      setHasMore(false)
-      setOffset((prev) => prev + 5)
     },
     [postId, offset, isLoading]
   )
@@ -55,7 +59,11 @@ export default function PostDetail() {
 
   useEffect(() => {
     const controller = new AbortController()
-    postId && fetchApi.get(`post/${postId}`, { signal: controller.signal }).then((res) => setPost(res.data[0]))
+    postId &&
+      fetchApi
+        .get(`post/${postId}`, { signal: controller.signal })
+        .then((res) => setPost(res.data[0]))
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }
@@ -72,12 +80,15 @@ export default function PostDetail() {
   useEffect(() => {
     if (author) {
       const controller = new AbortController()
-      fetchApi.get('users', { signal: controller.signal }).then((res) => {
-        Array.from(res.data).forEach((user: any) => {
-          user.username === author && setAuthorData(user)
+      fetchApi
+        .get('users', { signal: controller.signal })
+        .then((res) => {
+          Array.from(res.data).forEach((user: any) => {
+            user.username === author && setAuthorData(user)
+          })
+          setUsers(res.data)
         })
-        setUsers(res.data)
-      })
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
       return () => {
         controller.abort()
       }
@@ -93,10 +104,13 @@ export default function PostDetail() {
   useEffect(() => {
     const controller = new AbortController()
     commentList.length > 0 &&
-      fetchApi.get(`commentsPost/${postId}/5/0`, { signal: controller.signal }).then((res) => {
-        setComments(res.data)
-        setOffset(5)
-      })
+      fetchApi
+        .get(`commentsPost/${postId}/5/0`, { signal: controller.signal })
+        .then((res) => {
+          setComments(res.data)
+          setOffset(5)
+        })
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }

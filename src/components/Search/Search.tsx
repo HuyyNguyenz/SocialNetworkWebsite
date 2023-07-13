@@ -28,14 +28,15 @@ export default function Search() {
     if (debounceValue.length > 0) {
       setLoading(true)
       const controller = new AbortController()
-      const { signal } = controller
       const loading = setTimeout(() => {
         const getData = async () => {
           try {
-            const result = (await fetchApi.post('search', { searchValue: debounceValue }, { signal })).data
+            const result = (
+              await fetchApi.post('search', { searchValue: debounceValue }, { signal: controller.signal })
+            ).data
             setSearchData(result)
           } catch (error: any) {
-            throw error.response
+            error.name !== 'CanceledError' && console.log(error)
           }
         }
         getData()
@@ -60,13 +61,17 @@ export default function Search() {
         render={(attrs) => (
           <div className='overflow-hidden shadow-lg rounded-md animate-fade' tabIndex={-1} {...attrs}>
             <div
-              className={`scrollbar w-[26.5rem] text-14 p-2 bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color min-h-[6.25rem] max-h-[25rem] overflow-y-auto`}
+              className={`flex flex-col items-start justify-start scrollbar w-[26.5rem] text-14 p-2 bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color min-h-[6.25rem] max-h-[25rem] overflow-y-auto`}
             >
               <h2 className='text-title-color dark:text-dark-title-color font-semibold mb-2'>
                 Kết quả tìm kiếm {`'${searchValue}'`}
               </h2>
               {searchData.length > 0 ? (
-                searchData.map((data) => <UserPreview key={data.id} data={data} />)
+                searchData.map((data) => (
+                  <button className='w-full' onClick={() => setVisible(false)} key={data.id}>
+                    <UserPreview data={data} />
+                  </button>
+                ))
               ) : (
                 <span className='dark:text-dark-text-color'>Không tìm thấy</span>
               )}

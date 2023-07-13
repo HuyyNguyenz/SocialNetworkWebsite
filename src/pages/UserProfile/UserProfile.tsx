@@ -30,11 +30,14 @@ export default function UserProfile() {
   useEffect(() => {
     if (userId || newPost !== null) {
       const controller = new AbortController()
-      fetchApi.get(`postsUser/${userId}/5/0`, { signal: controller.signal }).then((res) => {
-        dispatch(setPostList(res.data))
-        setHasMore(true)
-        setOffset(5)
-      })
+      fetchApi
+        .get(`postsUser/${userId}/5/0`, { signal: controller.signal })
+        .then((res) => {
+          dispatch(setPostList(res.data))
+          setHasMore(true)
+          setOffset(5)
+        })
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
       return () => {
         controller.abort()
       }
@@ -43,9 +46,12 @@ export default function UserProfile() {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('comments', { signal: controller.signal }).then((res) => {
-      dispatch(setCommentList(res.data))
-    })
+    fetchApi
+      .get('comments', { signal: controller.signal })
+      .then((res) => {
+        dispatch(setCommentList(res.data))
+      })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }

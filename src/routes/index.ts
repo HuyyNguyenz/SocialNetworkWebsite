@@ -1,7 +1,7 @@
 import Friends from '~/pages/Friends'
 import Home from '~/pages/Home'
 import Login from '~/pages/Login'
-import Message from '~/pages/Message'
+import Chat from '~/pages/Chat'
 import NotFound from '~/pages/NotFound'
 import PostDetail from '~/pages/PostDetail'
 import Recovery from '~/pages/Recovery'
@@ -20,7 +20,7 @@ const publicRoutes: Router[] = [
   { path: '/:author/post/:postId', component: PostDetail },
   { path: ':username/profile/:userId/posts', component: UserProfile },
   { path: '/verify/register/:username', component: VerifyRegister },
-  { path: '/message/:userFriendId', component: Message },
+  { path: '/message/:userFriendId', component: Chat },
   { path: '/*', component: NotFound }
 ]
 

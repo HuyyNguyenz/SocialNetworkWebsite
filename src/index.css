@@ -64,6 +64,11 @@ body.dark .scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #606060;
 }
 
+p > a {
+  text-decoration: underline;
+  font-weight: 600;
+}
+
 .active {
   font-weight: 700;
   color: #4661ea;

@@ -28,13 +28,12 @@ export default function DefaultLayout(props: Props) {
 
   useEffect(() => {
     const controller = new AbortController()
-    const { signal } = controller
     const handleGetUserData = async () => {
       try {
-        const result = (await fetchApi.get('user', { signal })).data
+        const result = (await fetchApi.get('user', { signal: controller.signal })).data
         dispatch(setUserData(result))
       } catch (error: any) {
-        throw error.response
+        error.name !== 'CanceledError' && console.log(error)
       }
     }
 

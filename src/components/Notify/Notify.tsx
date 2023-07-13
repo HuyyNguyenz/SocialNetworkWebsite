@@ -76,43 +76,49 @@ export default function Notify() {
 
   const handleGetNotifies = useCallback(
     (controller: AbortController) => {
-      fetchApi.get('notifies', { signal: controller.signal }).then((res) => {
-        const notifyFriendList: NotifyType[] = []
-        const notifyCommentList: NotifyType[] = []
-        const notifyCommunityList: NotifyType[] = []
-        ;(res.data as NotifyType[]).forEach((notify) => {
-          friends.length > 0 &&
-            friends.forEach((friend) => {
-              ;(notify.type === 'friend' &&
-                notify.typeId === friend.id &&
-                userData.id === notify.receiverId &&
-                friend.status === 'pending' &&
-                notifyFriendList.push(notify)) ||
-                (notify.type === 'friend' &&
+      fetchApi
+        .get('notifies', { signal: controller.signal })
+        .then((res) => {
+          const notifyFriendList: NotifyType[] = []
+          const notifyCommentList: NotifyType[] = []
+          const notifyCommunityList: NotifyType[] = []
+          ;(res.data as NotifyType[]).forEach((notify) => {
+            friends.length > 0 &&
+              friends.forEach((friend) => {
+                ;(notify.type === 'friend' &&
                   notify.typeId === friend.id &&
                   userData.id === notify.receiverId &&
-                  friend.status === 'accept' &&
-                  notifyFriendList.push(notify))
-            })
-          notify.type === 'comment' && notify.receiverId === userData.id && notifyCommentList.push(notify)
-          notify.type === 'community' && notify.receiverId === userData.id && notifyCommunityList.push(notify)
+                  friend.status === 'pending' &&
+                  notifyFriendList.push(notify)) ||
+                  (notify.type === 'friend' &&
+                    notify.typeId === friend.id &&
+                    userData.id === notify.receiverId &&
+                    friend.status === 'accept' &&
+                    notifyFriendList.push(notify))
+              })
+            notify.type === 'comment' && notify.receiverId === userData.id && notifyCommentList.push(notify)
+            notify.type === 'community' && notify.receiverId === userData.id && notifyCommunityList.push(notify)
+          })
+          notifyFriendList.sort((a, b) => Number(b.id) - Number(a.id))
+          notifyCommentList.sort((a, b) => Number(b.id) - Number(a.id))
+          notifyCommunityList.sort((a, b) => Number(b.id) - Number(a.id))
+          setFriendNotifies(notifyFriendList)
+          setCommentNotifies(notifyCommentList)
+          setCommunityNotifies(notifyCommunityList)
         })
-        notifyFriendList.sort((a, b) => Number(b.id) - Number(a.id))
-        notifyCommentList.sort((a, b) => Number(b.id) - Number(a.id))
-        notifyCommunityList.sort((a, b) => Number(b.id) - Number(a.id))
-        setFriendNotifies(notifyFriendList)
-        setCommentNotifies(notifyCommentList)
-        setCommunityNotifies(notifyCommunityList)
-      })
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
     },
     [friends, userData.id]
   )
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('users', { signal: controller.signal }).then((res) => {
-      setUsers(res.data)
-    })
+    fetchApi
+      .get('users', { signal: controller.signal })
+      .then((res) => {
+        setUsers(res.data)
+      })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }
@@ -120,9 +126,12 @@ export default function Notify() {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('friends', { signal: controller.signal }).then((res) => {
-      setFriends(res.data)
-    })
+    fetchApi
+      .get('friends', { signal: controller.signal })
+      .then((res) => {
+        setFriends(res.data)
+      })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }
@@ -130,9 +139,12 @@ export default function Notify() {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('comments', { signal: controller.signal }).then((res) => {
-      setComments(res.data)
-    })
+    fetchApi
+      .get('comments', { signal: controller.signal })
+      .then((res) => {
+        setComments(res.data)
+      })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }
@@ -151,8 +163,12 @@ export default function Notify() {
     socket.connect()
     const socketId = socket.id
 
-    fetchApi.put(`user/${userData.id}/true`, {})
-    fetchApi.put(`user/${userData.id}`, { socketId }, { signal: controller.signal })
+    fetchApi
+      .put(`user/${userData.id}/true`, {}, { signal: controller.signal })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
+    fetchApi
+      .put(`user/${userData.id}`, { socketId }, { signal: controller.signal })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     socket.emit('sendRequestOnlineClient', { userId: userData.id })
 
     socket.on('sendCommentNotify', (res: any) => {

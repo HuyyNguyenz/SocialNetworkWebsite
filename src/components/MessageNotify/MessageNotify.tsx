@@ -52,14 +52,17 @@ export default function MessageNotify() {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('notifies', { signal: controller.signal }).then((res) => {
-      const notifies: Notify[] = []
-      ;(res.data as Notify[]).filter(
-        (notify) => notify.type === 'message' && notify.receiverId === userData.id && notifies.push(notify)
-      )
-      setMessageNotifies(notifies)
-      isReload && setReload(false)
-    })
+    fetchApi
+      .get('notifies', { signal: controller.signal })
+      .then((res) => {
+        const notifies: Notify[] = []
+        ;(res.data as Notify[]).filter(
+          (notify) => notify.type === 'message' && notify.receiverId === userData.id && notifies.push(notify)
+        )
+        setMessageNotifies(notifies)
+        isReload && setReload(false)
+      })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }
@@ -68,15 +71,18 @@ export default function MessageNotify() {
   useEffect(() => {
     const controller = new AbortController()
     messageNotifies.length > 0 &&
-      fetchApi.get('messages', { signal: controller.signal }).then((res) => {
-        const messageArray: Message[] = []
-        ;(res.data as Message[]).filter((message) => {
-          messageNotifies.forEach((messageNotify) => {
-            messageNotify.typeId === message.id && messageArray.push(message)
+      fetchApi
+        .get('messages', { signal: controller.signal })
+        .then((res) => {
+          const messageArray: Message[] = []
+          ;(res.data as Message[]).filter((message) => {
+            messageNotifies.forEach((messageNotify) => {
+              messageNotify.typeId === message.id && messageArray.push(message)
+            })
           })
+          setMessages(messageArray)
         })
-        setMessages(messageArray)
-      })
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }
@@ -84,15 +90,18 @@ export default function MessageNotify() {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('friends', { signal: controller.signal }).then((res) => {
-      const friendArray: Friend[] = []
-      ;(res.data as Friend[]).filter((friend) => {
-        friend.friendId === userData.id && friend.status === 'accept' && friendArray.push(friend)
-        friend.userId === userData.id && friend.status === 'accept' && friendArray.push(friend)
+    fetchApi
+      .get('friends', { signal: controller.signal })
+      .then((res) => {
+        const friendArray: Friend[] = []
+        ;(res.data as Friend[]).filter((friend) => {
+          friend.friendId === userData.id && friend.status === 'accept' && friendArray.push(friend)
+          friend.userId === userData.id && friend.status === 'accept' && friendArray.push(friend)
+        })
+        setFriends(friendArray)
+        isReload && setReload(false)
       })
-      setFriends(friendArray)
-      isReload && setReload(false)
-    })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }
@@ -101,16 +110,19 @@ export default function MessageNotify() {
   useEffect(() => {
     const controller = new AbortController()
     friends.length > 0 &&
-      fetchApi.get('users', { signal: controller.signal }).then((res) => {
-        const userArray: User[] = []
-        ;(res.data as User[]).filter((user) => {
-          friends.forEach((friend) => {
-            friend.friendId === user.id && friend.friendId !== userData.id && userArray.push(user)
-            friend.userId === user.id && friend.userId !== userData.id && userArray.push(user)
+      fetchApi
+        .get('users', { signal: controller.signal })
+        .then((res) => {
+          const userArray: User[] = []
+          ;(res.data as User[]).filter((user) => {
+            friends.forEach((friend) => {
+              friend.friendId === user.id && friend.friendId !== userData.id && userArray.push(user)
+              friend.userId === user.id && friend.userId !== userData.id && userArray.push(user)
+            })
           })
+          setUsers(userArray)
         })
-        setUsers(userArray)
-      })
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }

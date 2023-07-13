@@ -21,7 +21,10 @@ export default function PostList(props: Props) {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('users', { signal: controller.signal }).then((res) => setUsers(res.data))
+    fetchApi
+      .get('users', { signal: controller.signal })
+      .then((res) => setUsers(res.data))
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }

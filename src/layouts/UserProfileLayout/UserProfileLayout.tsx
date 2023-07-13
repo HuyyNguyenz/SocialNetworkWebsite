@@ -84,9 +84,12 @@ export default function UserProfileLayout(props: Props) {
       setFriend({})
       setLoading(true)
       const controller = new AbortController()
-      fetchApi.get(`user/${userId}`, { signal: controller.signal }).then((res) => {
-        setUser(res.data)
-      })
+      fetchApi
+        .get(`user/${userId}`, { signal: controller.signal })
+        .then((res) => {
+          setUser(res.data)
+        })
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
       window.scrollTo(0, 0)
       const loading = setTimeout(() => {
         setLoading(false)
@@ -176,11 +179,11 @@ export default function UserProfileLayout(props: Props) {
                     <>
                       <button
                         onClick={handleDeleteFriend}
-                        className='border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color py-2 px-4 hover:bg-hover-color dark:hover:bg-dark-hover-color'
+                        className='dark:text-dark-text-color border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color py-2 px-4 hover:bg-hover-color dark:hover:bg-dark-hover-color'
                       >
                         Huỷ lời mời kết bạn
                       </button>
-                      <span className='opacity-50 ml-4'>Đang theo dõi</span>
+                      <span className='dark:text-dark-text-color opacity-50 ml-4'>Đang theo dõi</span>
                     </>
                   ) : friend && friend.userId !== userData.id && friend.status === 'pending' ? (
                     <>

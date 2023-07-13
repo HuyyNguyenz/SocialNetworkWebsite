@@ -24,9 +24,13 @@ export default function Home() {
 
   const getPostList = useCallback(
     async (controller?: AbortController) => {
-      const result = (await fetchApi.get(`posts/5/${offset}`, controller && { signal: controller.signal })).data
-      result.length === 0 ? setHasMore(false) : setPosts((prev) => [...prev, ...result])
-      setOffset((prev) => prev + 5)
+      try {
+        const result = (await fetchApi.get(`posts/5/${offset}`, controller && { signal: controller.signal })).data
+        result.length === 0 ? setHasMore(false) : setPosts((prev) => [...prev, ...result])
+        setOffset((prev) => prev + 5)
+      } catch (error: any) {
+        error.name !== 'CanceledError' && console.log(error)
+      }
     },
     [offset]
   )
@@ -60,9 +64,12 @@ export default function Home() {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('friends', { signal: controller.signal }).then((res) => {
-      setFriends(res.data)
-    })
+    fetchApi
+      .get('friends', { signal: controller.signal })
+      .then((res) => {
+        setFriends(res.data)
+      })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()
     }
@@ -99,11 +106,14 @@ export default function Home() {
   useEffect(() => {
     if (newPost !== null) {
       const controller = new AbortController()
-      fetchApi.get(`posts/5/0`, { signal: controller.signal }).then((res) => {
-        setPosts(res.data)
-        setHasMore(true)
-        setOffset(5)
-      })
+      fetchApi
+        .get(`posts/5/0`, { signal: controller.signal })
+        .then((res) => {
+          setPosts(res.data)
+          setHasMore(true)
+          setOffset(5)
+        })
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
       return () => {
         controller.abort()
       }

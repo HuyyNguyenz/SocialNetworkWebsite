@@ -24,7 +24,12 @@ class Http {
     this.instance.interceptors.response.use(
       (config) => config,
       (error) => {
-        if (error.response.status === 403 && error.response.data.message === 'Token is not valid') {
+        if (
+          error &&
+          error.response &&
+          error.response.status === 403 &&
+          error.response.data.message === 'Token is not valid'
+        ) {
           this.requestRefreshToken = this.requestRefreshToken
             ? this.requestRefreshToken
             : handleRefreshToken().finally(() => (this.requestRefreshToken = null))

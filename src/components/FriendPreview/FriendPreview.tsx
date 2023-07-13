@@ -48,12 +48,15 @@ export default function FriendPreview(props: Props) {
   useEffect(() => {
     const controller = new AbortController()
     ;(type === 'suggest' || type === 'invite') &&
-      fetchApi.get('friends', { signal: controller.signal }).then((res) => {
-        type === 'invite' && setFriends(res.data)
-        ;(res.data as Friend[]).find(
-          (friend) => friend.friendId === data.id && friend.userId === userData.id && setPending(true)
-        )
-      })
+      fetchApi
+        .get('friends', { signal: controller.signal })
+        .then((res) => {
+          type === 'invite' && setFriends(res.data)
+          ;(res.data as Friend[]).find(
+            (friend) => friend.friendId === data.id && friend.userId === userData.id && setPending(true)
+          )
+        })
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
 
     return () => {
       controller.abort()

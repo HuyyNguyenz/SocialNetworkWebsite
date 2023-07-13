@@ -33,12 +33,18 @@ export default function Friends() {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchApi.get('friends', { signal: controller.signal }).then((res) => {
-      setStatusFriends(res.data)
-    })
-    fetchApi.get('users', { signal: controller.signal }).then((res) => {
-      setUsers(res.data)
-    })
+    fetchApi
+      .get('friends', { signal: controller.signal })
+      .then((res) => {
+        setStatusFriends(res.data)
+      })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
+    fetchApi
+      .get('users', { signal: controller.signal })
+      .then((res) => {
+        setUsers(res.data)
+      })
+      .catch((error) => error.name !== 'CanceledError' && console.log(error))
     isReload && setReload(false)
     return () => {
       controller.abort()
