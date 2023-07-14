@@ -103,7 +103,7 @@ export default function Comment(props: Props) {
                 <p className='break-all mb-4'>{comment.content}</p>
               </Linkify>
             ) : (
-              <del className='dark:text-dark-text-color'>Bình luận này đã bị ẩn</del>
+              <span className='dark:text-dark-text-color'>Bình luận này đã bị ẩn</span>
             )}
             {article && (
               <a href={article.link} target='_blank' rel='noreferrer'>

@@ -91,7 +91,8 @@ export default function Home() {
           })
       })
       const filterPosts = handleFilterPosts(postArray)
-      ;(filterPosts.length === 0 || postList.length < 5) && getPostList(controller)
+      filterPosts.length === 0 && getPostList(controller)
+      postList.length < 5 && getPostList(controller)
       dispatch(setPostList(filterPosts))
     }
     const loading = setTimeout(() => {

@@ -172,8 +172,10 @@ export default function TextEditor(props: Props) {
           }
           const result = (await fetchApi.put(`post/${post.id}`, { ...post, modifiedAt: createdAt, userId })).data
           const postUpdated = { ...post, modifiedAt: createdAt, userId: userId as number }
-          postUpdated.images && postUpdated.images?.forEach((image) => (image.origin = {} as File))
-          postUpdated.video?.origin && (postUpdated.video.origin = {} as File)
+          postUpdated.images &&
+            postUpdated.images.length > 0 &&
+            postUpdated.images.forEach((image) => (image.origin = {} as File))
+          postUpdated.video && postUpdated.video.origin && (postUpdated.video.origin = {} as File)
           toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
           dispatch(setNewPost(postUpdated))
         } else if (editingComment !== null && comment) {

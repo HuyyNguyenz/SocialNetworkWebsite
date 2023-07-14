@@ -97,7 +97,7 @@ export default function Message(props: Props) {
         {message.content !== '' && (
           <Linkify componentDecorator={linkDecorator}>
             <p className='border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color p-2'>
-              {message.deleted === 1 ? <del>Tin nhắn này đã bị gỡ</del> : message.content}
+              {message.deleted === 1 ? <span className='opacity-60'>Tin nhắn này đã bị gỡ</span> : message.content}
             </p>
           </Linkify>
         )}

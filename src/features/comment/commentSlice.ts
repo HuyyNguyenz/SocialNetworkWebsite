@@ -20,8 +20,10 @@ const commentSlice = createSlice({
     },
     deleteComment: (state, action: PayloadAction<Comment>) => {
       const id = action.payload.id
-      const newCommentList = current(state.data).filter((comment) => comment.id !== id)
-      state.data = [...newCommentList, action.payload]
+      const foundIndex = current(state.data).findIndex((comment) => comment.id === id)
+      const newCommentList = [...current(state.data)]
+      foundIndex !== -1 && newCommentList.splice(foundIndex, 1, action.payload)
+      state.data = [...newCommentList]
     },
     startEditingComment: (state, action: PayloadAction<Comment>) => {
       const comment = action.payload

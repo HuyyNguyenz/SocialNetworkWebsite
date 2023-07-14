@@ -131,7 +131,7 @@ export default function MessageNotify() {
   useEffect(() => {
     socket.on('sendMessageNotify', (data) => {
       data.userId === userData.id && setReload(true)
-      data.userId === userData.id && playNotificationSound()
+      data.userId === userData.id && data.isAttend === false && playNotificationSound()
     })
   }, [userData.id])
 

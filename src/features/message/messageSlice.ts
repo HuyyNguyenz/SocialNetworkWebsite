@@ -20,8 +20,10 @@ const messageSlice = createSlice({
     },
     deleteMessage: (state, action: PayloadAction<Message>) => {
       const id = action.payload.id
-      const newMessageList = current(state.data).filter((message) => message.id !== id)
-      state.data = [...newMessageList, action.payload]
+      const foundIndex = current(state.data).findIndex((message) => message.id === id)
+      const newMessageList = [...current(state.data)]
+      foundIndex !== -1 && newMessageList.splice(foundIndex, 1, action.payload)
+      state.data = [...newMessageList]
     },
     startEditingMessage: (state, action: PayloadAction<Message>) => {
       const message = action.payload

@@ -25,8 +25,10 @@ const postSlice = createSlice({
     },
     deletePost: (state, action: PayloadAction<Post>) => {
       const id = action.payload.id
-      const newPostList = current(state.data).filter((post) => post.id !== id)
-      state.data = [...newPostList, action.payload]
+      const foundIndex = current(state.data).findIndex((post) => post.id === id)
+      const newPostList = [...current(state.data)]
+      foundIndex !== -1 && newPostList.splice(foundIndex, 1, action.payload)
+      state.data = [...newPostList]
     },
     startEditing: (state, action: PayloadAction<Post>) => {
       const post = action.payload
