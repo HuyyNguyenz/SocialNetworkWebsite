@@ -6,6 +6,7 @@ import fetchApi from '~/utils/fetchApi'
 import { useSelector } from 'react-redux'
 import { RootState } from '~/store'
 import socket from '~/socket'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 interface Props {
   data: User
@@ -65,11 +66,14 @@ export default function FriendPreview(props: Props) {
 
   return (
     data && (
-      <div className='w-40 max-w-[10rem] pb-4 flex flex-col items-start justify-start bg-input-color dark:bg-dark-input-color text-14 text-center font-semibold border border-solid border-border-color dark:border-dark-border-color rounded-md overflow-hidden'>
+      <div className='w-40 max-w-[10rem] pb-4 flex flex-col items-center justify-center bg-input-color dark:bg-dark-input-color text-14 text-center font-semibold border border-solid border-border-color dark:border-dark-border-color rounded-md overflow-hidden'>
         <Link to={`/${data.username}/profile/${data.id}/posts`}>
-          <img
+          <LazyLoadImage
+            effect='blur'
+            width={'100%'}
+            height={'10rem'}
             className='w-full h-40 object-cover'
-            loading='lazy'
+            placeholderSrc={userImg}
             src={data.avatar ? data.avatar.url : userImg}
             alt={data.firstName + ' ' + data.lastName}
           />

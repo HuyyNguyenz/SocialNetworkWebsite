@@ -122,7 +122,10 @@ export default function SettingComment(props: Props) {
           </div>
         )}
       >
-        <button onClick={() => setOpenSetting(!isOpenSetting)} className='flex items-center justify-start'>
+        <button
+          onClick={() => setOpenSetting(!isOpenSetting)}
+          className='text-title-color dark:text-dark-title-color flex items-center justify-start'
+        >
           <FontAwesomeIcon
             icon={faEllipsis}
             className='hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-full p-2'

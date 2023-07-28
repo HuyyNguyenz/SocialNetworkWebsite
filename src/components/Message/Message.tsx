@@ -8,6 +8,8 @@ import { useSelector } from 'react-redux'
 import Linkify from 'react-linkify'
 import { load } from 'cheerio'
 import fetchApi from '~/utils/fetchApi'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
+import loadingImage from '~/assets/images/loading_image.png'
 
 interface Props {
   message: Message
@@ -73,6 +75,7 @@ export default function Message(props: Props) {
       className={`flex ${message.userId === userData.id ? 'flex-row-reverse' : ''} items-start justify-start p-4`}
     >
       <img
+        loading='lazy'
         className='w-8 h-8 object-cover rounded-md'
         src={
           message.userId === userData.id
@@ -105,6 +108,7 @@ export default function Message(props: Props) {
           <a href={article.link} target='_blank' rel='noreferrer'>
             <article className='mb-4 rounded-md bg-hover-color dark:bg-dark-hover-color border border-solid border-border-color dark:border-dark-border-color'>
               <img
+                loading='lazy'
                 src={article.thumbnail}
                 alt={article.title}
                 className='w-full max-h-[20rem] object-cover rounded-md rounded-bl-none rounded-br-none'
@@ -120,9 +124,12 @@ export default function Message(props: Props) {
           </a>
         )}
         {message.images && message.deleted === 0 && (
-          <div className='mt-4 w-[16rem] h-[16rem]'>
-            <img
-              loading='lazy'
+          <div className={`${message.content ? 'mt-4' : ''} w-[16rem] h-[16rem]`}>
+            <LazyLoadImage
+              placeholderSrc={loadingImage}
+              effect='blur'
+              width={'100%'}
+              height={'100%'}
               className='rounded-md object-cover w-full h-full'
               src={message.images[0].url}
               alt={message.images[0].name}
@@ -130,7 +137,7 @@ export default function Message(props: Props) {
           </div>
         )}
         {message.video?.name && message.deleted === 0 && (
-          <div className='mt-4 w-full'>
+          <div className={`${message.content || message.images ? 'mt-4' : ''} w-full`}>
             <video className='rounded-md w-full h-full' src={message.video.url} controls>
               <track src={message.video.url} kind='captions' srcLang='en' label='English' />
             </video>

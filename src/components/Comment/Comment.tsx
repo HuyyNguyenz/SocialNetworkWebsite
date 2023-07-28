@@ -11,6 +11,8 @@ import { Link } from 'react-router-dom'
 import fetchApi from '~/utils/fetchApi'
 import Linkify from 'react-linkify'
 import { load } from 'cheerio'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
+import loadingImage from '~/assets/images/loading_image.png'
 
 interface Props {
   comment: Comment
@@ -109,6 +111,7 @@ export default function Comment(props: Props) {
               <a href={article.link} target='_blank' rel='noreferrer'>
                 <article className='mb-4 w-[20rem] rounded-md bg-hover-color dark:bg-dark-hover-color border border-solid border-border-color dark:border-dark-border-color'>
                   <img
+                    loading='lazy'
                     src={article.thumbnail}
                     alt={article.title}
                     className='w-full max-h-[20rem] object-cover rounded-md rounded-bl-none rounded-br-none'
@@ -125,9 +128,12 @@ export default function Comment(props: Props) {
             )}
           </div>
           {comment.images && comment.deleted === 0 && (
-            <div className='mt-4 w-[16rem] h-[16rem]'>
-              <img
-                loading='lazy'
+            <div className={`${comment.content ? 'mt-4' : ''} w-[16rem] h-[16rem]`}>
+              <LazyLoadImage
+                placeholderSrc={loadingImage}
+                effect='blur'
+                width={'100%'}
+                height={'100%'}
                 className='rounded-md object-cover w-full h-full'
                 src={comment.images[0].url}
                 alt={comment.images[0].name}
@@ -135,7 +141,7 @@ export default function Comment(props: Props) {
             </div>
           )}
           {comment.video?.name && comment.deleted === 0 && (
-            <div className='mt-4 w-[26rem]'>
+            <div className={`${comment.content || comment.images ? 'mt-4' : ''} w-[26rem]`}>
               <video className='rounded-md w-full h-full' src={comment.video.url} controls>
                 <track src={comment.video.url} kind='captions' srcLang='en' label='English' />
               </video>
@@ -143,14 +149,14 @@ export default function Comment(props: Props) {
           )}
           {comment.deleted === 0 && (
             <div className='flex items-center justify-start py-2 px-4 text-16'>
-              <button className='flex items-center justify-start mr-8'>
+              <button className='text-title-color dark:text-dark-title-color flex items-center justify-start mr-8'>
                 <FontAwesomeIcon
                   icon={faThumbsUp}
                   className='hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-full p-2'
                 />
                 <span className='ml-2 text-14'>0</span>
               </button>
-              <button className='flex items-center justify-start mr-8'>
+              <button className='text-title-color dark:text-dark-title-color flex items-center justify-start mr-8'>
                 <FontAwesomeIcon
                   icon={faReply}
                   className='hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-full p-2'

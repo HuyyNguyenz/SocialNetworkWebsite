@@ -13,6 +13,9 @@ import socket from '~/socket'
 import { RootState } from '~/store'
 import Linkify from 'react-linkify'
 import { load } from 'cheerio'
+import PopupImage from '../PopupImage'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
+import loadingImage from '~/assets/images/loading_image.png'
 
 interface Props {
   post: Post
@@ -33,6 +36,7 @@ export default function PostItem(props: Props) {
     thumbnail: string
     link: string
   }>()
+  const [zoomImage, setZoomImage] = useState<{ src: string; name: string } | null>(null)
   const dispatch = useDispatch()
 
   const handleLinkClick = (url: string) => {
@@ -52,6 +56,18 @@ export default function PostItem(props: Props) {
         {text}
       </a>
     )
+  }
+
+  const handleZoomImage = (src: string, name: string) => {
+    document.body.classList.add('overflow-hidden')
+    setZoomImage({ src, name })
+  }
+
+  const handleCloseZoom = (isClosed: boolean) => {
+    if (isClosed) {
+      document.body.classList.remove('overflow-hidden')
+      setZoomImage(null)
+    }
   }
 
   useEffect(() => {
@@ -148,6 +164,7 @@ export default function PostItem(props: Props) {
           <a href={article.link} target='_blank' rel='noreferrer'>
             <article className='mb-4 rounded-md bg-hover-color dark:bg-dark-hover-color border border-solid border-border-color dark:border-dark-border-color'>
               <img
+                loading='lazy'
                 src={article.thumbnail}
                 alt={article.title}
                 className='w-full max-h-[20rem] object-cover rounded-md rounded-bl-none rounded-br-none'
@@ -164,17 +181,22 @@ export default function PostItem(props: Props) {
         )}
         <div className={`${post.images?.length === 1 ? 'w-full' : 'grid grid-cols-2 gap-4'} mb-4`}>
           {(post.images as FilePreview[]).length > 0 &&
-            post.images?.map((image, index) => (
-              <img
-                loading='lazy'
-                key={index}
-                className={`${post.images?.length === 1 ? 'h-[25rem]' : 'h-52'} w-full rounded-md object-cover`}
-                src={image.url}
-                alt={image.name}
-              />
+            post.images?.map((image) => (
+              <button onClick={() => handleZoomImage(image.url as string, image.name)} key={image.id}>
+                <LazyLoadImage
+                  placeholderSrc={loadingImage}
+                  effect='blur'
+                  width={'100%'}
+                  className={`${post.images?.length === 1 ? 'h-[25rem]' : 'h-52'} w-full rounded-md object-cover`}
+                  src={image.url}
+                  alt={image.name}
+                />
+              </button>
             ))}
         </div>
-
+        {zoomImage && (
+          <PopupImage src={zoomImage.src} name={zoomImage.name} closed={(isClosed) => handleCloseZoom(isClosed)} />
+        )}
         {post.video?.name && (
           <div className='w-full'>
             <video className='rounded-md' src={post.video?.url} controls>

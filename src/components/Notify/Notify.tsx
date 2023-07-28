@@ -9,7 +9,6 @@ import { useSelector } from 'react-redux'
 import { RootState } from '~/store'
 import socket from '~/socket'
 import audioMessage from '~/assets/audios/audio_message.mp3'
-import { NavLink } from 'react-router-dom'
 
 export default function Notify() {
   const userData = useSelector((state: RootState) => state.userData)
@@ -21,6 +20,7 @@ export default function Notify() {
   const [communityNotifies, setCommunityNotifies] = useState<NotifyType[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [notifyMessage, setNotifyMessage] = useState<{ message: string; userId: number } | null>(null)
+  const [isShowInviteNotify, setShowInviteNotify] = useState<boolean>(true)
 
   const handleFindUser = (userId: number) => {
     return users.find((user) => user.id === userId)
@@ -217,100 +217,129 @@ export default function Notify() {
             ) : (
               <span className='mx-2'>Bạn chưa có thông báo</span>
             )}
-            <div className='mt-4'>
+            <div className='flex items-center justify-start my-2 font-semibold text-16 text-title-color dark:text-dark-title-color'>
               {friendNotifies.length > 0 && (
-                <div className='flex items-center justify-between mb-2 mx-2'>
-                  <h3 className='text-title-color dark:text-dark-title-color text-16 font-semibold'>Lời mời kết bạn</h3>
-                  <NavLink to={'/friends'}>
-                    <button className='text-primary-color dark:text-dark-primary-color hover:font-semibold'>
-                      Xem tất cả
-                    </button>
-                  </NavLink>
-                </div>
+                <button
+                  onClick={() => setShowInviteNotify(true)}
+                  className={`py-1 px-2 rounded-full ${
+                    isShowInviteNotify
+                      ? 'bg-hover-color dark:bg-dark-hover-color text-primary-color dark:text-dark-primary-color border border-solid border-border-color dark:border-dark-border-color'
+                      : ''
+                  } hover:bg-hover-color dark:hover:bg-dark-hover-color mr-6`}
+                >
+                  <span>Lời mời kết bạn</span>
+                  {handleCheckSeenNotify(friendNotifies) && (
+                    <FontAwesomeIcon
+                      className='ml-2 text-primary-color dark:text-dark-primary-color text-14'
+                      icon={faCircle}
+                    />
+                  )}
+                </button>
               )}
-              {friendNotifies.length > 0 &&
-                friendNotifies.map((notify) => {
-                  const friend = handleFindFriend(notify.typeId as number) as Friend
-                  const user = handleFindUser(
-                    userData.id === friend.friendId ? (friend.userId as number) : (friend.friendId as number)
-                  ) as User
+              {commentNotifies.length > 0 && (
+                <button
+                  onClick={() => setShowInviteNotify(false)}
+                  className={`py-1 px-2 rounded-full ${
+                    isShowInviteNotify
+                      ? ''
+                      : 'bg-hover-color dark:bg-dark-hover-color text-primary-color dark:text-dark-primary-color border border-solid border-border-color dark:border-dark-border-color'
+                  } hover:bg-hover-color dark:hover:bg-dark-hover-color`}
+                >
+                  <span>Bài viết</span>
+                  {handleCheckSeenNotify(commentNotifies) && (
+                    <FontAwesomeIcon
+                      className='ml-2 text-primary-color dark:text-dark-primary-color text-14'
+                      icon={faCircle}
+                    />
+                  )}
+                </button>
+              )}
+            </div>
+            {isShowInviteNotify ? (
+              <div>
+                {friendNotifies.length > 0 &&
+                  friendNotifies.map((notify) => {
+                    const friend = handleFindFriend(notify.typeId as number) as Friend
+                    const user = handleFindUser(
+                      userData.id === friend.friendId ? (friend.userId as number) : (friend.friendId as number)
+                    ) as User
 
-                  return (
-                    <Fragment key={notify.id}>
-                      {friend.userId === userData.id && friend.status === 'pending' ? (
-                        ''
-                      ) : (
-                        <button
-                          onClick={() => {
-                            notify.status === 'unseen'
-                              ? handleSeenNotify(Number(notify.id), notify.type as string)
-                              : null
-                            setOpen(false)
-                          }}
-                          className={`${
-                            notify.status === 'unseen'
-                              ? 'flex items-center justify-between bg-hover-color dark:bg-dark-hover-color'
-                              : ''
-                          } cursor-pointer hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-md mb-4 py-2 w-full`}
-                        >
-                          <UserPreview data={user} friend={friend} />
-                          <FontAwesomeIcon
-                            icon={faCircle}
+                    return (
+                      <Fragment key={notify.id}>
+                        {friend.userId === userData.id && friend.status === 'pending' ? (
+                          ''
+                        ) : (
+                          <button
+                            onClick={() => {
+                              notify.status === 'unseen'
+                                ? handleSeenNotify(Number(notify.id), notify.type as string)
+                                : null
+                              setOpen(false)
+                            }}
                             className={`${
                               notify.status === 'unseen'
-                                ? 'inline-block text-primary-color dark:text-dark-primary-color mr-2'
-                                : 'hidden'
-                            }`}
-                          />
-                        </button>
-                      )}
-                    </Fragment>
-                  )
-                })}
-            </div>
-            <div className='mt-4'>
-              {commentNotifies.length > 0 && (
-                <div className='flex items-center justify-between mb-2 mx-2'>
-                  <h3 className='text-title-color dark:text-dark-title-color text-16 font-semibold'>
-                    Bình luận bài viết
-                  </h3>
-                </div>
-              )}
-              {commentNotifies.length > 0 &&
-                commentNotifies.map((notify) => {
-                  const comment = handleFindComment(notify.typeId as number) as Comment
-                  const user = handleFindUser(Number(comment?.userId)) as User
-                  return (
-                    <button
-                      key={notify.id}
-                      onClick={() => {
-                        notify.status === 'unseen' ? handleSeenNotify(Number(notify.id), notify.type as string) : null
-                        setOpen(false)
-                      }}
-                      className={`${
-                        notify.status === 'unseen'
-                          ? 'flex items-center justify-between bg-hover-color dark:bg-dark-hover-color'
-                          : ''
-                      } cursor-pointer hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-md mb-4 py-2 w-full`}
-                    >
-                      <UserPreview data={user} comment={comment} />
-                      <FontAwesomeIcon
-                        icon={faCircle}
+                                ? 'flex items-center justify-between bg-hover-color dark:bg-dark-hover-color'
+                                : ''
+                            } cursor-pointer hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-md mb-4 py-2 w-full`}
+                          >
+                            <UserPreview data={user} friend={friend} />
+                            <FontAwesomeIcon
+                              icon={faCircle}
+                              className={`${
+                                notify.status === 'unseen'
+                                  ? 'inline-block text-primary-color dark:text-dark-primary-color mr-2'
+                                  : 'hidden'
+                              }`}
+                            />
+                          </button>
+                        )}
+                      </Fragment>
+                    )
+                  })}
+              </div>
+            ) : (
+              <div>
+                {commentNotifies.length > 0 &&
+                  commentNotifies.map((notify) => {
+                    const comment = handleFindComment(notify.typeId as number) as Comment
+                    const user = handleFindUser(Number(comment?.userId)) as User
+                    return (
+                      <button
+                        key={notify.id}
+                        onClick={() => {
+                          notify.status === 'unseen' ? handleSeenNotify(Number(notify.id), notify.type as string) : null
+                          setOpen(false)
+                        }}
                         className={`${
                           notify.status === 'unseen'
-                            ? 'inline-block text-primary-color dark:text-dark-primary-color mr-2'
-                            : 'hidden'
-                        }`}
-                      />
-                    </button>
-                  )
-                })}
-            </div>
+                            ? 'flex items-center justify-between bg-hover-color dark:bg-dark-hover-color'
+                            : ''
+                        } cursor-pointer hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-md mb-4 py-2 w-full`}
+                      >
+                        <UserPreview data={user} comment={comment} />
+                        <FontAwesomeIcon
+                          icon={faCircle}
+                          className={`${
+                            notify.status === 'unseen'
+                              ? 'inline-block text-primary-color dark:text-dark-primary-color mr-2'
+                              : 'hidden'
+                          }`}
+                        />
+                      </button>
+                    )
+                  })}
+              </div>
+            )}
           </div>
         )}
       >
         <button className='relative' onClick={() => setOpen(!isOpen)}>
-          <FontAwesomeIcon icon={faBell} className='w-5 h-5 px-4 mx-2 cursor-pointer dark:text-dark-title-color' />
+          <FontAwesomeIcon
+            icon={faBell}
+            className={`w-5 h-5 px-4 mx-2 cursor-pointer ${
+              isOpen ? 'text-primary-color dark:text-dark-primary-color' : 'text-title-color dark:text-dark-title-color'
+            }`}
+          />
           {((friendNotifies.length > 0 && handleCheckSeenNotify(friendNotifies)) ||
             (commentNotifies.length > 0 && handleCheckSeenNotify(commentNotifies))) && (
             <FontAwesomeIcon

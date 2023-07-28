@@ -5,6 +5,7 @@ import './locales/vi.ts'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'react-confirm-alert/src/react-confirm-alert.css'
+import 'react-lazy-load-image-component/src/effects/blur.css'
 
 function App() {
   return (

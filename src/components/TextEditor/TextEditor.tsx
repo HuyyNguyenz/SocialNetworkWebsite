@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '~/store'
 import userImg from '~/assets/images/user.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faImage } from '@fortawesome/free-regular-svg-icons'
+import { faFaceSmile, faImage } from '@fortawesome/free-regular-svg-icons'
 import { faC, faFileVideo } from '@fortawesome/free-solid-svg-icons'
 import { Comment, FilePreview, Message, Post } from '~/types'
 import SectionPreview from '../SectionPreview'
@@ -18,6 +18,7 @@ import Loading from '../Loading'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/socket'
 import { cancelEditingMessage, setMessageList } from '~/features/message/messageSlice'
+import EmojiPicker, { Theme } from 'emoji-picker-react'
 
 interface Props {
   comment: boolean
@@ -43,6 +44,7 @@ export default function TextEditor(props: Props) {
   }
   const [post, setPost] = useState<Post>(initialPost)
   const [isLoading, setLoading] = useState<boolean>(false)
+  const [isOpenEmojiPicker, setOpenEmojiPicker] = useState<boolean>(false)
   const dispatch = useDispatch()
   const [images, video, error, handleValidation] = useFileValidation()
   const textInput = document.getElementById('textInput')
@@ -62,6 +64,10 @@ export default function TextEditor(props: Props) {
       textInput?.classList.remove('h-[10rem]')
       errorTextInput.innerText = ''
     }
+  }
+
+  const handlePickerEmoji = (data: any) => {
+    setPost((prev) => ({ ...prev, content: prev.content + data.emoji }))
   }
 
   const handleSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -223,7 +229,7 @@ export default function TextEditor(props: Props) {
               const { type, communityId, ...data } = post
               const message = { ...data, createdAt, userId, friendId: chatUserId }
               const result = (await fetchApi.post('message', { ...message })).data
-              result.message && socket.emit('sendMessageClient', { friendId: chatUserId })
+              result.message && socket.emit('sendMessageClient', { friendId: chatUserId, status: 'new message' })
             } else {
               const { type, communityId, ...data } = post
               const comment = { ...data, postId }
@@ -346,6 +352,7 @@ export default function TextEditor(props: Props) {
             )}
 
             <textarea
+              onFocus={() => setOpenEmojiPicker(false)}
               maxLength={400}
               onChange={handleChange}
               value={post.content}
@@ -381,11 +388,16 @@ export default function TextEditor(props: Props) {
             )}
 
             <div className='flex items-center justify-end text-primary-color dark:text-dark-primary-color text-16 font-semibold'>
-              {isLoading ? (
-                ''
-              ) : (
+              {isLoading ? null : (
                 <>
-                  <div className='flex items-center justify-start'>
+                  <button
+                    type='button'
+                    onClick={() => setOpenEmojiPicker(!isOpenEmojiPicker)}
+                    className='py-2 w-10 rounded-full hover:bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color hover:text-white'
+                  >
+                    <FontAwesomeIcon icon={faFaceSmile} />
+                  </button>
+                  <div className='ml-4 flex items-center justify-start'>
                     <label
                       htmlFor='images'
                       className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color hover:text-white cursor-pointer'
@@ -402,7 +414,7 @@ export default function TextEditor(props: Props) {
                       className='hidden'
                     />
                   </div>
-                  <div className='ml-8 flex items-center justify-start'>
+                  <div className='ml-4 flex items-center justify-start'>
                     <label
                       htmlFor='video'
                       className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color hover:text-white cursor-pointer'
@@ -421,14 +433,14 @@ export default function TextEditor(props: Props) {
                 </>
               )}
               {(editingPost || editingComment) && !isLoading && (
-                <button type='reset' id='btnReset' className='ml-8 px-2 py-1'>
+                <button type='reset' id='btnReset' className='ml-4 px-2 py-1'>
                   Huỷ
                 </button>
               )}
               {isLoading ? (
                 <button
                   disabled
-                  className='ml-8 text-white bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md px-6 py-1 opacity-50'
+                  className='ml-4 text-white bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md px-6 py-1 opacity-50'
                 >
                   <FontAwesomeIcon className='animate-spin mr-2' icon={faC} />
                   <span>Đang xử lý</span>
@@ -436,7 +448,7 @@ export default function TextEditor(props: Props) {
               ) : (
                 <button
                   id='btnSubmit'
-                  className='ml-8 text-white bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md px-6 py-1 opacity-20 cursor-not-allowed'
+                  className='ml-4 text-white bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md px-6 py-1 opacity-20 cursor-not-allowed'
                 >
                   {editingPost || editingComment || editingMessage
                     ? 'Cập nhật'
@@ -448,6 +460,12 @@ export default function TextEditor(props: Props) {
                 </button>
               )}
             </div>
+            {isOpenEmojiPicker && (
+              <EmojiPicker
+                onEmojiClick={handlePickerEmoji}
+                theme={localStorage.getItem('theme') === 'dark' ? Theme.DARK : Theme.LIGHT}
+              />
+            )}
           </form>
         </div>
       </div>

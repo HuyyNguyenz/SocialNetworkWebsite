@@ -67,19 +67,27 @@ export default function UserPreview(props: Props) {
               {message ? (
                 message.content ? (
                   <div className='flex flex-col items-start justify-start'>
-                    <span className='line-clamp-1 mr-2 flex-1'>{message.content}.</span>
+                    <span className='line-clamp-1 break-all'>
+                      {message.deleted === 1 ? 'Tin nhắn này đã bị gỡ' : message.content}
+                    </span>
                     <span className='font-normal'>{moment(message?.createdAt, 'DD/MM/YYYY hh:mm').fromNow()}</span>
                   </div>
                 ) : message?.video?.name ? (
-                  <span>đã gửi 1 video. {moment(message?.createdAt, 'DD/MM/YYYY hh:mm').fromNow()}</span>
+                  <div className='flex flex-col items-start justify-start'>
+                    <span>đã gửi 1 video</span>
+                    <span>{moment(message?.createdAt, 'DD/MM/YYYY hh:mm').fromNow()}</span>
+                  </div>
                 ) : (
-                  <span>đã gửi 1 ảnh. {moment(message?.createdAt, 'DD/MM/YYYY hh:mm').fromNow()}</span>
+                  <div className='flex flex-col items-start justify-start'>
+                    <span>đã gửi 1 ảnh</span>
+                    <span>{moment(message?.createdAt, 'DD/MM/YYYY hh:mm').fromNow()}</span>
+                  </div>
                 )
               ) : (
                 ''
               )}
 
-              {noMessage ? <span>Bạn chưa có tin nhắn với người này</span> : ''}
+              {noMessage ? <span>Người dùng này chưa có tin nhắn</span> : ''}
 
               {online === 'false' ? (
                 <span>Đã rời mạng</span>

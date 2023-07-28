@@ -119,7 +119,7 @@ export default function EditProfile(props: Props) {
 
   return (
     <>
-      <div className='text-center fixed center w-[48rem] h-[90%] bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color z-[60] rounded-md py-2 text-20 text-text-color dark:text-dark-text-color overflow-hidden'>
+      <div className='text-center center w-[48rem] h-[90%] bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color z-[60] rounded-md py-2 text-20 text-text-color dark:text-dark-text-color overflow-hidden'>
         <div className='flex item-center justify-between text-title-color dark:text-dark-title-color border-b border-solid border-border-color dark:border-dark-border-color py-4 px-6'>
           <h2 className='font-bold'>Chỉnh sửa trang cá nhân</h2>
           <button onClick={handleCloseEditProfile} className='hover:opacity-80'>

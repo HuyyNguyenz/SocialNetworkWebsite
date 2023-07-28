@@ -45,6 +45,14 @@ export default function MessageNotify() {
     setOpen(false)
   }
 
+  const handleSortLatestNotify = (users: User[]) => {
+    return users.sort((a, b) => {
+      const messA = handleFindLatestMessage(a.id as number) as Message
+      const messB = handleFindLatestMessage(b.id as number) as Message
+      return Number(messB?.id) - Number(messA?.id)
+    })
+  }
+
   const playNotificationSound = () => {
     const notificationSound = new Audio(audioMessage)
     notificationSound.play()
@@ -131,7 +139,7 @@ export default function MessageNotify() {
   useEffect(() => {
     socket.on('sendMessageNotify', (data) => {
       data.userId === userData.id && setReload(true)
-      data.userId === userData.id && data.isAttend === false && playNotificationSound()
+      data.userId === userData.id && data.isAttend === false && data.status && playNotificationSound()
     })
   }, [userData.id])
 
@@ -151,7 +159,7 @@ export default function MessageNotify() {
             <h2 className='text-20 font-bold text-title-color dark:text-dark-title-color mx-2 mb-2'>Tin nhắn</h2>
 
             {users.length > 0 ? (
-              users.map((user) => {
+              handleSortLatestNotify(users).map((user) => {
                 const message = handleFindLatestMessage(user.id as number)
                 const notify = handleFindNotify(message?.id as number)
                 return message ? (
@@ -191,7 +199,12 @@ export default function MessageNotify() {
         )}
       >
         <button className='relative' onClick={() => setOpen(!isOpen)}>
-          <FontAwesomeIcon icon={faMessage} className='w-5 h-5 px-4 mx-2 cursor-pointer dark:text-dark-title-color' />
+          <FontAwesomeIcon
+            icon={faMessage}
+            className={`w-5 h-5 px-4 mx-2 cursor-pointer ${
+              isOpen ? 'text-primary-color dark:text-dark-primary-color' : 'text-title-color dark:text-dark-title-color'
+            }`}
+          />
           {handleCheckUnseenNotify() && (
             <FontAwesomeIcon
               className='absolute top-[-2px] right-5 text-primary-color dark:text-dark-primary-color text-14'

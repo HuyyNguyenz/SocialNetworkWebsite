@@ -10,6 +10,8 @@ import { Friend, Message as MessageType, User } from '~/types'
 import fetchApi from '~/utils/fetchApi'
 import { setMessageList } from '~/features/message/messageSlice'
 import Message from '~/components/Message'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faVideo } from '@fortawesome/free-solid-svg-icons'
 
 export default function Chat() {
   const messageList = useSelector((state: RootState) => state.messageList.data)
@@ -19,6 +21,13 @@ export default function Chat() {
   const [isReload, setReload] = useState<boolean>(false)
   const { userFriendId } = useParams()
   const navigate = useNavigate()
+
+  const handleCallVideo = () => {
+    const from = userData
+    const to = userFriend
+    socket.emit('startingCallUser', { from, to })
+    socket.emit('pendingCall', { from, to })
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -101,9 +110,19 @@ export default function Chat() {
 
   return (
     <DefaultLayout>
-      <div className='pt-32 my-0 mx-auto w-[48rem] max-w-[48rem] text-14 text-text-color dark:text-dark-text-color bg-bg-light dark:bg-bg-dark border border-t-transparent border-b-transparent border-solid border-border-color dark:border-dark-border-color'>
+      <div className='relative pt-32 my-0 mx-auto w-[48rem] max-w-[48rem] text-14 text-text-color dark:text-dark-text-color bg-bg-light dark:bg-bg-dark border border-t-transparent border-b-transparent border-solid border-border-color dark:border-dark-border-color'>
         <div className='flex flex-col items-start justify-start'>
-          <div className='mx-4'>{userFriend && <UserPreview data={userFriend} online={userFriend.isOnline} />}</div>
+          <div className='px-4 flex items-center justify-between w-full'>
+            {userFriend && <UserPreview data={userFriend} online={userFriend.isOnline} />}{' '}
+            {userFriend?.isOnline !== 'false' && (
+              <button
+                onClick={handleCallVideo}
+                className='text-title-color dark:text-dark-title-color hover:text-primary-color dark:hover:text-dark-primary-color'
+              >
+                <FontAwesomeIcon className='text-16' icon={faVideo} />
+              </button>
+            )}
+          </div>
           <div
             id='container'
             className='scrollbar border border-l-transparent border-r-transparent border-solid border-border-color dark:border-dark-border-color bg-hover-color dark:bg-dark-hover-color w-full min-h-[24rem] max-h-96 overflow-y-auto'

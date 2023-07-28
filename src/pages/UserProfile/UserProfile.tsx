@@ -83,7 +83,7 @@ export default function UserProfile() {
               ? 'Hãy cho chúng tôi biết cảm nghĩ của bạn'
               : 'Người dùng hiện tại chưa có bài viết.'}
           </h2>
-          <img className='object-cover rounded-md' src={postGif} alt='gif' />
+          <img loading='lazy' className='object-cover rounded-md' src={postGif} alt='gif' />
         </div>
       )}
     </UserProfileLayout>

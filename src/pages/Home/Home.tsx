@@ -79,7 +79,7 @@ export default function Home() {
     const controller = new AbortController()
     if (posts.length > 0 && hasMore) {
       const postArray: Post[] = []
-      posts.filter((post) => {
+      posts.forEach((post) => {
         post.userId === userData.id && postArray.push(post)
         friends.length > 0 &&
           friends.forEach((friend) => {
@@ -91,9 +91,7 @@ export default function Home() {
           })
       })
       const filterPosts = handleFilterPosts(postArray)
-      filterPosts.length === 0 && getPostList(controller)
-      postList.length < 5 && getPostList(controller)
-      dispatch(setPostList(filterPosts))
+      filterPosts.length === 0 ? getPostList(controller) : dispatch(setPostList(filterPosts))
     }
     const loading = setTimeout(() => {
       isLoading && setLoading(false)
@@ -102,7 +100,7 @@ export default function Home() {
       clearTimeout(loading)
       controller.abort()
     }
-  }, [posts, postList.length, friends, dispatch, userData, isLoading, getPostList, hasMore, handleFilterPosts])
+  }, [posts, friends, dispatch, userData, isLoading, getPostList, hasMore, handleFilterPosts])
 
   useEffect(() => {
     if (newPost !== null) {
@@ -119,7 +117,7 @@ export default function Home() {
         controller.abort()
       }
     }
-  }, [newPost, dispatch])
+  }, [newPost])
 
   return (
     <DefaultLayout>
@@ -142,7 +140,7 @@ export default function Home() {
               <h2 className='text-18 uppercase font-semibold text-center bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color bg-clip-text text-transparent'>
                 Hãy kết bạn để theo dõi nhiều bài viết hay hơn
               </h2>
-              <img className='object-cover rounded-md' src={socialNetworkGif} alt='gif' />
+              <img loading='lazy' className='object-cover rounded-md' src={socialNetworkGif} alt='gif' />
             </div>
           )}
         </div>

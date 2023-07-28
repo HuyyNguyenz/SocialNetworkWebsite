@@ -7,6 +7,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setUserData } from '~/features/userData/userDataSlice'
 import { RootState } from '~/store'
 import { ToastContainer } from 'react-toastify'
+import VideoCall from '~/components/VideoCall'
+import socket from '~/socket'
+import { User } from '~/types'
 
 interface Props {
   children: React.ReactNode
@@ -19,6 +22,17 @@ export default function DefaultLayout(props: Props) {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const userData = useSelector((state: RootState) => state.userData)
+  const [isOpen, setOpen] = useState<boolean>(false)
+  const [caller, setCaller] = useState<User | null>(null)
+  const [userCalled, setUserCalled] = useState<User | null>(null)
+
+  const handleCancelledCall = () => {
+    setCaller(null)
+    setUserCalled(null)
+    setOpen(false)
+    document.body.classList.remove('overflow-hidden')
+    window.location.reload()
+  }
 
   useEffect(() => {
     if (!isLogin) {
@@ -46,6 +60,18 @@ export default function DefaultLayout(props: Props) {
     }
   }, [dispatch, userData])
 
+  useEffect(() => {
+    socket.on('receiveCall', (data) => {
+      !isOpen && setOpen(true)
+      caller === null && setCaller(data.caller)
+    })
+    socket.on('pendingStatusCall', (data) => {
+      !isOpen && setOpen(true)
+      userCalled === null && setUserCalled(data.receiver)
+      document.body.classList.add('overflow-hidden')
+    })
+  }, [isOpen, caller, userCalled])
+
   return (
     <>
       {isLogin && (
@@ -53,6 +79,13 @@ export default function DefaultLayout(props: Props) {
           <Header />
           {children}
           <ToastContainer />
+          {isOpen && (
+            <VideoCall
+              caller={caller}
+              userCalled={userCalled}
+              canceled={(isCancelled) => isCancelled && handleCancelledCall()}
+            />
+          )}
         </div>
       )}
     </>
