@@ -43,6 +43,13 @@ export interface Post {
   deleted?: number
 }
 
+export interface ExtraPost {
+  id?: number
+  userId?: number
+  postId?: number
+  type?: string
+}
+
 export interface Comment {
   content: string
   createdAt: string

@@ -163,7 +163,7 @@ export default function Comment(props: Props) {
                 />
                 <span className='ml-2 text-14'>0</span>
               </button>
-              {userData.id === comment.userId && <SettingComment comment={comment} />}
+              {(userData.id === comment.userId || userData.id === authorPostId) && <SettingComment comment={comment} />}
             </div>
           )}
         </div>

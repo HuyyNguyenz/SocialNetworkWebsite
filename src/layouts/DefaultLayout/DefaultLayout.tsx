@@ -26,7 +26,7 @@ export default function DefaultLayout(props: Props) {
   const [caller, setCaller] = useState<User | null>(null)
   const [userCalled, setUserCalled] = useState<User | null>(null)
 
-  const handleCancelledCall = () => {
+  const handleCallCancelled = () => {
     setCaller(null)
     setUserCalled(null)
     setOpen(false)
@@ -83,7 +83,7 @@ export default function DefaultLayout(props: Props) {
             <VideoCall
               caller={caller}
               userCalled={userCalled}
-              canceled={(isCancelled) => isCancelled && handleCancelledCall()}
+              canceled={(isCancelled) => isCancelled && handleCallCancelled()}
             />
           )}
         </div>

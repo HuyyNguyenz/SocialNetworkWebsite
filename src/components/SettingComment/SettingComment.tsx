@@ -4,13 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import { Comment, FilePreview, Message } from '~/types'
 import { confirmAlert } from 'react-confirm-alert'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { deleteComment, startEditingComment } from '~/features/comment/commentSlice'
 import fetchApi from '~/utils/fetchApi'
 import { toast } from 'react-toastify'
 import { deleteFile } from '~/utils/firebase'
 import { deleteMessage, startEditingMessage } from '~/features/message/messageSlice'
 import socket from '~/socket'
+import { RootState } from '~/store'
 
 interface Props {
   comment?: Comment
@@ -19,6 +20,7 @@ interface Props {
 
 export default function SettingComment(props: Props) {
   const { comment, message } = props
+  const userData = useSelector((state: RootState) => state.userData)
   const [isOpenSetting, setOpenSetting] = useState<boolean>(false)
   const dispatch = useDispatch()
 
@@ -107,12 +109,14 @@ export default function SettingComment(props: Props) {
             tabIndex={-1}
             {...attrs}
           >
-            <button
-              onClick={message ? handleEditingMessage : handleEditingComment}
-              className='w-full px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
-            >
-              Chỉnh sửa
-            </button>
+            {userData.id === comment?.userId && (
+              <button
+                onClick={message ? handleEditingMessage : handleEditingComment}
+                className='w-full px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
+              >
+                Chỉnh sửa
+              </button>
+            )}
             <button
               onClick={message ? handleDeleteMessage : handleDeleteComment}
               className='w-full px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Comment, FilePreview, Post, User } from '~/types'
+import { Comment, ExtraPost, FilePreview, Post, User } from '~/types'
 import moment from 'moment'
 import userImg from '~/assets/images/user.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -25,9 +25,12 @@ interface Props {
 
 export default function PostItem(props: Props) {
   const { post, author, detail } = props
+  const userData = useSelector((state: RootState) => state.userData)
   const commentList = useSelector((state: RootState) => state.commentList.data)
   const createdAt = moment(post.createdAt, 'DD/MM/YYYY hh:mm').fromNow()
   const modifiedAt = moment(post.modifiedAt, 'DD/MM/YYYY hh:mm').fromNow()
+  const [isReload, setReload] = useState<boolean>(false)
+  const [likes, setLikes] = useState<ExtraPost[]>([])
   const [comments, setComments] = useState<Comment[]>([])
   const [article, setArticle] = useState<{
     siteName: string
@@ -68,6 +71,25 @@ export default function PostItem(props: Props) {
       document.body.classList.remove('overflow-hidden')
       setZoomImage(null)
     }
+  }
+
+  const handleLikePost = async () => {
+    await fetchApi.post('like/post', { userId: userData.id, postId: post.id, type: 'like', receiverId: post.userId })
+    post.userId !== userData.id &&
+      socket.emit('sendUserLikedPost', { userId: userData.id, postId: post.id, receiverId: post.userId })
+    setReload(true)
+  }
+
+  const handleUnlikePost = async () => {
+    const ep = handleCheckLikedPost()
+    await fetchApi.delete(`unlike/post/${ep?.id}`)
+    post.userId !== userData.id &&
+      socket.emit('sendUserLikedPost', { userId: userData.id, postId: post.id, receiverId: post.userId })
+    setReload(true)
+  }
+
+  const handleCheckLikedPost = () => {
+    return likes.find((likePost) => likePost.userId === userData.id)
   }
 
   useEffect(() => {
@@ -120,6 +142,25 @@ export default function PostItem(props: Props) {
       controller.abort()
     }
   }, [post])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    post &&
+      fetchApi
+        .get(`likes/post/${post.id}`, { signal: controller.signal })
+        .then((res) => setLikes(res.data))
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
+    isReload && setReload(false)
+    return () => {
+      controller.abort()
+    }
+  }, [post, isReload])
+
+  useEffect(() => {
+    socket.on('receiveUserLikedPost', () => {
+      !isReload && setReload(true)
+    })
+  }, [isReload])
 
   return (
     <div
@@ -206,12 +247,19 @@ export default function PostItem(props: Props) {
         )}
       </div>
       <div className='flex items-center justify-around mt-4'>
-        <button className='flex items-center justify-start'>
+        <button
+          onClick={handleCheckLikedPost() ? handleUnlikePost : handleLikePost}
+          className='flex items-center justify-start'
+        >
           <FontAwesomeIcon
             icon={faThumbsUp}
-            className='text-title-color dark:text-dark-title-color text-20 rounded-full p-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
+            className={`${
+              handleCheckLikedPost()
+                ? 'text-primary-color dark:text-dark-primary-color'
+                : 'text-title-color dark:text-dark-title-color'
+            } text-20 rounded-full p-2 hover:bg-hover-color dark:hover:bg-dark-hover-color`}
           />
-          <span className='ml-2'>0</span>
+          <span className='ml-2'>{likes.length}</span>
         </button>
         <Link to={`/${author && author.username}/post/${post.id}`}>
           <button className='flex items-center justify-start'>

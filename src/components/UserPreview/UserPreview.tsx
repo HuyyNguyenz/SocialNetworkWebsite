@@ -3,19 +3,20 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import userImg from '~/assets/images/user.png'
 import { RootState } from '~/store'
-import { Comment, Friend, Message, User } from '~/types'
+import { Comment, ExtraPost, Friend, Message, User } from '~/types'
 
 interface Props {
   data: User
   friend?: Friend
   comment?: Comment
+  liked?: ExtraPost
   message?: Message
   online?: string
   noMessage?: boolean
 }
 
 export default function UserPreview(props: Props) {
-  const { data, friend, comment, message, online, noMessage } = props
+  const { data, friend, comment, message, online, noMessage, liked } = props
   const userData = useSelector((state: RootState) => state.userData)
 
   return (
@@ -23,8 +24,8 @@ export default function UserPreview(props: Props) {
       {data && (
         <Link
           to={
-            comment
-              ? `/${userData.username}/post/${comment.postId}`
+            comment || liked
+              ? `/${userData.username}/post/${comment?.postId || liked?.postId}`
               : message || noMessage
               ? `/message/${data.id}`
               : `/${data.username}/profile/${data.id}/posts`
@@ -32,7 +33,7 @@ export default function UserPreview(props: Props) {
         >
           <div
             className={`flex items-center justify-start text-14 rounded-md cursor-pointer ${
-              friend?.id || comment?.id || message?.id || noMessage
+              friend?.id || comment?.id || liked?.id || message?.id || noMessage
                 ? 'ml-2'
                 : 'mb-4 hover:bg-input-color dark:hover:bg-dark-hover-color'
             } ${online ? 'hover:bg-transparent dark:hover:bg-transparent' : ''} `}
@@ -45,7 +46,9 @@ export default function UserPreview(props: Props) {
             />
             <div className='flex flex-col items-start justify-start text-left dark:text-dark-text-color'>
               <span
-                className={`${friend?.id || comment?.id || online || message?.id || noMessage ? 'font-semibold ' : ''}`}
+                className={`${
+                  friend?.id || comment?.id || liked?.id || online || message?.id || noMessage ? 'font-semibold ' : ''
+                }`}
               >
                 {data.firstName} {data.lastName}
               </span>
@@ -64,6 +67,7 @@ export default function UserPreview(props: Props) {
                   đã bình luận vào bài viết của bạn lúc {moment(comment?.createdAt, 'DD/MM/YYYY hh:mm').fromNow()}
                 </span>
               )}
+              {liked && <span>đã thích bài viết của bạn</span>}
               {message ? (
                 message.content ? (
                   <div className='flex flex-col items-start justify-start'>

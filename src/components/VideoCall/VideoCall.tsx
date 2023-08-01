@@ -35,6 +35,7 @@ export default function VideoCall(props: Props) {
   const [isShowCamera, setShowCamera] = useState<boolean>(true)
   const [localMiro, setLocalMicro] = useState<boolean>(true)
   const [remoteMicro, setRemoteMicro] = useState<boolean>(true)
+  const [message, setMessage] = useState<string>('')
 
   const handleCallUser = useCallback(
     (id: number) => {
@@ -52,12 +53,6 @@ export default function VideoCall(props: Props) {
       peer.on('stream', (stream) => {
         remoteVideoRef.current && (remoteVideoRef.current.srcObject = stream)
       })
-      peer.on('close', () => {
-        if (peer.destroyed) {
-          peerRef.current = null
-          props.canceled(true)
-        }
-      })
       socket.on('callAccepted', (data) => {
         const { signal } = data
         peer.signal(signal)
@@ -65,7 +60,7 @@ export default function VideoCall(props: Props) {
       })
       peerRef.current = peer
     },
-    [stream, props]
+    [stream]
   )
 
   const handleAnswerCall = () => {
@@ -81,12 +76,6 @@ export default function VideoCall(props: Props) {
     peer.on('stream', (stream) => {
       remoteVideoRef.current && (remoteVideoRef.current.srcObject = stream)
     })
-    peer.on('close', () => {
-      if (peer.destroyed) {
-        peerRef.current = null
-        props.canceled(true)
-      }
-    })
     callerSignal && peer.signal(callerSignal)
     peerRef.current = peer
   }
@@ -94,20 +83,22 @@ export default function VideoCall(props: Props) {
   const handleSendCancelCall = () => {
     caller === null && socket.emit('cancelledCall', { from: userCalled })
     userCalled === null && socket.emit('cancelledCall', { from: caller })
-    handleCanceledCall()
+    handleCallCanceled()
   }
 
-  const handleCanceledCall = useCallback(() => {
-    if (peerRef.current) {
-      peerRef.current.destroy()
-    }
+  const handleCallCanceled = useCallback(() => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop())
       setStream(null)
     }
+    if (peerRef.current) {
+      peerRef.current.destroy()
+      peerRef.current = null
+    }
     setAccepted(false)
     setCallerSignal(null)
-  }, [stream])
+    props.canceled(true)
+  }, [stream, props])
 
   const handleToggleCamera = () => {
     setShowCamera(!isShowCamera)
@@ -143,14 +134,12 @@ export default function VideoCall(props: Props) {
     })
     socket.on('receiveStatusMicro', (data) => {
       const { micro } = data
-      console.log('micro:', micro)
-
       micro ? setRemoteMicro(true) : setRemoteMicro(false)
     })
     socket.on('callEnded', () => {
-      isAccepted && handleCanceledCall()
+      callerSignal === null ? setMessage('Người nhận không nghe máy') : handleCallCanceled()
     })
-  }, [handleCanceledCall, isAccepted])
+  }, [handleCallCanceled, callerSignal])
 
   useEffect(() => {
     userCalled && stream && handleCallUser(userCalled.id as number)
@@ -177,6 +166,18 @@ export default function VideoCall(props: Props) {
       ? userCalled === null && socket.emit('sendStatusMicro', { id: caller?.id, micro: true })
       : userCalled === null && socket.emit('sendStatusMicro', { id: caller?.id, micro: false })
   }, [localMiro, caller, userCalled])
+
+  useEffect(() => {
+    if (message) {
+      setAccepted(false)
+      const setTimeOut = setTimeout(() => {
+        props.canceled(true)
+      }, 1000)
+      return () => {
+        clearTimeout(setTimeOut)
+      }
+    }
+  }, [message, props])
 
   return (
     <>
@@ -361,7 +362,7 @@ export default function VideoCall(props: Props) {
                 <div className='text-18 font-bold text-title-color dark:text-dark-title-color'>
                   <h3 className='my-6'>{userCalled.firstName + ' ' + userCalled.lastName}</h3>
                   <div className='flex flex-col items-center justify-between'>
-                    <span className='mb-4'>Đang gọi ...</span>
+                    <span className='mb-4'>{message ? message : 'Đang gọi ...'}</span>
                     <button
                       onClick={handleSendCancelCall}
                       className='bg-red-600 w-14 h-14 text-white rounded-full hover:opacity-80'
