@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Tippy from '@tippyjs/react/headless'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
+import { faEllipsis, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { Comment, FilePreview, Message } from '~/types'
 import { confirmAlert } from 'react-confirm-alert'
 import { useDispatch, useSelector } from 'react-redux'
@@ -109,19 +109,21 @@ export default function SettingComment(props: Props) {
             tabIndex={-1}
             {...attrs}
           >
-            {userData.id === comment?.userId && (
+            {(userData.id === comment?.userId || userData.id === message?.userId) && (
               <button
                 onClick={message ? handleEditingMessage : handleEditingComment}
-                className='w-full px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
+                className='flex items-center justify-start w-full px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
               >
-                Chỉnh sửa
+                <FontAwesomeIcon icon={faPencil} />
+                <span className='ml-2'>Chỉnh sửa</span>
               </button>
             )}
             <button
               onClick={message ? handleDeleteMessage : handleDeleteComment}
-              className='w-full px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
+              className='flex items-center justify-start w-full px-4 py-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
             >
-              {message ? 'Gỡ tin nhắn' : 'Xoá'}
+              <FontAwesomeIcon icon={faTrash} />
+              <span className='ml-2'>{message ? 'Gỡ tin nhắn' : 'Xoá'}</span>
             </button>
           </div>
         )}

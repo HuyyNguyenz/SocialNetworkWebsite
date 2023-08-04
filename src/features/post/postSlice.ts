@@ -5,12 +5,14 @@ interface PostSlice {
   data: Post[]
   editingPost: Post | null
   newPost: Post | null
+  sharePost: Post | null
 }
 
 const initialState: PostSlice = {
   data: [],
   editingPost: null,
-  newPost: null
+  newPost: null,
+  sharePost: null
 }
 
 const postSlice = createSlice({
@@ -22,6 +24,9 @@ const postSlice = createSlice({
     },
     setNewPost: (state, action: PayloadAction<Post | null>) => {
       state.newPost = action.payload
+    },
+    setSharePost: (state, action: PayloadAction<Post | null>) => {
+      state.sharePost = action.payload
     },
     deletePost: (state, action: PayloadAction<Post>) => {
       const id = action.payload.id
@@ -40,6 +45,6 @@ const postSlice = createSlice({
   }
 })
 
-export const { setPostList, deletePost, startEditing, cancelEditing, setNewPost } = postSlice.actions
+export const { setPostList, deletePost, startEditing, cancelEditing, setNewPost, setSharePost } = postSlice.actions
 const postReducer = postSlice.reducer
 export default postReducer

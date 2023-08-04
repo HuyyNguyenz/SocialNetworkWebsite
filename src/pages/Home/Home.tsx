@@ -15,6 +15,7 @@ export default function Home() {
   const postList = useSelector((state: RootState) => state.postList.data)
   const newPost = useSelector((state: RootState) => state.postList.newPost)
   const userData = useSelector((state: RootState) => state.userData)
+  const sharePost = useSelector((state: RootState) => state.postList.sharePost)
   const dispatch = useDispatch()
   const [friends, setFriends] = useState<Friend[]>([])
   const [posts, setPosts] = useState<Post[]>([])
@@ -123,7 +124,7 @@ export default function Home() {
     <DefaultLayout>
       <main>
         <div className='w-[48rem] max-w-3xl my-0 mx-auto pt-36 pb-10'>
-          <TextEditor comment={false} />
+          {!sharePost && <TextEditor comment={false} />}
           {isLoading ? (
             <Loading quantity={5} />
           ) : postList.length > 0 ? (

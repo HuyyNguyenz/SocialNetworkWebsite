@@ -63,9 +63,10 @@ export default function UserPreview(props: Props) {
                 </span>
               )}
               {comment && (
-                <span>
-                  đã bình luận vào bài viết của bạn lúc {moment(comment?.createdAt, 'DD/MM/YYYY hh:mm').fromNow()}
-                </span>
+                <>
+                  <span>đã bình luận vào bài viết của bạn</span>
+                  <span>{moment(comment?.createdAt, 'DD/MM/YYYY hh:mm').fromNow()}</span>
+                </>
               )}
               {liked && <span>đã thích bài viết của bạn</span>}
               {message ? (

@@ -11,7 +11,7 @@ import { toast } from 'react-toastify'
 import useFileValidation from '~/hooks/useFileValidation'
 import { deleteFile, uploadFile } from '~/utils/firebase'
 import fetchApi from '~/utils/fetchApi'
-import { cancelEditing, setNewPost } from '~/features/post/postSlice'
+import { cancelEditing, setNewPost, setSharePost } from '~/features/post/postSlice'
 import { useParams } from 'react-router-dom'
 import { cancelEditingComment, setCommentList } from '~/features/comment/commentSlice'
 import Loading from '../Loading'
@@ -24,10 +24,11 @@ interface Props {
   comment: boolean
   chatUserId?: number
   communityId?: number
+  share?: string
 }
 
 export default function TextEditor(props: Props) {
-  const { comment, chatUserId, communityId } = props
+  const { comment, chatUserId, communityId, share } = props
   const { postId } = useParams()
   const userData = useSelector((state: RootState) => state.userData)
   const editingPost = useSelector((state: RootState) => state.postList.editingPost)
@@ -56,7 +57,9 @@ export default function TextEditor(props: Props) {
     if (event.target.value.length > 100) {
       textInput?.classList.add('h-[10rem]')
       if (event.target.value.length === 400) {
-        errorTextInput.innerText = `${comment ? 'Bình luận' : 'Bài viết'} đã đạt tối đa 400 ký tự`
+        errorTextInput.innerText = `${
+          comment ? 'Bình luận' : chatUserId ? 'Tin nhắn' : 'Bài viết'
+        } đã đạt tối đa 400 ký tự`
       } else {
         errorTextInput.innerText = ''
       }
@@ -67,7 +70,7 @@ export default function TextEditor(props: Props) {
   }
 
   const handlePickerEmoji = (data: any) => {
-    setPost((prev) => ({ ...prev, content: prev.content + data.emoji }))
+    setPost((prev) => ({ ...prev, content: prev.content.length < 400 ? prev.content + data.emoji : prev.content }))
   }
 
   const handleSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -124,6 +127,7 @@ export default function TextEditor(props: Props) {
 
   const handleCancelEditing = () => {
     dispatch(chatUserId ? cancelEditingMessage() : comment ? cancelEditingComment() : cancelEditing())
+    share && dispatch(setSharePost(null))
     textInput?.classList.remove('h-[10rem]')
     errorTextInput.innerText = ''
     // video.name = ''
@@ -239,8 +243,24 @@ export default function TextEditor(props: Props) {
               socket.emit('sendDataClient', { ...comment, createdAt, userId })
             }
           } else {
-            const result = (await fetchApi.post('post', { ...post, createdAt, userId })).data
-            toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
+            const result = (
+              await fetchApi.post('post', {
+                ...post,
+                content: share ? post.content + ' ' + share : post.content,
+                createdAt,
+                userId
+              })
+            ).data
+            if (share) {
+              const postId = Number(share.split('/post/')[1])
+              await fetchApi.post('share/post', { userId: userData.id, postId, type: 'share' })
+            }
+            !share &&
+              toast(result.message, {
+                autoClose: 2000,
+                type: 'success',
+                position: 'top-right'
+              })
             dispatch(setNewPost(result.post))
           }
         }
@@ -370,7 +390,7 @@ export default function TextEditor(props: Props) {
             />
             <span className='text-red-600 error-text-input'></span>
 
-            {isLoading ? (
+            {share ? null : isLoading ? (
               <Skeleton className={`${chatUserId ? 'h-52 w-72' : 'h-[25rem]'} mb-2 dark:bg-bg-dark`} />
             ) : (
               <>
@@ -397,42 +417,46 @@ export default function TextEditor(props: Props) {
                   >
                     <FontAwesomeIcon icon={faFaceSmile} />
                   </button>
-                  <div className='ml-4 flex items-center justify-start'>
-                    <label
-                      htmlFor='images'
-                      className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color hover:text-white cursor-pointer'
-                    >
-                      <FontAwesomeIcon icon={faImage} />
-                    </label>
-                    <input
-                      multiple={comment ? false : true}
-                      onChange={handleFileChange}
-                      onClick={handleClearPreValue}
-                      type='file'
-                      name='images'
-                      id='images'
-                      className='hidden'
-                    />
-                  </div>
-                  <div className='ml-4 flex items-center justify-start'>
-                    <label
-                      htmlFor='video'
-                      className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color hover:text-white cursor-pointer'
-                    >
-                      <FontAwesomeIcon icon={faFileVideo} />
-                    </label>
-                    <input
-                      onChange={handleFileChange}
-                      onClick={handleClearPreValue}
-                      type='file'
-                      name='video'
-                      id='video'
-                      className='hidden'
-                    />
-                  </div>
+                  {!share && (
+                    <>
+                      <div className='ml-4 flex items-center justify-start'>
+                        <label
+                          htmlFor='images'
+                          className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color hover:text-white cursor-pointer'
+                        >
+                          <FontAwesomeIcon icon={faImage} />
+                        </label>
+                        <input
+                          multiple={comment ? false : true}
+                          onChange={handleFileChange}
+                          onClick={handleClearPreValue}
+                          type='file'
+                          name='images'
+                          id='images'
+                          className='hidden'
+                        />
+                      </div>
+                      <div className='ml-4 flex items-center justify-start'>
+                        <label
+                          htmlFor='video'
+                          className='w-10 py-2 text-center rounded-full hover:bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color hover:text-white cursor-pointer'
+                        >
+                          <FontAwesomeIcon icon={faFileVideo} />
+                        </label>
+                        <input
+                          onChange={handleFileChange}
+                          onClick={handleClearPreValue}
+                          type='file'
+                          name='video'
+                          id='video'
+                          className='hidden'
+                        />
+                      </div>
+                    </>
+                  )}
                 </>
               )}
-              {(editingPost || editingComment) && !isLoading && (
+              {(editingPost || editingComment || editingMessage) && !isLoading && (
                 <button type='reset' id='btnReset' className='ml-4 px-2 py-1'>
                   Huỷ
                 </button>
@@ -456,6 +480,8 @@ export default function TextEditor(props: Props) {
                     ? 'Bình luận'
                     : comment && chatUserId
                     ? 'Gửi'
+                    : share
+                    ? 'Chia sẻ'
                     : 'Đăng bài'}
                 </button>
               )}

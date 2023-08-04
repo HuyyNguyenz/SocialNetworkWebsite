@@ -3,7 +3,7 @@ import { Comment, ExtraPost, FilePreview, Post, User } from '~/types'
 import moment from 'moment'
 import userImg from '~/assets/images/user.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCommentDots, faEarthAmericas, faLock, faShare, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
+import { faCommentDots, faEarthAmericas, faLock, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
 import SettingPost from '../SettingPost'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -16,21 +16,24 @@ import { load } from 'cheerio'
 import PopupImage from '../PopupImage'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import loadingImage from '~/assets/images/loading_image.png'
+import ShareOption from '../ShareOption'
 
 interface Props {
   post: Post
   author: User
   detail: boolean
+  share?: boolean
 }
 
 export default function PostItem(props: Props) {
-  const { post, author, detail } = props
+  const { post, author, detail, share } = props
   const userData = useSelector((state: RootState) => state.userData)
   const commentList = useSelector((state: RootState) => state.commentList.data)
   const createdAt = moment(post.createdAt, 'DD/MM/YYYY hh:mm').fromNow()
   const modifiedAt = moment(post.modifiedAt, 'DD/MM/YYYY hh:mm').fromNow()
   const [isReload, setReload] = useState<boolean>(false)
   const [likes, setLikes] = useState<ExtraPost[]>([])
+  const [shares, setShares] = useState<ExtraPost[]>([])
   const [comments, setComments] = useState<Comment[]>([])
   const [article, setArticle] = useState<{
     siteName: string
@@ -40,6 +43,8 @@ export default function PostItem(props: Props) {
     link: string
   }>()
   const [zoomImage, setZoomImage] = useState<{ src: string; name: string } | null>(null)
+  const [sharePost, setSharePost] = useState<Post | null>(null)
+  const [authorSharePost, setAuthorSharePost] = useState<User | null>(null)
   const dispatch = useDispatch()
 
   const handleLinkClick = (url: string) => {
@@ -125,19 +130,33 @@ export default function PostItem(props: Props) {
   useEffect(() => {
     const controller = new AbortController()
     const articleElement = document.querySelector(`.article-${post.id}`) as HTMLAnchorElement
-    post &&
-      articleElement &&
-      fetchApi
-        .get(`article?link=${articleElement.innerText}`, { signal: controller.signal })
-        .then((res) => {
-          const $ = load(res.data)
-          const siteName = $('meta[property="og:site_name"]').attr('content') as string
-          const title = $('meta[property="og:title"]').attr('content') as string
-          const description = $('meta[property="og:description"]').attr('content') as string
-          const thumbnail = $('meta[property="og:image"]').attr('content') as string
-          setArticle({ siteName, title, description, thumbnail, link: articleElement.innerText })
-        })
-        .catch((error) => error.name !== 'CanceledError' && console.log(error))
+    if (post && articleElement) {
+      if (articleElement.text.includes(import.meta.env.VITE_HOST_URL) && articleElement.text.includes('/post/')) {
+        const postId = Number(articleElement.text.split('/post/')[1])
+        const usernameAuthor = articleElement.text.split('/')[3]
+        fetchApi
+          .get(`post/${postId}`, { signal: controller.signal })
+          .then((res) => setSharePost(res.data[0]))
+          .catch((error) => error.name !== 'CanceledError' && console.log(error))
+        fetchApi
+          .get(`user/${usernameAuthor}`, { signal: controller.signal })
+          .then((res) => setAuthorSharePost(res.data))
+          .catch((error) => error.name !== 'CanceledError' && console.log(error))
+      } else {
+        fetchApi
+          .get(`article?link=${articleElement.text}`, { signal: controller.signal })
+          .then((res) => {
+            const $ = load(res.data)
+            const siteName = $('meta[property="og:site_name"]').attr('content') as string
+            const title = $('meta[property="og:title"]').attr('content') as string
+            const description = $('meta[property="og:description"]').attr('content') as string
+            const thumbnail = $('meta[property="og:image"]').attr('content') as string
+            setArticle({ siteName, title, description, thumbnail, link: articleElement.text })
+          })
+          .catch((error) => error.name !== 'CanceledError' && console.log(error))
+      }
+    }
+
     return () => {
       controller.abort()
     }
@@ -145,11 +164,16 @@ export default function PostItem(props: Props) {
 
   useEffect(() => {
     const controller = new AbortController()
-    post &&
+    if (post) {
       fetchApi
         .get(`likes/post/${post.id}`, { signal: controller.signal })
         .then((res) => setLikes(res.data))
         .catch((error) => error.name !== 'CanceledError' && console.log(error))
+      fetchApi
+        .get(`shares/post/${post.id}`, { signal: controller.signal })
+        .then((res) => setShares(res.data))
+        .catch((error) => error.name !== 'CanceledError' && console.log(error))
+    }
     isReload && setReload(false)
     return () => {
       controller.abort()
@@ -195,7 +219,7 @@ export default function PostItem(props: Props) {
             </div>
           </div>
         </div>
-        {!detail && <SettingPost post={post} />}
+        {!detail && !share && <SettingPost post={post} />}
       </div>
       <div className='my-2'>
         <Linkify componentDecorator={linkDecorator}>
@@ -220,10 +244,14 @@ export default function PostItem(props: Props) {
             </article>
           </a>
         )}
-        <div className={`${post.images?.length === 1 ? 'w-full' : 'grid grid-cols-2 gap-4'} mb-4`}>
-          {(post.images as FilePreview[]).length > 0 &&
-            post.images?.map((image) => (
-              <button onClick={() => handleZoomImage(image.url as string, image.name)} key={image.id}>
+        {sharePost && authorSharePost && (
+          <PostItem author={authorSharePost} post={sharePost} detail={false} share={true} />
+        )}
+        <div className={`${post.images && post.images.length === 1 ? 'w-full' : 'grid grid-cols-2 gap-4'} mb-4`}>
+          {post.images &&
+            post.images.length > 0 &&
+            post.images.map((image) => (
+              <button onClick={() => (share ? null : handleZoomImage(image.url as string, image.name))} key={image.id}>
                 <LazyLoadImage
                   placeholderSrc={loadingImage}
                   effect='blur'
@@ -238,46 +266,45 @@ export default function PostItem(props: Props) {
         {zoomImage && (
           <PopupImage src={zoomImage.src} name={zoomImage.name} closed={(isClosed) => handleCloseZoom(isClosed)} />
         )}
-        {post.video?.name && (
+        {post.video && post.video.name && (
           <div className='w-full'>
-            <video className='rounded-md' src={post.video?.url} controls>
-              <track src={post.video?.url} kind='captions' srcLang='en' label='English' />
+            <video className='rounded-md' src={post.video.url} controls>
+              <track src={post.video.url} kind='captions' srcLang='en' label='English' />
             </video>
           </div>
         )}
       </div>
-      <div className='flex items-center justify-around mt-4'>
-        <button
-          onClick={handleCheckLikedPost() ? handleUnlikePost : handleLikePost}
-          className='flex items-center justify-start'
-        >
-          <FontAwesomeIcon
-            icon={faThumbsUp}
-            className={`${
-              handleCheckLikedPost()
-                ? 'text-primary-color dark:text-dark-primary-color'
-                : 'text-title-color dark:text-dark-title-color'
-            } text-20 rounded-full p-2 hover:bg-hover-color dark:hover:bg-dark-hover-color`}
-          />
-          <span className='ml-2'>{likes.length}</span>
-        </button>
-        <Link to={`/${author && author.username}/post/${post.id}`}>
-          <button className='flex items-center justify-start'>
+      {!share && (
+        <div className='flex items-center justify-around mt-4'>
+          <button
+            onClick={handleCheckLikedPost() ? handleUnlikePost : handleLikePost}
+            className='flex items-center justify-start'
+          >
             <FontAwesomeIcon
-              icon={faCommentDots}
-              className='text-title-color dark:text-dark-title-color text-20 rounded-full p-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
+              icon={faThumbsUp}
+              className={`${
+                handleCheckLikedPost()
+                  ? 'text-primary-color dark:text-dark-primary-color'
+                  : 'text-title-color dark:text-dark-title-color'
+              } text-20 rounded-full p-2 hover:bg-hover-color dark:hover:bg-dark-hover-color`}
             />
-            <span className='ml-2'>{detail ? commentList.length : comments.length}</span>
+            <span className='ml-2'>{likes.length}</span>
           </button>
-        </Link>
-        <button className='flex items-center justify-start'>
-          <FontAwesomeIcon
-            icon={faShare}
-            className='text-title-color dark:text-dark-title-color text-20 rounded-full p-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
-          />
-          <span className='ml-2'>0</span>
-        </button>
-      </div>
+          <Link to={`/${author && author.username}/post/${post.id}`}>
+            <button className='flex items-center justify-start'>
+              <FontAwesomeIcon
+                icon={faCommentDots}
+                className='text-title-color dark:text-dark-title-color text-20 rounded-full p-2 hover:bg-hover-color dark:hover:bg-dark-hover-color'
+              />
+              <span className='ml-2'>{detail ? commentList.length : comments.length}</span>
+            </button>
+          </Link>
+          <div className='flex items-center justify-start'>
+            <ShareOption post={post} author={author} />
+            <span className='ml-2'>{shares.length}</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
