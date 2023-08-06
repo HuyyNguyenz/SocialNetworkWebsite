@@ -25,10 +25,11 @@ interface Props {
   chatUserId?: number
   communityId?: number
   share?: string
+  usersShare?: number[]
 }
 
 export default function TextEditor(props: Props) {
-  const { comment, chatUserId, communityId, share } = props
+  const { comment, chatUserId, communityId, share, usersShare } = props
   const { postId } = useParams()
   const userData = useSelector((state: RootState) => state.userData)
   const editingPost = useSelector((state: RootState) => state.postList.editingPost)
@@ -243,25 +244,53 @@ export default function TextEditor(props: Props) {
               socket.emit('sendDataClient', { ...comment, createdAt, userId })
             }
           } else {
-            const result = (
-              await fetchApi.post('post', {
-                ...post,
-                content: share ? post.content + ' ' + share : post.content,
-                createdAt,
-                userId
+            if (usersShare && usersShare.length > 0) {
+              usersShare.forEach(async (userFriendId) => {
+                const { type, communityId, ...data } = post
+                const message = {
+                  ...data,
+                  content: share ? post.content + ' ' + share : post.content,
+                  createdAt,
+                  userId,
+                  friendId: Number(userFriendId)
+                }
+                const result = (await fetchApi.post('message', { ...message })).data
+                if (share) {
+                  const postId = Number(share.split('/post/')[1])
+                  await fetchApi.post('share/post', { userId: userData.id, postId, type: 'shareTo' })
+                }
+                result.message &&
+                  socket.emit('sendMessageClient', { friendId: Number(userFriendId), status: 'new message' })
               })
-            ).data
-            if (share) {
-              const postId = Number(share.split('/post/')[1])
-              await fetchApi.post('share/post', { userId: userData.id, postId, type: 'share' })
-            }
-            !share &&
-              toast(result.message, {
+            } else if (usersShare && usersShare.length === 0) {
+              toast('Vui lòng chọn người dùng cần chia sẻ', {
                 autoClose: 2000,
-                type: 'success',
+                type: 'warning',
                 position: 'top-right'
               })
-            dispatch(setNewPost(result.post))
+              setLoading(false)
+              return
+            } else {
+              const result = (
+                await fetchApi.post('post', {
+                  ...post,
+                  content: share ? post.content + ' ' + share : post.content,
+                  createdAt,
+                  userId
+                })
+              ).data
+              if (share) {
+                const postId = Number(share.split('/post/')[1])
+                await fetchApi.post('share/post', { userId: userData.id, postId, type: 'share' })
+              }
+              !share &&
+                toast(result.message, {
+                  autoClose: 2000,
+                  type: 'success',
+                  position: 'top-right'
+                })
+              dispatch(setNewPost(result.post))
+            }
           }
         }
         handleCancelEditing()
@@ -352,7 +381,7 @@ export default function TextEditor(props: Props) {
         </button>
         <div className='w-full flex-1'>
           <form method='POST' onSubmit={handleSubmit} onReset={handleCancelEditing}>
-            {comment || communityId ? (
+            {comment || communityId || share ? (
               ''
             ) : (
               <select

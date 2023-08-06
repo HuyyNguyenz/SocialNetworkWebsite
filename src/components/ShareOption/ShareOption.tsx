@@ -24,7 +24,14 @@ export default function ShareOption(props: Props) {
 
   const handleShareImmediately = () => {
     dispatch(setSharePost(post))
-    setShareType('Chia sẻ ngay (Công khai)')
+    setShareType('Chia sẻ bài viết (Công khai)')
+    setShowSharePostPreview(true)
+    document.body.classList.add('overflow-hidden')
+  }
+
+  const handleShareToUser = () => {
+    dispatch(setSharePost(post))
+    setShareType('Chia sẻ qua tin nhắn')
     setShowSharePostPreview(true)
     document.body.classList.add('overflow-hidden')
   }
@@ -48,9 +55,12 @@ export default function ShareOption(props: Props) {
               className='flex items-center justify-start py-2 px-4 mb-2 hover:bg-hover-color dark:hover:bg-dark-hover-color w-full'
             >
               <FontAwesomeIcon icon={faShare} />
-              <span className='ml-2'>Chia sẻ ngay (Công khai)</span>
+              <span className='ml-2'>Chia sẻ bài viết (Công khai)</span>
             </button>
-            <button className='flex items-center justify-start py-2 px-4 hover:bg-hover-color dark:hover:bg-dark-hover-color w-full'>
+            <button
+              onClick={handleShareToUser}
+              className='flex items-center justify-start py-2 px-4 hover:bg-hover-color dark:hover:bg-dark-hover-color w-full'
+            >
               <FontAwesomeIcon icon={faMessage} />
               <span className='ml-2'>Chia sẻ qua tin nhắn</span>
             </button>

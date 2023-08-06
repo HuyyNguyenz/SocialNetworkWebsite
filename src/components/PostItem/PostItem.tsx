@@ -300,7 +300,7 @@ export default function PostItem(props: Props) {
             </button>
           </Link>
           <div className='flex items-center justify-start'>
-            <ShareOption post={post} author={author} />
+            <ShareOption post={sharePost ? sharePost : post} author={authorSharePost ? authorSharePost : author} />
             <span className='ml-2'>{shares.length}</span>
           </div>
         </div>

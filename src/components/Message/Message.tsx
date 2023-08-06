@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import moment from 'moment'
-import { Message, User } from '~/types'
+import { Message, Post, User } from '~/types'
 import userImg from '~/assets/images/user.png'
 import SettingComment from '~/components/SettingComment'
 import { RootState } from '~/store'
@@ -10,6 +10,8 @@ import { load } from 'cheerio'
 import fetchApi from '~/utils/fetchApi'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import loadingImage from '~/assets/images/loading_image.png'
+import { Link } from 'react-router-dom'
+import PopupImage from '../PopupImage'
 
 interface Props {
   message: Message
@@ -28,6 +30,9 @@ export default function Message(props: Props) {
     thumbnail: string
     link: string
   }>()
+  const [sharePost, setSharePost] = useState<Post | null>(null)
+  const [authorSharePost, setAuthorSharePost] = useState<User | null>(null)
+  const [zoomImage, setZoomImage] = useState<{ src: string; name: string } | null>(null)
 
   const handleLinkClick = (url: string) => {
     window.open(url, '_blank')
@@ -48,22 +53,49 @@ export default function Message(props: Props) {
     )
   }
 
+  const handleZoomImage = (src: string, name: string) => {
+    document.body.classList.add('overflow-hidden')
+    setZoomImage({ src, name })
+  }
+
+  const handleCloseZoom = (isClosed: boolean) => {
+    if (isClosed) {
+      document.body.classList.remove('overflow-hidden')
+      setZoomImage(null)
+    }
+  }
+
   useEffect(() => {
     const controller = new AbortController()
     const articleElement = document.querySelector(`.article-${message.id}`) as HTMLAnchorElement
-    message &&
-      articleElement &&
-      fetchApi
-        .get(`article?link=${articleElement.innerText}`, { signal: controller.signal })
-        .then((res) => {
-          const $ = load(res.data)
-          const siteName = $('meta[property="og:site_name"]').attr('content') as string
-          const title = $('meta[property="og:title"]').attr('content') as string
-          const description = $('meta[property="og:description"]').attr('content') as string
-          const thumbnail = $('meta[property="og:image"]').attr('content') as string
-          setArticle({ siteName, title, description, thumbnail, link: articleElement.innerText })
-        })
-        .catch((error) => error.name !== 'CanceledError' && console.log(error))
+
+    if (message && articleElement) {
+      if (articleElement.text.includes(import.meta.env.VITE_HOST_URL) && articleElement.text.includes('/post/')) {
+        const postId = Number(articleElement.text.split('/post/')[1])
+        const usernameAuthor = articleElement.text.split('/')[3]
+        fetchApi
+          .get(`post/${postId}`, { signal: controller.signal })
+          .then((res) => setSharePost(res.data[0]))
+          .catch((error) => error.name !== 'CanceledError' && console.log(error))
+        fetchApi
+          .get(`user/${usernameAuthor}`, { signal: controller.signal })
+          .then((res) => setAuthorSharePost(res.data))
+          .catch((error) => error.name !== 'CanceledError' && console.log(error))
+      } else {
+        fetchApi
+          .get(`article?link=${articleElement.innerText}`, { signal: controller.signal })
+          .then((res) => {
+            const $ = load(res.data)
+            const siteName = $('meta[property="og:site_name"]').attr('content') as string
+            const title = $('meta[property="og:title"]').attr('content') as string
+            const description = $('meta[property="og:description"]').attr('content') as string
+            const thumbnail = $('meta[property="og:image"]').attr('content') as string
+            setArticle({ siteName, title, description, thumbnail, link: articleElement.innerText })
+          })
+          .catch((error) => error.name !== 'CanceledError' && console.log(error))
+      }
+    }
+
     return () => {
       controller.abort()
     }
@@ -99,7 +131,7 @@ export default function Message(props: Props) {
       >
         {message.content !== '' && (
           <Linkify componentDecorator={linkDecorator}>
-            <p className='border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color p-2'>
+            <p className='border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color p-2 max-w-[100%] break-all'>
               {message.deleted === 1 ? <span className='opacity-60'>Tin nhắn này đã bị gỡ</span> : message.content}
             </p>
           </Linkify>
@@ -123,8 +155,28 @@ export default function Message(props: Props) {
             </article>
           </a>
         )}
+        {sharePost && authorSharePost && (
+          <Link to={`/${authorSharePost.username}/post/${sharePost.id}`} target='_blank'>
+            <div className='border border-solid border-border-color dark:border-dark-border-color rounded-md bg-input-color dark:bg-dark-input-color p-2 mt-2'>
+              {sharePost.images ? (
+                <img className='rounded-md object-cover' src={sharePost.images[0].url} alt={sharePost.images[0].name} />
+              ) : sharePost.video ? (
+                <video className='rounded-md' src={sharePost.video.url} controls>
+                  <track src={sharePost.video.url} kind='captions' srcLang='en' label='English' />
+                </video>
+              ) : null}
+              <p className='line-clamp-2 break-all my-2'>{sharePost.content}</p>
+              <strong className='text-title-color dark:text-dark-title-color'>
+                {authorSharePost.firstName + ' ' + authorSharePost.lastName}
+              </strong>
+            </div>
+          </Link>
+        )}
         {message.images && message.deleted === 0 && (
-          <div className={`${message.content ? 'mt-4' : ''} w-[16rem] h-[16rem]`}>
+          <button
+            onClick={() => message.images && handleZoomImage(message.images[0].url as string, message.images[0].name)}
+            className={`${message.content ? 'mt-4' : ''} w-[16rem] h-[16rem]`}
+          >
             <LazyLoadImage
               placeholderSrc={loadingImage}
               effect='blur'
@@ -134,7 +186,10 @@ export default function Message(props: Props) {
               src={message.images[0].url}
               alt={message.images[0].name}
             />
-          </div>
+          </button>
+        )}
+        {zoomImage && (
+          <PopupImage src={zoomImage.src} name={zoomImage.name} closed={(isClosed) => handleCloseZoom(isClosed)} />
         )}
         {message.video?.name && message.deleted === 0 && (
           <div className={`${message.content || message.images ? 'mt-4' : ''} w-full`}>

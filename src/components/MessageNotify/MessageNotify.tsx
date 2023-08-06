@@ -152,7 +152,7 @@ export default function MessageNotify() {
         visible={isOpen}
         render={(attrs) => (
           <div
-            className='bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color shadow-lg w-[22.5rem] max-h-[31.25rem] overflow-y-auto rounded-md animate-fade text-text-color dark:text-dark-text-color text-14 p-2'
+            className='bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color shadow-lg w-[22.5rem] max-h-[31.25rem] scrollbar overflow-y-auto rounded-md animate-fade text-text-color dark:text-dark-text-color text-14 p-2'
             tabIndex={-1}
             {...attrs}
           >
