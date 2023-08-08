@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { publicRoutes } from './routes/index.ts'
+import routes from './routes/index.ts'
 import { Router } from './types/index.ts'
 import './locales/vi.ts'
 import 'react-toastify/dist/ReactToastify.css'
@@ -11,7 +11,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {publicRoutes.map((route: Router) => {
+        {routes.map((route: Router) => {
           const Page = route.component
           return <Route key={route.path} path={route.path} element={<Page />} />
         })}

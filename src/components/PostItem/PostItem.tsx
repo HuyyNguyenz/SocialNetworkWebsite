@@ -189,7 +189,7 @@ export default function PostItem(props: Props) {
   return (
     <div
       className={`w-full px-8 py-4 bg-bg-light dark:bg-bg-dark rounded-md text-14 text-text-color dark:text-dark-text-color border border-solid border-border-color dark:border-dark-border-color ${
-        detail ? 'rounded-br-none rounded-bl-none mt-8' : 'mb-8'
+        detail ? 'rounded-br-none rounded-bl-none mt-8' : share ? '' : 'mb-8'
       }`}
     >
       <div className='flex items-center justify-between'>
@@ -247,10 +247,9 @@ export default function PostItem(props: Props) {
         {sharePost && authorSharePost && (
           <PostItem author={authorSharePost} post={sharePost} detail={false} share={true} />
         )}
-        <div className={`${post.images && post.images.length === 1 ? 'w-full' : 'grid grid-cols-2 gap-4'} mb-4`}>
-          {post.images &&
-            post.images.length > 0 &&
-            post.images.map((image) => (
+        {post.images && post.images.length > 0 && (
+          <div className={`${post.images && post.images.length === 1 ? 'w-full' : 'grid grid-cols-2 gap-4'} mb-4`}>
+            {post.images.map((image) => (
               <button onClick={() => (share ? null : handleZoomImage(image.url as string, image.name))} key={image.id}>
                 <LazyLoadImage
                   placeholderSrc={loadingImage}
@@ -262,7 +261,8 @@ export default function PostItem(props: Props) {
                 />
               </button>
             ))}
-        </div>
+          </div>
+        )}
         {zoomImage && (
           <PopupImage src={zoomImage.src} name={zoomImage.name} closed={(isClosed) => handleCloseZoom(isClosed)} />
         )}

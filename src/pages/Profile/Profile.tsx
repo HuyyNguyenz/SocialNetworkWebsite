@@ -12,7 +12,7 @@ import fetchApi from '~/utils/fetchApi'
 import { setCommentList } from '~/features/comment/commentSlice'
 import UserProfileLayout from '~/layouts/UserProfileLayout'
 
-export default function UserProfile() {
+export default function Profile() {
   const { userId } = useParams()
   const userData = useSelector((state: RootState) => state.userData)
   const postList = useSelector((state: RootState) => state.postList.data)

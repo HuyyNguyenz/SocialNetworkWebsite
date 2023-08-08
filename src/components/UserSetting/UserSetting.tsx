@@ -4,7 +4,7 @@ import Tippy from '@tippyjs/react/headless'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircle, faGear, faMoon, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import useCookie from '~/hooks/useCookie'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { removeUserData } from '~/features/userData/userDataSlice'
 import { RootState } from '~/store'
@@ -77,10 +77,12 @@ export default function UserSetting() {
                 <span className='text-18 dark:text-dark-title-color font-semibold ml-2 line-clamp-1'>{`${userData.firstName} ${userData.lastName}`}</span>
               </li>
             </Link>
-            <li className='flex items-center justify-start py-2 px-4 my-2 cursor-pointer hover:bg-hover-color dark:hover:bg-dark-hover-color'>
-              <FontAwesomeIcon icon={faGear} />
-              <span className='ml-2'>Cài đặt chung</span>
-            </li>
+            <NavLink to={`/${userData.username}/setting/${userData.id}`}>
+              <li className='flex items-center justify-start py-2 px-4 my-2 cursor-pointer hover:bg-hover-color dark:hover:bg-dark-hover-color'>
+                <FontAwesomeIcon icon={faGear} />
+                <span className='ml-2'>Cài đặt chung</span>
+              </li>
+            </NavLink>
             <li className='flex items-center justify-between py-2 px-4 my-2 select-none'>
               <div className='flex items-center justify-start w-full'>
                 <FontAwesomeIcon icon={faMoon} />
