@@ -197,7 +197,6 @@ export default function VideoCall(props: Props) {
                       <track kind='captions' srcLang='en' label='English' />
                     </video>
                     <img
-                      loading='lazy'
                       ref={localAvatar}
                       className='hidden h-40 w-[13.5rem] object-cover'
                       src={userData.avatar ? userData.avatar.url : userImg}
@@ -214,7 +213,6 @@ export default function VideoCall(props: Props) {
                       <track kind='captions' srcLang='en' label='English' />
                     </video>
                     <img
-                      loading='lazy'
                       ref={remoteAvatar}
                       className='hidden h-[28.125rem] w-[37.5rem] object-cover'
                       src={caller.avatar ? caller.avatar.url : userImg}
@@ -253,7 +251,6 @@ export default function VideoCall(props: Props) {
             {!isAccepted && (
               <div className='center'>
                 <img
-                  loading='lazy'
                   className='w-52 h-52 object-cover rounded-md my-0 mx-auto'
                   src={caller.avatar ? caller.avatar.url : userImg}
                   alt={caller.firstName + ' ' + caller.lastName}
@@ -298,7 +295,6 @@ export default function VideoCall(props: Props) {
                       <track kind='captions' srcLang='en' label='English' />
                     </video>
                     <img
-                      loading='lazy'
                       ref={localAvatar}
                       className='hidden h-40 w-[13.5rem] object-cover'
                       src={userData.avatar ? userData.avatar.url : userImg}
@@ -315,7 +311,6 @@ export default function VideoCall(props: Props) {
                       <track kind='captions' srcLang='en' label='English' />
                     </video>
                     <img
-                      loading='lazy'
                       ref={remoteAvatar}
                       className='hidden h-[28.125rem] w-[37.5rem] object-cover'
                       src={userCalled.avatar ? userCalled.avatar.url : userImg}
@@ -354,7 +349,6 @@ export default function VideoCall(props: Props) {
             {!isAccepted && (
               <div className='center'>
                 <img
-                  loading='lazy'
                   className='w-52 h-52 object-cover rounded-md my-0 mx-auto'
                   src={userCalled.avatar ? userCalled.avatar.url : userImg}
                   alt={userCalled.firstName + ' ' + userCalled.lastName}

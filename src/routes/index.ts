@@ -10,6 +10,7 @@ import Profile from '~/pages/Profile'
 import VerifyRegister from '~/pages/VerifyRegister'
 import ProfileSetting from '~/pages/ProfileSetting'
 import { Router } from '~/types'
+import UserFriend from '~/pages/UserFriend'
 
 const routes: Router[] = [
   { path: '/', component: Home },
@@ -19,6 +20,7 @@ const routes: Router[] = [
   { path: '/recovery', component: Recovery },
   { path: '/:author/post/:postId', component: PostDetail },
   { path: '/:username/profile/:userId/posts', component: Profile },
+  { path: '/:username/profile/:userId/friends', component: UserFriend },
   { path: '/verify/register/:username', component: VerifyRegister },
   { path: '/message/:userFriendId', component: Chat },
   { path: '/:username/setting/:userId', component: ProfileSetting },

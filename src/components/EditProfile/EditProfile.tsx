@@ -1,6 +1,7 @@
 import { faC, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import userImg from '~/assets/images/user.png'
+import loadingImg from '~/assets/images/loading_image.png'
 import backGroundDefault from '~/assets/images/background_default.jpg'
 import { useEffect, useState } from 'react'
 import { FilePreview, User } from '~/types'
@@ -11,6 +12,7 @@ import { deleteFile, uploadFile } from '~/utils/firebase'
 import fetchApi from '~/utils/fetchApi'
 import { setUserData } from '~/features/userData/userDataSlice'
 import Skeleton from 'react-loading-skeleton'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 interface Props {
   isOpen: (value: boolean) => void
@@ -119,7 +121,7 @@ export default function EditProfile(props: Props) {
 
   return (
     <>
-      <div className='text-center center w-[48rem] h-[90%] bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color z-[60] rounded-md py-2 text-20 text-text-color dark:text-dark-text-color overflow-hidden'>
+      <div className='text-center fixed center w-full md:w-[48rem] h-[90%] bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color z-[60] rounded-md py-2 text-20 text-text-color dark:text-dark-text-color overflow-hidden'>
         <div className='flex item-center justify-between text-title-color dark:text-dark-title-color border-b border-solid border-border-color dark:border-dark-border-color py-4 px-6'>
           <h2 className='font-bold'>Chỉnh sửa trang cá nhân</h2>
           <button onClick={handleCloseEditProfile} className='hover:opacity-80'>
@@ -150,17 +152,23 @@ export default function EditProfile(props: Props) {
             isLoading ? (
               <Skeleton className='w-28 h-28 object-cover rounded-md my-0 mx-auto dark:bg-bg-dark' />
             ) : (
-              <img
+              <LazyLoadImage
+                placeholderSrc={userImg}
+                effect='blur'
+                width={'7rem'}
+                height={'7rem'}
                 className='w-28 h-28 object-cover rounded-md my-0 mx-auto'
-                loading='lazy'
                 src={avatar.src}
                 alt={userData.firstName + ' ' + userData.lastName}
               />
             )
           ) : (
-            <img
+            <LazyLoadImage
+              placeholderSrc={userImg}
+              effect='blur'
+              width={'7rem'}
+              height={'7rem'}
               className='w-28 h-28 object-cover rounded-md my-0 mx-auto'
-              loading='lazy'
               src={userData.avatar ? userData.avatar.url : userImg}
               alt={userData.firstName + ' ' + userData.lastName}
             />
@@ -190,17 +198,23 @@ export default function EditProfile(props: Props) {
             isLoading ? (
               <Skeleton className='w-[70%] h-[14rem] object-cover rounded-md my-0 mx-auto dark:bg-bg-dark' />
             ) : (
-              <img
-                className='w-[70%] h-[14rem] object-cover rounded-md my-0 mx-auto'
-                loading='lazy'
+              <LazyLoadImage
+                placeholderSrc={loadingImg}
+                effect='blur'
+                width={'100%'}
+                height={'14rem'}
+                className='w-full md:w-[70%] h-56 object-cover rounded-md my-0 mx-auto'
                 src={coverImage.src}
                 alt={userData.firstName + ' ' + userData.lastName}
               />
             )
           ) : (
-            <img
-              className='w-[70%] h-[14rem] object-cover rounded-md my-0 mx-auto'
-              loading='lazy'
+            <LazyLoadImage
+              placeholderSrc={loadingImg}
+              effect='blur'
+              width={'100%'}
+              height={'14rem'}
+              className='w-full md:w-[70%] h-56 object-cover rounded-md my-0 mx-auto'
               src={userData.backgroundImage ? userData.backgroundImage.url : backGroundDefault}
               alt={userData.firstName + ' ' + userData.lastName}
             />
@@ -218,7 +232,7 @@ export default function EditProfile(props: Props) {
           <button
             id='submitBtn'
             onClick={handleClick}
-            className='mt-4 bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md text-white font-semibold w-[30%] py-1 text-16'
+            className='bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color rounded-md text-white font-semibold w-[30%] py-1 text-16'
           >
             Cập nhật
           </button>

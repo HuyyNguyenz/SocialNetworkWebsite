@@ -122,35 +122,33 @@ export default function UserProfileLayout(props: Props) {
   return (
     <DefaultLayout>
       <main>
-        <div className='w-[48rem] max-w-3xl my-0 mx-auto pb-10'>
+        <div className='md:w-[48rem] md:max-w-3xl my-0 mx-auto pb-10'>
           <div className='flex flex-col items-start justify-start bg-bg-light dark:bg-bg-dark border-b border-solid border-border-color dark:border-dark-border-color'>
             {isLoading ? (
-              <Skeleton className='w-[48rem] h-[25rem] rounded-md object-cover dark:bg-bg-dark' />
+              <Skeleton className='w-80 md:w-[48rem] h-[20rem] md:h-[25rem] md:rounded-md object-cover dark:bg-bg-dark' />
             ) : (
               <img
-                loading='lazy'
-                className='w-full h-[25rem] rounded-md object-cover'
+                className='w-full h-[20rem] md:h-[25rem] md:rounded-md object-cover'
                 src={user?.backgroundImage ? user.backgroundImage.url : backgroundDefault}
                 alt={user?.firstName + ' ' + user?.lastName}
               />
             )}
-            <div className='mt-4 flex items-center justify-between w-full'>
-              <div className='flex items-center justify-start flex-1'>
+            <div className='mt-4 flex flex-col md:flex-row items-center justify-between w-full'>
+              <div className='flex flex-col md:flex-row items-center justify-start flex-1'>
                 {isLoading ? (
                   <Skeleton className='w-28 h-28 rounded-md object-cover dark:bg-bg-dark' />
                 ) : (
                   <img
-                    loading='lazy'
                     src={user?.avatar ? user.avatar.url : userImg}
                     alt={user?.firstName + ' ' + user?.lastName}
                     className='w-28 h-28 rounded-md object-cover'
                   />
                 )}
-                <div className='flex flex-col items-start justify-start font-bold ml-4 flex-1'>
+                <div className='flex flex-col items-center md:items-start justify-start font-bold ml-4 flex-1'>
                   {isLoading ? (
                     <Skeleton className='w-52 h-6 dark:bg-bg-dark' />
                   ) : (
-                    <h1 className='text-24 text-title-color dark:text-dark-title-color line-clamp-1'>
+                    <h1 className='text-24 text-title-color dark:text-dark-title-color line-clamp-1 mt-2 md:my-0'>
                       {user?.firstName + ' ' + user?.lastName}
                     </h1>
                   )}
@@ -169,12 +167,12 @@ export default function UserProfileLayout(props: Props) {
                     setOpenEditProfile(true)
                     document.body.classList.add('overflow-y-hidden')
                   }}
-                  className='bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color text-white font-semibold text-14 rounded-md p-2 hover:opacity-90'
+                  className='bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color text-white font-semibold text-14 rounded-md p-2 hover:opacity-90 my-4 md:my-0'
                 >
                   Chỉnh sửa trang cá nhân
                 </button>
               ) : (
-                <div className='flex items-center justify-start text-14 font-semibold'>
+                <div className='flex items-center justify-start text-14 font-semibold my-4 md:my-0'>
                   {friend && friend.friendId !== userData.id && friend.status === 'pending' ? (
                     <>
                       <button
@@ -226,27 +224,29 @@ export default function UserProfileLayout(props: Props) {
               )}
             </div>
           </div>
-          <div className='mt-10 flex items-start justify-start'>
-            <div className='bg-bg-light dark:bg-bg-dark rounded-md border border-solid border-border-color dark:border-dark-border-color font-semibold text-14 text-title-color dark:text-dark-title-color'>
-              <ul>
+          <div className='md:mt-10 flex flex-col md:flex-row items-start justify-start'>
+            <div className='w-full p-4 md:p-0 md:w-auto bg-bg-light dark:bg-bg-dark md:rounded-md border border-solid border-border-color dark:border-dark-border-color font-semibold text-14 text-title-color dark:text-dark-title-color'>
+              <ul className='flex items-center justify-between md:flex-col'>
                 <NavLink to={`/${username}/profile/${userId}/posts`}>
-                  <li className='px-10 py-2 my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
+                  <li className='md:px-10 md:py-2 md:my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
                     Bài viết
                   </li>
                 </NavLink>
-                <li className='px-10 py-2 my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
-                  Bạn bè
-                </li>
-                <li className='px-10 py-2 my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
+                <NavLink to={`/${username}/profile/${userId}/friends`}>
+                  <li className='md:px-10 md:py-2 md:my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
+                    Bạn bè
+                  </li>
+                </NavLink>
+                <li className='md:px-10 md:py-2 md:my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
                   Ảnh
                 </li>
-                <li className='px-10 py-2 my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
+                <li className='md:px-10 md:py-2 md:my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
                   Video
                 </li>
               </ul>
             </div>
 
-            <div className='flex-1 ml-4 max-w-[38.75rem] overflow-hidden'>
+            <div className='flex-1 mt-8 w-full md:mt-0 md:ml-4 md:max-w-[38.75rem] overflow-hidden'>
               {isLoading ? <Loading quantity={1} /> : children}
             </div>
           </div>

@@ -52,7 +52,7 @@ export default function CommentList(props: Props) {
 
   return (
     <section>
-      <div className='text-14 text-text-color dark:text-dark-text-color bg-bg-light dark:bg-bg-dark px-8 py-4 rounded-md rounded-tl-none rounded-tr-none border border-solid border-border-color dark:border-dark-border-color border-t-transparent text-center'>
+      <div className='text-14 text-text-color dark:text-dark-text-color bg-bg-light dark:bg-bg-dark px-4 md:px-8 py-4 rounded-md rounded-tl-none rounded-tr-none border border-solid border-border-color dark:border-dark-border-color border-t-transparent text-center'>
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center justify-start text-18 text-title-color dark:text-dark-title-color'>
             <h2 className='font-bold'>Bình luận</h2>

@@ -106,7 +106,7 @@ export default function ForgotPassword(props: Props) {
               onClick={handleRequestResetPassword}
               type='button'
               id='sendCode'
-              className='w-[30%] px-4 py-2 bg-primary-color text-white rounded-md ml-4'
+              className='w-[34%] px-4 py-2 bg-primary-color text-white rounded-md ml-4'
             >
               Nhận mã
             </button>

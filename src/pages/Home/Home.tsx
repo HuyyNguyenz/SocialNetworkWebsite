@@ -123,7 +123,7 @@ export default function Home() {
   return (
     <DefaultLayout>
       <main>
-        <div className='w-[48rem] max-w-3xl my-0 mx-auto pt-36 pb-10'>
+        <div className='md:w-[48rem] max-w-3xl my-0 mx-auto pt-36 pb-10'>
           {!sharePost && <TextEditor comment={false} />}
           {isLoading ? (
             <Loading quantity={5} />
@@ -138,10 +138,10 @@ export default function Home() {
             </InfiniteScroll>
           ) : (
             <div>
-              <h2 className='text-18 uppercase font-semibold text-center bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color bg-clip-text text-transparent'>
+              <h2 className='px-4 md:px-0 text-16 mb-2 md:text-18 uppercase font-semibold text-center bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color bg-clip-text text-transparent'>
                 Hãy kết bạn để theo dõi nhiều bài viết hay hơn
               </h2>
-              <img loading='lazy' className='object-cover rounded-md' src={socialNetworkGif} alt='gif' />
+              <img className='object-cover rounded-md' src={socialNetworkGif} alt='gif' />
             </div>
           )}
         </div>

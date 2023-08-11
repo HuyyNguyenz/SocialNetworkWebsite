@@ -88,7 +88,7 @@ export default function ProfileSetting() {
 
   return (
     <UserSettingLayout>
-      <div className='ml-8 text-14 text-text-color dark:text-dark-text-color w-full bg-bg-light dark:bg-bg-dark p-4 rounded-md border border-solid border-border-color dark:border-dark-border-color flex-1'>
+      <div className='mt-8 md:mt-0 md:ml-8 text-14 text-text-color dark:text-dark-text-color w-full bg-bg-light dark:bg-bg-dark p-4 rounded-md border border-solid border-border-color dark:border-dark-border-color flex-1'>
         <form
           onSubmit={handleSubmit}
           onReset={handleReset}

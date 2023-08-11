@@ -12,13 +12,14 @@ import useFileValidation from '~/hooks/useFileValidation'
 import { deleteFile, uploadFile } from '~/utils/firebase'
 import fetchApi from '~/utils/fetchApi'
 import { cancelEditing, setNewPost, setSharePost } from '~/features/post/postSlice'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { cancelEditingComment, setCommentList } from '~/features/comment/commentSlice'
 import Loading from '../Loading'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/socket'
 import { cancelEditingMessage, setMessageList } from '~/features/message/messageSlice'
 import EmojiPicker, { Theme } from 'emoji-picker-react'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 interface Props {
   comment: boolean
@@ -368,17 +369,24 @@ export default function TextEditor(props: Props) {
     <>
       <div
         className={`${
-          comment ? '' : 'py-4 px-8 border border-solid border-border-color dark:border-dark-border-color rounded-md'
-        } flex items-start justify-start bg-bg-light dark:bg-bg-dark text-14 ${comment ? '' : 'mb-8'}`}
+          comment
+            ? ''
+            : 'py-4 px-4 md:px-8 border border-solid border-border-color dark:border-dark-border-color rounded-md'
+        } flex flex-col md:flex-row items-start justify-start bg-bg-light dark:bg-bg-dark text-14 ${
+          comment ? '' : 'mb-8'
+        }`}
       >
-        <button className='mr-4'>
-          <img
-            loading='lazy'
+        <Link to={`${userData.username}/profile/${userData.id}/posts`} className='hidden mr-4 md:block'>
+          <LazyLoadImage
+            placeholderSrc={userImg}
+            effect='blur'
+            width={'2rem'}
+            height={'2rem'}
             className='w-8 h-8 object-cover rounded-md'
             src={userData.avatar ? userData.avatar.url : userImg}
             alt={`${userData.firstName} ${userData.lastName}`}
           />
-        </button>
+        </Link>
         <div className='w-full flex-1'>
           <form method='POST' onSubmit={handleSubmit} onReset={handleCancelEditing}>
             {comment || communityId || share ? (
@@ -420,7 +428,7 @@ export default function TextEditor(props: Props) {
             <span className='text-red-600 error-text-input'></span>
 
             {share ? null : isLoading ? (
-              <Skeleton className={`${chatUserId ? 'h-52 w-72' : 'h-[25rem]'} mb-2 dark:bg-bg-dark`} />
+              <Skeleton className={`${chatUserId ? 'h-52 w-72' : 'h-60 md:h-[25rem]'} mb-2 dark:bg-bg-dark`} />
             ) : (
               <>
                 {(post.images?.length as number) > 0 && (

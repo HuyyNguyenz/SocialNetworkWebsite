@@ -1,5 +1,3 @@
-import { faAngleDown } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import FriendPreview from '~/components/FriendPreview'
@@ -86,43 +84,37 @@ export default function Friends() {
 
   return (
     <DefaultLayout>
-      <div className='pt-32 pb-10 my-0 mx-auto w-[48rem] max-w-[48rem] text-14'>
+      <div className='pt-32 pb-10 my-0 mx-auto md:w-[48rem] max-w-[48rem] text-14'>
         {inviteFriends.length > 0 && (
           <div className='text-center mb-4'>
-            <h3 className='dark:text-dark-title-color font-bold text-18 mb-4 text-left'>Lời mời kết bạn</h3>
+            <h3 className='font-bold text-18 mb-4 text-left dark:text-dark-title-color px-4 md:px-0'>
+              Lời mời kết bạn
+            </h3>
             <div className='bg-bg-light dark:bg-bg-dark p-4 border border-solid border-border-color dark:border-dark-border-color rounded-md'>
-              <div className='grid grid-cols-4 gap-4'>
+              <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
                 {inviteFriends.map((user) => (
                   <FriendPreview key={user.id} data={user} type='invite' reload={(value) => setReload(value)} />
                 ))}
               </div>
-              {/* <button className='text-primary-color font-bold hover:text-secondary-color transition-all ease-linear duration-200 mt-8'>
-                <span className='mr-2'>Xem thêm</span>
-                <FontAwesomeIcon icon={faAngleDown} />
-              </button> */}
             </div>
           </div>
         )}
         {friends.length > 0 && (
           <div className='text-center mb-4'>
-            <h3 className='font-bold text-18 mb-4 text-left dark:text-dark-title-color'>Bạn bè</h3>
+            <h3 className='font-bold text-18 mb-4 text-left dark:text-dark-title-color px-4 md:px-0'>Bạn bè</h3>
             <div className='bg-bg-light dark:bg-bg-dark p-4 border border-solid border-border-color dark:border-dark-border-color rounded-md'>
-              <div className='grid grid-cols-4 gap-4'>
+              <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
                 {friends.map((user) => (
                   <FriendPreview key={user.id} data={user} type='friend' reload={(value) => setReload(value)} />
                 ))}
               </div>
-              {/* <button className='text-primary-color font-bold hover:text-secondary-color transition-all ease-linear duration-200 mt-8'>
-                <span className='mr-2'>Xem thêm</span>
-                <FontAwesomeIcon icon={faAngleDown} />
-              </button> */}
             </div>
           </div>
         )}
         <div className='text-center mb-4'>
-          <h3 className='font-bold text-18 mb-4 text-left dark:text-dark-title-color'>Gợi ý kết bạn</h3>
+          <h3 className='font-bold text-18 mb-4 text-left dark:text-dark-title-color px-4 md:px-0'>Gợi ý kết bạn</h3>
           <div className='bg-bg-light dark:bg-bg-dark p-4 border border-solid border-border-color dark:border-dark-border-color rounded-md'>
-            <div className='grid grid-cols-4 gap-4'>
+            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
               {users.length > 0 &&
                 users.map(
                   (user) =>
@@ -132,10 +124,6 @@ export default function Friends() {
                     )
                 )}
             </div>
-            {/* <button className='text-primary-color font-bold hover:text-secondary-color transition-all ease-linear duration-200 mt-8'>
-              <span className='mr-2'>Xem thêm</span>
-              <FontAwesomeIcon icon={faAngleDown} />
-            </button> */}
           </div>
         </div>
       </div>

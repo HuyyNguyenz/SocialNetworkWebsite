@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { removeUserData } from '~/features/userData/userDataSlice'
 import { RootState } from '~/store'
 import socket from '~/socket'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 export default function UserSetting() {
   const [isOpen, setOpen] = useState<boolean>(false)
@@ -68,8 +69,11 @@ export default function UserSetting() {
           <ul className='text-14'>
             <Link to={`/${userData.username}/profile/${userData.id}/posts`}>
               <li className='flex items-center justify-start py-2 px-4 my-2 cursor-pointer'>
-                <img
-                  loading='lazy'
+                <LazyLoadImage
+                  placeholderSrc={userImg}
+                  effect='blur'
+                  width={'2rem'}
+                  height={'2rem'}
                   className={`w-8 h-8 object-cover rounded-md`}
                   src={userData.avatar ? userData.avatar.url : userImg}
                   alt={userData.firstName + ' ' + userData.lastName}
@@ -113,8 +117,11 @@ export default function UserSetting() {
       )}
     >
       <button onClick={handleOpenMenu}>
-        <img
-          loading='lazy'
+        <LazyLoadImage
+          placeholderSrc={userImg}
+          effect='blur'
+          width={'2.25rem'}
+          height={'2.25rem'}
           src={userData.avatar ? userData.avatar.url : userImg}
           alt={userData.firstName + ' ' + userData.lastName}
           className='w-9 h-9 ml-4 rounded-md object-cover cursor-pointer'

@@ -110,7 +110,7 @@ export default function Chat() {
 
   return (
     <DefaultLayout>
-      <div className='relative pt-32 my-0 mx-auto w-[48rem] max-w-[48rem] text-14 text-text-color dark:text-dark-text-color bg-bg-light dark:bg-bg-dark border border-t-transparent border-b-transparent border-solid border-border-color dark:border-dark-border-color'>
+      <div className='relative pt-32 my-0 mx-auto md:w-[48rem] md:max-w-[48rem] text-14 text-text-color dark:text-dark-text-color bg-bg-light dark:bg-bg-dark border border-t-transparent border-b-transparent border-solid border-border-color dark:border-dark-border-color'>
         <div className='flex flex-col items-start justify-start'>
           <div className='px-4 flex items-center justify-between w-full'>
             {userFriend && <UserPreview data={userFriend} online={userFriend.isOnline} />}{' '}

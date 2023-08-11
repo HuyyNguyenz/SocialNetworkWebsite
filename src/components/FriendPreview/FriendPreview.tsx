@@ -66,7 +66,7 @@ export default function FriendPreview(props: Props) {
 
   return (
     data && (
-      <div className='w-40 max-w-[10rem] pb-4 flex flex-col items-center justify-center bg-input-color dark:bg-dark-input-color text-14 text-center font-semibold border border-solid border-border-color dark:border-dark-border-color rounded-md overflow-hidden'>
+      <div className='w-40 max-w-[10rem] pb-4 flex flex-col items-center justify-start bg-input-color dark:bg-dark-input-color text-14 text-center font-semibold border border-solid border-border-color dark:border-dark-border-color rounded-md overflow-hidden'>
         <Link to={`/${data.username}/profile/${data.id}/posts`}>
           <LazyLoadImage
             effect='blur'
@@ -79,25 +79,29 @@ export default function FriendPreview(props: Props) {
           />
           <h5 className='my-2 dark:text-dark-text-color'>{data.firstName + ' ' + data.lastName}</h5>
         </Link>
-        {isPending ? (
-          <button className='w-28 py-1 text-primary-color dark:text-dark-primary-color bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color my-0 mx-auto rounded-md hover:bg-hover-color dark:hover:bg-dark-hover-color'>
-            <Link to={`/${data.username}/profile/${data.id}/posts`}>Đã gửi lời mời</Link>
-          </button>
-        ) : (
-          <button
-            onClick={handleClick}
-            className='w-28 py-1 text-white bg-primary-color dark:bg-dark-primary-color my-0 mx-auto rounded-md hover:opacity-90'
-          >
-            {type === 'invite' ? (
-              'Xác nhận'
-            ) : type === 'friend' ? (
-              <Link to={`/message/${data.id}`}>
-                <span className='w-full inline-block'>Nhắn tin</span>
-              </Link>
+        {type !== '' && (
+          <>
+            {isPending ? (
+              <button className='w-28 py-1 text-primary-color dark:text-dark-primary-color bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color my-0 mx-auto rounded-md hover:bg-hover-color dark:hover:bg-dark-hover-color'>
+                <Link to={`/${data.username}/profile/${data.id}/posts`}>Đã gửi lời mời</Link>
+              </button>
             ) : (
-              'Kết bạn'
+              <button
+                onClick={handleClick}
+                className='w-28 py-1 text-white bg-primary-color dark:bg-dark-primary-color my-0 mx-auto rounded-md hover:opacity-90'
+              >
+                {type === 'invite' ? (
+                  'Xác nhận'
+                ) : type === 'friend' ? (
+                  <Link to={`/message/${data.id}`}>
+                    <span className='w-full inline-block'>Nhắn tin</span>
+                  </Link>
+                ) : (
+                  'Kết bạn'
+                )}
+              </button>
             )}
-          </button>
+          </>
         )}
       </div>
     )

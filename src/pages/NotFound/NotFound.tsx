@@ -16,10 +16,10 @@ export default function NotFound() {
 
   return (
     <div className='w-full relative min-h-screen bg-gradient-to-br from-primary-color to-secondary-color'>
-      <div className='center text-white text-center text-32'>
+      <div className='center w-full text-white text-center text-32'>
         <div>
           <h1 className='font-black uppercase'>{info.title}</h1>
-          <span className='text-28'>{info.message}</span>
+          <span className='text-22'>{info.message}</span>
         </div>
         <NavLink to='/'>
           <button className='text-18 bg-bg-light text-title-color font-bold rounded-md p-2 hover:text-secondary-color transition-all ease-linear duration-150'>

@@ -188,15 +188,18 @@ export default function PostItem(props: Props) {
 
   return (
     <div
-      className={`w-full px-8 py-4 bg-bg-light dark:bg-bg-dark rounded-md text-14 text-text-color dark:text-dark-text-color border border-solid border-border-color dark:border-dark-border-color ${
+      className={`w-full px-4 md:px-8 py-4 bg-bg-light dark:bg-bg-dark rounded-md text-14 text-text-color dark:text-dark-text-color border border-solid border-border-color dark:border-dark-border-color ${
         detail ? 'rounded-br-none rounded-bl-none mt-8' : share ? '' : 'mb-8'
       }`}
     >
       <div className='flex items-center justify-between'>
         <div className='flex items-center justify-start'>
           <Link to={`/${author && author.username}/profile/${author && author.id}/posts`}>
-            <img
-              loading='lazy'
+            <LazyLoadImage
+              placeholderSrc={userImg}
+              effect='blur'
+              width={'2rem'}
+              height={'2rem'}
               className='w-8 h-8 rounded-md object-cover'
               src={author?.avatar ? author?.avatar.url : userImg}
               alt={author?.firstName + ' ' + author?.lastName}
@@ -208,14 +211,16 @@ export default function PostItem(props: Props) {
                 {author?.firstName + ' ' + author?.lastName}
               </span>
             </Link>
-            <div className='flex items-center justify-start'>
-              <span className='mr-2'>{createdAt}</span>
-              {post.type === 'public' ? (
-                <FontAwesomeIcon icon={faEarthAmericas} className='text-title-color dark:text-dark-title-color' />
-              ) : (
-                <FontAwesomeIcon icon={faLock} className='text-title-color dark:text-dark-title-color' />
-              )}
-              {post.modifiedAt && <span className='ml-2 opacity-60'>Đã chỉnh sửa {modifiedAt}</span>}
+            <div className='flex flex-col md:flex-row items-start md:items-center justify-start'>
+              <div>
+                <span className='mr-2'>{createdAt}</span>
+                {post.type === 'public' ? (
+                  <FontAwesomeIcon icon={faEarthAmericas} className='text-title-color dark:text-dark-title-color' />
+                ) : (
+                  <FontAwesomeIcon icon={faLock} className='text-title-color dark:text-dark-title-color' />
+                )}
+              </div>
+              {post.modifiedAt && <span className='md:ml-2 opacity-60'>Đã chỉnh sửa {modifiedAt}</span>}
             </div>
           </div>
         </div>
@@ -228,13 +233,15 @@ export default function PostItem(props: Props) {
         {article && (
           <a href={article.link} target='_blank' rel='noreferrer'>
             <article className='mb-4 rounded-md bg-hover-color dark:bg-dark-hover-color border border-solid border-border-color dark:border-dark-border-color'>
-              <img
-                loading='lazy'
+              <LazyLoadImage
+                placeholderSrc={loadingImage}
+                effect='blur'
+                width={'100%'}
                 src={article.thumbnail}
                 alt={article.title}
                 className='w-full max-h-[20rem] object-cover rounded-md rounded-bl-none rounded-br-none'
               />
-              <div className='flex flex-col items-start justify-start p-2'>
+              <div className='flex flex-col items-start justify-start p-2 break-all'>
                 <span className='uppercase text-xs'>{article.siteName}</span>
                 <div className='flex flex-col items-start justify-start'>
                   <h3 className='text-16 font-bold'>{article.title}</h3>
@@ -248,14 +255,18 @@ export default function PostItem(props: Props) {
           <PostItem author={authorSharePost} post={sharePost} detail={false} share={true} />
         )}
         {post.images && post.images.length > 0 && (
-          <div className={`${post.images && post.images.length === 1 ? 'w-full' : 'grid grid-cols-2 gap-4'} mb-4`}>
+          <div
+            className={`${post.images && post.images.length === 1 ? 'w-full' : 'grid grid-cols-2 gap-2 md:gap-4'} mb-4`}
+          >
             {post.images.map((image) => (
               <button onClick={() => (share ? null : handleZoomImage(image.url as string, image.name))} key={image.id}>
                 <LazyLoadImage
                   placeholderSrc={loadingImage}
                   effect='blur'
                   width={'100%'}
-                  className={`${post.images?.length === 1 ? 'h-[25rem]' : 'h-52'} w-full rounded-md object-cover`}
+                  className={`${
+                    post.images?.length === 1 ? 'h-80 md:h-[25rem]' : 'h-40 md:h-52'
+                  } w-full rounded-md object-cover`}
                   src={image.url}
                   alt={image.name}
                 />

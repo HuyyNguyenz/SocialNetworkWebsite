@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '~/store'
 import fetchApi from '~/utils/fetchApi'
 import userImg from '~/assets/images/user.png'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 interface Props {
   post: Post
@@ -81,7 +82,7 @@ export default function SharePostPreview(props: Props) {
 
   return (
     <>
-      <div className='center px-10 fixed z-[60] w-[48rem] h-[80%] animate-fade bg-input-color dark:bg-dark-input-color rounded-md border border-solid border-border-color dark:border-dark-border-color overflow-y-auto scrollbar'>
+      <div className='center px-4 md:px-10 fixed z-[60] w-full md:w-[48rem] h-[80%] animate-fade bg-input-color dark:bg-dark-input-color rounded-md border border-solid border-border-color dark:border-dark-border-color overflow-y-auto scrollbar'>
         <div className='flex items-center justify-between w-full py-4 text-title-color dark:text-dark-title-color text-18 font-semibold'>
           <h4>{type}</h4>
           <button
@@ -97,17 +98,21 @@ export default function SharePostPreview(props: Props) {
           share={`${import.meta.env.VITE_HOST_URL}${author.username}/post/${post.id}`}
         />
         {userFriends.length > 0 && (
-          <div className='bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color rounded-md py-4 px-8 mb-8 max-h-56 overflow-y-auto scrollbar'>
+          <div className='bg-bg-light dark:bg-bg-dark border border-solid border-border-color dark:border-dark-border-color rounded-md py-4 px-4 md:px-8 mb-8 max-h-56 overflow-y-auto scrollbar'>
             <h3 className='text-18 font-semibold text-title-color dark:text-dark-title-color'>Bạn bè</h3>
             {userFriends.map((user) => (
               <div key={user.id} className='py-3 flex items-center justify-between'>
                 <div className='flex items-center justify-start'>
-                  <img
-                    className='w-9 h-9 object-cover rounded-md mr-2'
+                  <LazyLoadImage
+                    placeholderSrc={userImg}
+                    effect='blur'
+                    width={'2.25rem'}
+                    height={'2.25rem'}
+                    className='w-9 h-9 object-cover rounded-md'
                     src={user.avatar ? user.avatar.url : userImg}
                     alt={user.firstName + ' ' + user.lastName}
                   />
-                  <span>{user.firstName + ' ' + user.lastName}</span>
+                  <span className='ml-2'>{user.firstName + ' ' + user.lastName}</span>
                 </div>
 
                 <input

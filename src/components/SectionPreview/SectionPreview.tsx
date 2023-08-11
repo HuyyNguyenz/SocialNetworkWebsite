@@ -28,12 +28,11 @@ export default function SectionPreview(props: Props) {
               key={image.id}
               className={`${
                 (data as FilePreview[]).length === 1
-                  ? `${chatUserId ? 'w-40 h-w-40' : 'w-full h-[20rem]'} relative`
-                  : 'w-full h-52 relative'
+                  ? `${chatUserId ? 'w-40 h-40' : 'w-full h-60 md:h-[20rem]'} relative`
+                  : 'w-full h-32 md:h-52 relative'
               }`}
             >
               <img
-                loading='lazy'
                 src={image.src ? image.src : image.url}
                 alt={image.name}
                 className='rounded-md w-full h-full object-cover'

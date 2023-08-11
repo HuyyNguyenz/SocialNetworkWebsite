@@ -81,42 +81,43 @@ export default function Comment(props: Props) {
     <div className={`my-4 ${comment.deleted === 1 && 'opacity-60'}`}>
       <div className='flex items-start justify-start'>
         <Link to={`/${author.username}/profile/${author.id}/posts`}>
-          <img
-            loading='lazy'
+          <LazyLoadImage
+            placeholderSrc={userImg}
+            effect='blur'
             src={author.avatar ? author.avatar.url : userImg}
             alt={author.firstName + ' ' + author.lastName}
             className='w-8 h-8 object-cover rounded-md'
           />
         </Link>
-        <div className='ml-4'>
+        <div className='ml-4 flex-1 md:max-w-[60%]'>
           <div className='flex flex-col items-start justify-start bg-input-color dark:bg-dark-input-color rounded-md border border-solid border-border-color dark:border-dark-border-color py-2 px-4'>
-            <div className='mb-1 flex items-center justify-start'>
+            <div className='mb-1 flex items-center justify-start text-left'>
               <Link to={`/${author.username}/profile/${author.id}/posts`}>
-                <span className='text-primary-color dark:text-dark-primary-color font-bold'>
+                <span className='text-primary-color dark:text-dark-primary-color font-bold line-clamp-1 break-all'>
                   {author.firstName} {author.lastName}
                 </span>
               </Link>
               {author.id === authorPostId && <FontAwesomeIcon icon={faCrown} className='ml-2 text-crown-color' />}
-              <span className='ml-2 text-xs'>{createdAt}</span>
-              {comment.modifiedAt && <span className='ml-2 opacity-60 text-xs'>| Đã chỉnh sửa {modifiedAt}</span>}
             </div>
+            {comment.modifiedAt && <span className='opacity-60 text-xs mb-2'>Đã chỉnh sửa {modifiedAt}</span>}
             {comment.deleted === 0 ? (
               <Linkify componentDecorator={linkDecorator}>
-                <p className='break-all mb-4'>{comment.content}</p>
+                <p className='mb-4 text-left'>{comment.content}</p>
               </Linkify>
             ) : (
               <span className='dark:text-dark-text-color'>Bình luận này đã bị ẩn</span>
             )}
             {article && (
               <a href={article.link} target='_blank' rel='noreferrer'>
-                <article className='mb-4 w-[20rem] rounded-md bg-hover-color dark:bg-dark-hover-color border border-solid border-border-color dark:border-dark-border-color'>
-                  <img
-                    loading='lazy'
+                <article className='mb-4 rounded-md bg-hover-color dark:bg-dark-hover-color border border-solid border-border-color dark:border-dark-border-color'>
+                  <LazyLoadImage
+                    placeholderSrc={loadingImage}
+                    effect='blur'
                     src={article.thumbnail}
                     alt={article.title}
                     className='w-full max-h-[20rem] object-cover rounded-md rounded-bl-none rounded-br-none'
                   />
-                  <div className='flex flex-col items-start justify-start p-2'>
+                  <div className='flex flex-col items-start justify-start text-left p-2'>
                     <span className='uppercase text-xs'>{article.siteName}</span>
                     <div className='flex flex-col items-start justify-start'>
                       <h3 className='text-16 font-bold'>{article.title}</h3>
@@ -132,8 +133,6 @@ export default function Comment(props: Props) {
               <LazyLoadImage
                 placeholderSrc={loadingImage}
                 effect='blur'
-                width={'100%'}
-                height={'100%'}
                 className='rounded-md object-cover w-full h-full'
                 src={comment.images[0].url}
                 alt={comment.images[0].name}
@@ -149,21 +148,22 @@ export default function Comment(props: Props) {
           )}
           {comment.deleted === 0 && (
             <div className='flex items-center justify-start py-2 px-4 text-16'>
-              <button className='text-title-color dark:text-dark-title-color flex items-center justify-start mr-8'>
+              <button className='text-title-color dark:text-dark-title-color flex items-center justify-start mr-4 md:mr-8'>
                 <FontAwesomeIcon
                   icon={faThumbsUp}
                   className='hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-full p-2'
                 />
-                <span className='ml-2 text-14'>0</span>
+                <span className='md:ml-2 text-14'>0</span>
               </button>
-              <button className='text-title-color dark:text-dark-title-color flex items-center justify-start mr-8'>
+              <button className='text-title-color dark:text-dark-title-color flex items-center justify-start mr-4 md:mr-8'>
                 <FontAwesomeIcon
                   icon={faReply}
                   className='hover:bg-hover-color dark:hover:bg-dark-hover-color rounded-full p-2'
                 />
-                <span className='ml-2 text-14'>0</span>
+                <span className='md:ml-2 text-14'>0</span>
               </button>
               {(userData.id === comment.userId || userData.id === authorPostId) && <SettingComment comment={comment} />}
+              <span className='ml-4 md:ml-0 text-xs'>{createdAt}</span>
             </div>
           )}
         </div>

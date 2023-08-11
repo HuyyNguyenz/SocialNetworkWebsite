@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import userImg from '~/assets/images/user.png'
@@ -38,13 +39,16 @@ export default function UserPreview(props: Props) {
                 : 'mb-4 hover:bg-input-color dark:hover:bg-dark-hover-color'
             } ${online ? 'hover:bg-transparent dark:hover:bg-transparent' : ''} `}
           >
-            <img
-              loading='lazy'
+            <LazyLoadImage
+              placeholderSrc={userImg}
+              effect='blur'
+              width={'2.25rem'}
+              height={'2.25rem'}
               src={data.avatar ? data.avatar.url : userImg}
               alt={data.firstName + ' ' + data.lastName}
-              className='w-9 h-9 object-cover rounded-md mr-2'
+              className='w-9 h-9 object-cover rounded-md'
             />
-            <div className='flex flex-col items-start justify-start text-left dark:text-dark-text-color'>
+            <div className='flex flex-col items-start justify-start text-left dark:text-dark-text-color ml-2'>
               <span
                 className={`${
                   friend?.id || comment?.id || liked?.id || online || message?.id || noMessage ? 'font-semibold ' : ''

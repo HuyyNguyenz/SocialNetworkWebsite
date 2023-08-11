@@ -78,12 +78,12 @@ export default function Profile() {
         </InfiniteScroll>
       ) : (
         <div>
-          <h2 className='text-18 uppercase font-semibold text-center bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color bg-clip-text text-transparent'>
+          <h2 className='px-4 md:px-0 mb-2 text-16 md:text-18 uppercase font-semibold text-center bg-gradient-to-r from-primary-color dark:from-dark-primary-color to-secondary-color dark:to-secondary-color bg-clip-text text-transparent'>
             {userData.id === Number(userId)
               ? 'Hãy cho chúng tôi biết cảm nghĩ của bạn'
               : 'Người dùng hiện tại chưa có bài viết.'}
           </h2>
-          <img loading='lazy' className='object-cover rounded-md' src={postGif} alt='gif' />
+          <img className='object-cover rounded-md' src={postGif} alt='gif' />
         </div>
       )}
     </UserProfileLayout>

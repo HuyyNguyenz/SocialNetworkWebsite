@@ -6,15 +6,15 @@ moment.locale('vi', {
     past: '%s trước',
     s: 'vài giây',
     ss: '%d giây',
-    m: 'một phút',
+    m: '1 phút',
     mm: '%d phút',
-    h: 'một giờ',
+    h: '1 giờ',
     hh: '%d giờ',
-    d: 'một ngày',
+    d: '1 ngày',
     dd: '%d ngày',
-    M: 'một tháng',
+    M: '1 tháng',
     MM: '%d tháng',
-    y: 'một năm',
+    y: '1 năm',
     yy: '%d năm'
   }
 })

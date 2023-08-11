@@ -14,7 +14,6 @@ export default function RegisterForm() {
     gender: 'male',
     createdAt: ''
   }
-  const [isLoading, setLoading] = useState<boolean>(false)
   const [formData, setFormData] = useState<User>(initialData)
   const [messages, handleValidation, disableValidation, checkFormError] = useFormValidation(formData)
 
@@ -49,7 +48,6 @@ export default function RegisterForm() {
     event.preventDefault()
     const isFormError = checkFormError()
     if (!isFormError) {
-      setLoading(true)
       const stringArray = formData.birthDay?.split('-') as string[]
       const birthDay = `${stringArray[2]}/${stringArray[1]}/${stringArray[0]}`
       const data = { ...formData, birthDay }
@@ -72,7 +70,6 @@ export default function RegisterForm() {
         }
       }
       createAccount()
-      setLoading(false)
     }
   }
 
@@ -200,12 +197,13 @@ export default function RegisterForm() {
             </div>
           </div>
         </div>
-        <input
-          type={isLoading ? 'button' : 'submit'}
-          value={isLoading ? 'Đang xử lý' : 'Đăng ký'}
+        <button
+          type='submit'
           id='submitBtn'
           className='w-full mt-4 rounded-md bg-gradient-to-br from-primary-color to-secondary-color text-white font-bold py-2 px-16 lg:w-auto'
-        />
+        >
+          Đăng ký
+        </button>
       </form>
     </div>
   )

@@ -106,8 +106,11 @@ export default function Message(props: Props) {
       key={message.id}
       className={`flex ${message.userId === userData.id ? 'flex-row-reverse' : ''} items-start justify-start p-4`}
     >
-      <img
-        loading='lazy'
+      <LazyLoadImage
+        placeholderSrc={userImg}
+        effect='blur'
+        width={'2rem'}
+        height={'2rem'}
         className='w-8 h-8 object-cover rounded-md'
         src={
           message.userId === userData.id
@@ -138,13 +141,15 @@ export default function Message(props: Props) {
         )}
         {article && (
           <a href={article.link} target='_blank' rel='noreferrer'>
-            <article className='mb-4 rounded-md bg-hover-color dark:bg-dark-hover-color border border-solid border-border-color dark:border-dark-border-color'>
-              <img
-                loading='lazy'
+            <article className='mb-4 rounded-md bg-input-color dark:bg-dark-input-color border border-solid border-border-color dark:border-dark-border-color'>
+              <LazyLoadImage
+                placeholderSrc={loadingImage}
+                effect='blur'
                 src={article.thumbnail}
                 alt={article.title}
                 className='w-full max-h-[20rem] object-cover rounded-md rounded-bl-none rounded-br-none'
               />
+
               <div className='flex flex-col items-start justify-start p-2'>
                 <span className='uppercase text-xs'>{article.siteName}</span>
                 <div className='flex flex-col items-start justify-start'>
@@ -175,13 +180,11 @@ export default function Message(props: Props) {
         {message.images && message.deleted === 0 && (
           <button
             onClick={() => message.images && handleZoomImage(message.images[0].url as string, message.images[0].name)}
-            className={`${message.content ? 'mt-4' : ''} w-[16rem] h-[16rem]`}
+            className={`${message.content ? 'mt-4' : ''} w-64 h-64`}
           >
             <LazyLoadImage
               placeholderSrc={loadingImage}
               effect='blur'
-              width={'100%'}
-              height={'100%'}
               className='rounded-md object-cover w-full h-full'
               src={message.images[0].url}
               alt={message.images[0].name}

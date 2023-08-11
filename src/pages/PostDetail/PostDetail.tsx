@@ -119,7 +119,7 @@ export default function PostDetail() {
   return (
     <DefaultLayout>
       <main>
-        <div className='w-[48rem] max-w-3xl my-0 mx-auto pt-28 pb-10'>
+        <div className='md:w-[48rem] max-w-3xl my-0 mx-auto pt-28 pb-10'>
           {authorData && post && <PostItem post={post} author={authorData} detail={true} />}
           <CommentList
             loading={isLoading}
