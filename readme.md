@@ -12,7 +12,7 @@
 
 2. **Back-End:**
 
-- Nodejs
+- NodeJS
 - ExpressJS
 - JWT
 - Nodemailer
