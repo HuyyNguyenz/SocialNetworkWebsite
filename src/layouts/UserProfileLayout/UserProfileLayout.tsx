@@ -106,15 +106,15 @@ export default function UserProfileLayout(props: Props) {
   }, [userData])
 
   useEffect(() => {
-    socket.on('sendInviteFriendNotify', (res: any) => {
+    socket.on('sendInviteFriendNotify', (res) => {
       res.message !== '' && res.userId === userData.id && handleCheckStatus()
     })
 
-    socket.on('sendAcceptFriendNotify', (res: any) => {
+    socket.on('sendAcceptFriendNotify', (res) => {
       res.message !== '' && res.userId === userData.id && handleCheckStatus()
     })
 
-    socket.on('sendRemoveInviteFriendNotify', (res: any) => {
+    socket.on('sendRemoveInviteFriendNotify', (res) => {
       res.userId === userData.id && setFriend({})
     })
   }, [handleCheckStatus, userData.id])
@@ -207,7 +207,7 @@ export default function UserProfileLayout(props: Props) {
                         Huỷ kết bạn
                       </button>
                       <Link to={`/message/${user?.id}`}>
-                        <button className='ml-4 border border-solid border-border-color dark:border-dark-border-color rounded-md bg-primary-color dark:bg-dark-primary-color text-white py-2 px-4 ml-4 hover:opacity-90'>
+                        <button className='border border-solid border-border-color dark:border-dark-border-color rounded-md bg-primary-color dark:bg-dark-primary-color text-white py-2 px-4 ml-4 hover:opacity-90'>
                           Nhắn tin
                         </button>
                       </Link>
