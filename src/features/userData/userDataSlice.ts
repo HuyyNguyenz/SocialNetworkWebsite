@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { User } from '~/types'
 
-const initialState: User = {
+const user: User = {
   email: '',
   password: '',
   firstName: '',
@@ -11,15 +11,19 @@ const initialState: User = {
   createdAt: ''
 }
 
+const initialState = {
+  data: user
+}
+
 const userDataSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
     setUserData: (state, action: PayloadAction<User>) => {
-      return (state = { ...state, ...action.payload })
+      state.data = action.payload
     },
     removeUserData: (state) => {
-      return (state = initialState)
+      state.data = user
     }
   }
 })

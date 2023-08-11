@@ -18,7 +18,7 @@ interface Props {
 
 export default function UserPreview(props: Props) {
   const { data, friend, comment, message, online, noMessage, liked } = props
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
 
   return (
     <>

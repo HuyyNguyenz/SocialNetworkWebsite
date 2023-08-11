@@ -20,7 +20,7 @@ interface Props {
 
 export default function SettingComment(props: Props) {
   const { comment, message } = props
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [isOpenSetting, setOpenSetting] = useState<boolean>(false)
   const dispatch = useDispatch()
 

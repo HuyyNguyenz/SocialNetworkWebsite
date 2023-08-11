@@ -22,7 +22,7 @@ interface Props {
 
 export default function Comment(props: Props) {
   const { comment, author, authorPostId } = props
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const createdAt = moment(comment.createdAt, 'DD/MM/YYYY hh:mm').fromNow()
   const modifiedAt = moment(comment.modifiedAt, 'DD/MM/YYYY hh:mm').fromNow()
   const [article, setArticle] = useState<{

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Comment, ExtraPost, FilePreview, Post, User } from '~/types'
+import { Comment, ExtraPost, Post, User } from '~/types'
 import moment from 'moment'
 import userImg from '~/assets/images/user.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -27,7 +27,7 @@ interface Props {
 
 export default function PostItem(props: Props) {
   const { post, author, detail, share } = props
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const commentList = useSelector((state: RootState) => state.commentList.data)
   const createdAt = moment(post.createdAt, 'DD/MM/YYYY hh:mm').fromNow()
   const modifiedAt = moment(post.modifiedAt, 'DD/MM/YYYY hh:mm').fromNow()

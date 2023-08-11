@@ -8,7 +8,7 @@ import { Friend, User } from '~/types'
 import fetchApi from '~/utils/fetchApi'
 
 export default function Friends() {
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [statusFriends, setStatusFriends] = useState<Friend[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [inviteFriends, setInviteFriends] = useState<User[]>([])

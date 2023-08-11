@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, Fragment, useEffect } from 'react'
+import { lazy, Suspense, useState, Fragment } from 'react'
 import { Comment as CommentType, User } from '~/types'
 import TextEditor from '../TextEditor'
 import Loading from '../Loading'

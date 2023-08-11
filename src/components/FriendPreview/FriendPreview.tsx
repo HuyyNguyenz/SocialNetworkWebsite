@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function FriendPreview(props: Props) {
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [friends, setFriends] = useState<Friend[]>([])
   const [isPending, setPending] = useState<boolean>(false)
   const { data, type } = props

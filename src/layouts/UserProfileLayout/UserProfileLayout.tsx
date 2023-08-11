@@ -19,7 +19,7 @@ interface Props {
 export default function UserProfileLayout(props: Props) {
   const { children } = props
   const { username, userId } = useParams()
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [user, setUser] = useState<User>()
   const [isLoading, setLoading] = useState<boolean>(false)
   const [isOpenEditProfile, setOpenEditProfile] = useState<boolean>(false)

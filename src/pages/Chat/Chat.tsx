@@ -15,7 +15,7 @@ import { faVideo } from '@fortawesome/free-solid-svg-icons'
 
 export default function Chat() {
   const messageList = useSelector((state: RootState) => state.messageList.data)
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const dispatch = useDispatch()
   const [userFriend, setUserFriend] = useState<User>()
   const [isReload, setReload] = useState<boolean>(false)

@@ -11,7 +11,7 @@ import socket from '~/socket'
 import audioMessage from '~/assets/audios/audio_message.mp3'
 
 export default function MessageNotify() {
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [isOpen, setOpen] = useState<boolean>(false)
   const [messageNotifies, setMessageNotifies] = useState<Notify[]>([])
   const [friends, setFriends] = useState<Friend[]>([])

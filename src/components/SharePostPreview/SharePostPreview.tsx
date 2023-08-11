@@ -19,7 +19,7 @@ interface Props {
 
 export default function SharePostPreview(props: Props) {
   const { post, author, type } = props
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const sharePost = useSelector((state: RootState) => state.postList.sharePost)
   const [friends, setFriends] = useState<Friend[]>([])
   const [users, setUsers] = useState<User[]>([])

@@ -17,7 +17,7 @@ export default function PostList(props: Props) {
   const { postList, profile } = props
   const [users, setUsers] = useState<User[]>([])
   const { userId } = useParams()
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
 
   useEffect(() => {
     const controller = new AbortController()

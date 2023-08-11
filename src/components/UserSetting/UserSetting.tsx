@@ -6,18 +6,18 @@ import { faCircle, faGear, faMoon, faRightFromBracket } from '@fortawesome/free-
 import useCookie from '~/hooks/useCookie'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { removeUserData } from '~/features/userData/userDataSlice'
 import { RootState } from '~/store'
 import socket from '~/socket'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
+import { removeUserData } from '~/features/userData/userDataSlice'
 
 export default function UserSetting() {
   const [isOpen, setOpen] = useState<boolean>(false)
   const [, , removeCookie] = useCookie()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [isDarkMode, setDarkMode] = useState<boolean>(false)
+  const dispatch = useDispatch()
 
   const handleOpenMenu = () => {
     setOpen((prev) => !prev)
@@ -26,8 +26,8 @@ export default function UserSetting() {
   const handleLogout = () => {
     removeCookie('accessToken')
     removeCookie('refreshToken')
-    localStorage.removeItem('remember')
     dispatch(removeUserData())
+    localStorage.removeItem('remember')
     socket.emit('sendRequestOfflineClient', { userId: userData.id })
     navigate('/login')
   }

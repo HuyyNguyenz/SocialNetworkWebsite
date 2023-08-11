@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import FriendPreview from '~/components/FriendPreview'
@@ -8,7 +8,7 @@ import { Friend, User } from '~/types'
 import fetchApi from '~/utils/fetchApi'
 
 export default function UserFriend() {
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const { userId } = useParams()
   const [users, setUsers] = useState<User[]>([])
   const [friendsOther, setFriendsOther] = useState<Friend[]>([])

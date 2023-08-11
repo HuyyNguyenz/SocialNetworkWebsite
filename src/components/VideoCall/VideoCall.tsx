@@ -23,7 +23,7 @@ interface Props {
 
 export default function VideoCall(props: Props) {
   const { caller, userCalled } = props
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [isAccepted, setAccepted] = useState<boolean>(false)
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [callerSignal, setCallerSignal] = useState<Peer.SignalData | null>(null)

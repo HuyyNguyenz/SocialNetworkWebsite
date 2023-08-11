@@ -10,7 +10,7 @@ interface Props {
 
 export default function UserSettingLayout(props: Props) {
   const { children } = props
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const { username, userId } = useParams()
   const navigate = useNavigate()
 

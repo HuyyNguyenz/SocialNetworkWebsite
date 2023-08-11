@@ -17,7 +17,7 @@ interface Props {
 
 export default function SettingPost(props: Props) {
   const { post } = props
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [isOpenSetting, setOpenSetting] = useState<boolean>(false)
   const dispatch = useDispatch()
 

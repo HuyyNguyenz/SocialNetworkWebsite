@@ -21,7 +21,7 @@ export default function DefaultLayout(props: Props) {
   const [isLogin] = useState<boolean>(() => !!getCookie('refreshToken'))
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [isOpen, setOpen] = useState<boolean>(false)
   const [caller, setCaller] = useState<User | null>(null)
   const [userCalled, setUserCalled] = useState<User | null>(null)

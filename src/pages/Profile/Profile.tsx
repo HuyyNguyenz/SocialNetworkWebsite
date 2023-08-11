@@ -14,7 +14,7 @@ import UserProfileLayout from '~/layouts/UserProfileLayout'
 
 export default function Profile() {
   const { userId } = useParams()
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const postList = useSelector((state: RootState) => state.postList.data)
   const newPost = useSelector((state: RootState) => state.postList.newPost)
   const [offset, setOffset] = useState<number>(0)

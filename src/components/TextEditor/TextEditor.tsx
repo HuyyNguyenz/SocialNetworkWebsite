@@ -32,7 +32,7 @@ interface Props {
 export default function TextEditor(props: Props) {
   const { comment, chatUserId, communityId, share, usersShare } = props
   const { postId } = useParams()
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const editingPost = useSelector((state: RootState) => state.postList.editingPost)
   const editingComment = useSelector((state: RootState) => state.commentList.editingComment)
   const editingMessage = useSelector((state: RootState) => state.messageList.editingMessage)

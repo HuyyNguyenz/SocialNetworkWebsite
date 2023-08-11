@@ -23,7 +23,7 @@ export default function EditProfile(props: Props) {
   const [avatar, setAvatar] = useState<Omit<FilePreview, 'id'>>(initialValue)
   const [coverImage, setCoverImage] = useState<Omit<FilePreview, 'id'>>(initialValue)
   const [isLoading, setLoading] = useState<boolean>(false)
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const avatarImage = { name: '', url: '' }
   const backgroundImage = { name: '', url: '' }
   const dispatch = useDispatch()

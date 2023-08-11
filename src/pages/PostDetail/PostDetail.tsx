@@ -10,7 +10,7 @@ import { setCommentList } from '~/features/comment/commentSlice'
 import { RootState } from '~/store'
 
 export default function PostDetail() {
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const commentList = useSelector((state: RootState) => state.commentList.data)
   const [users, setUsers] = useState<User[]>([])
   const [authorData, setAuthorData] = useState<User>()

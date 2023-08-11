@@ -22,7 +22,7 @@ export default function Message(props: Props) {
   const { message, userFriend } = props
   const createdAt = moment(message.createdAt, 'DD/MM/YYYY hh:mm').fromNow()
   const modifiedAt = message.modifiedAt && moment(message.modifiedAt, 'DD/MM/YYYY hh:mm').fromNow()
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const [article, setArticle] = useState<{
     siteName: string
     title: string

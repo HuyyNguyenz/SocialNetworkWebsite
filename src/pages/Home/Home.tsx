@@ -14,7 +14,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 export default function Home() {
   const postList = useSelector((state: RootState) => state.postList.data)
   const newPost = useSelector((state: RootState) => state.postList.newPost)
-  const userData = useSelector((state: RootState) => state.userData)
+  const userData = useSelector((state: RootState) => state.userData.data)
   const sharePost = useSelector((state: RootState) => state.postList.sharePost)
   const dispatch = useDispatch()
   const [friends, setFriends] = useState<Friend[]>([])
