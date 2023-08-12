@@ -8,6 +8,11 @@ interface Props {
 
 export default function LoginLayout(props: Props) {
   const { children } = props
+  console.log('VITE_HOST_URL', import.meta.env.VITE_HOST_URL)
+  console.log('VITE_API_URL', import.meta.env.VITE_API_URL)
+  console.log('VITE_SOCKET_URL', import.meta.env.VITE_SOCKET_URL)
+  console.log('VITE_API_KEY', import.meta.env.VITE_API_KEY)
+
   return (
     <div>
       <div className='font-inter relative w-screen min-h-screen bg-gradient-to-br from-primary-color to-secondary-color'>
