@@ -165,7 +165,6 @@ export default function Notify() {
 
   useEffect(() => {
     const controller = new AbortController()
-    socket.connect()
     const socketId = socket.id
 
     fetchApi
