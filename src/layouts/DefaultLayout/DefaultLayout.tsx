@@ -40,25 +40,25 @@ export default function DefaultLayout(props: Props) {
     }
   }, [isLogin, navigate])
 
-  useEffect(() => {
-    const controller = new AbortController()
-    const handleGetUserData = async () => {
-      try {
-        const result = (await fetchApi.get('user', { signal: controller.signal })).data
-        dispatch(setUserData(result))
-      } catch (error: any) {
-        error.name !== 'CanceledError' && console.log(error)
-      }
-    }
+  // useEffect(() => {
+  //   const controller = new AbortController()
+  //   const handleGetUserData = async () => {
+  //     try {
+  //       const result = (await fetchApi.get('user', { signal: controller.signal })).data
+  //       dispatch(setUserData(result))
+  //     } catch (error: any) {
+  //       error.name !== 'CanceledError' && console.log(error)
+  //     }
+  //   }
 
-    if (userData.email === '') {
-      handleGetUserData()
-    }
+  //   if (userData.email === '') {
+  //     handleGetUserData()
+  //   }
 
-    return () => {
-      controller.abort()
-    }
-  }, [dispatch, userData])
+  //   return () => {
+  //     controller.abort()
+  //   }
+  // }, [dispatch, userData])
 
   useEffect(() => {
     socket.on('receiveCall', (data) => {
