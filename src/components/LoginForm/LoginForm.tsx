@@ -4,8 +4,6 @@ import { toast } from 'react-toastify'
 import useCookie from '~/hooks/useCookie'
 import fetchApi from '~/utils/fetchApi'
 import ForgotForm from '../ForgotForm'
-import { useDispatch } from 'react-redux'
-import { setUserData } from '~/features/userData/userDataSlice'
 
 export default function LoginForm() {
   const [formData, setFormData] = useState<{ email: string; password: string; remember: boolean }>({
@@ -16,7 +14,6 @@ export default function LoginForm() {
   const [isOpenForgotForm, setOpenForgotForm] = useState<boolean>(false)
   const [setCookie] = useCookie()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [event.target.name]: event.target.value, remember: event.target.checked }))
@@ -37,7 +34,6 @@ export default function LoginForm() {
           localStorage.setItem('remember', remember + '')
           setCookie('accessToken', result.accessToken, expireDay)
           setCookie('refreshToken', result.refreshToken, expireDay)
-          dispatch(setUserData(result.user))
           toast(result.message, { position: 'top-right', type: 'success', autoClose: 1000 })
           setTimeout(() => {
             navigate('/')
