@@ -21,7 +21,7 @@ export default function Register() {
     <>
       {isLogout && (
         <>
-          <div className='font-inter relative w-full min-h-screen bg-gradient-to-br from-primary-color to-secondary-color'>
+          <div className='font-inter relative w-full min-h-screen overflow-y-auto bg-gradient-to-br from-primary-color to-secondary-color'>
             <div className='bg-bg-light center flex flex-col-reverse rounded-2xl overflow-hidden lg:flex-row lg:items-start lg:justify-start'>
               <div className='bg-bg-light lg:bg-hover-color'>
                 <div className='min-w-[28.125rem] min-h-[28.125rem] relative hidden lg:block'>

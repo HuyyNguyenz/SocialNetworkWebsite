@@ -10,7 +10,7 @@ export default function LoginLayout(props: Props) {
   const { children } = props
   return (
     <div>
-      <div className='font-inter relative w-screen min-h-screen bg-gradient-to-br from-primary-color to-secondary-color'>
+      <div className='font-inter relative w-screen min-h-screen overflow-y-auto bg-gradient-to-br from-primary-color to-secondary-color'>
         <div className='bg-bg-light center flex flex-col-reverse rounded-2xl overflow-hidden lg:flex-row lg:items-center lg:justify-center'>
           <div className='bg-bg-light lg:bg-hover-color'>
             <div className='min-w-[25rem] min-h-[25rem] hidden lg:block relative'>
