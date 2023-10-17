@@ -10,7 +10,7 @@ export default function VerifyRegister() {
     if (username) {
       const controller = new AbortController()
       fetchApi
-        .put(`verifyUser/${username}`, { signal: controller.signal })
+        .post(`verify-user`, { username }, { signal: controller.signal })
         .then((res) => {
           setDescription(res.data.message)
         })

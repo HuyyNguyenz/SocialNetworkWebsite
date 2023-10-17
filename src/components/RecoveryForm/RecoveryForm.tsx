@@ -28,7 +28,7 @@ export default function RecoveryForm() {
       const { password } = formData
       const { userEmail } = JSON.parse(sessionStorage.getItem('recovery') as string)
       try {
-        const result = (await fetchApi.put(`recovery/${userEmail}`, { password })).data
+        const result = (await fetchApi.put(`recovery-password/${userEmail}`, { password })).data
         toast(result.message, { type: 'success', autoClose: 2000, position: 'top-right' })
         setTimeout(() => {
           sessionStorage.removeItem('recovery')

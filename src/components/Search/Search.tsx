@@ -37,7 +37,7 @@ export default function Search(props: Props) {
         const getData = async () => {
           try {
             const result = (
-              await fetchApi.post('search', { searchValue: debounceValue }, { signal: controller.signal })
+              await fetchApi.get(`search?value=${debounceValue}&limit=5&page=1`, { signal: controller.signal })
             ).data
             setSearchData(result)
           } catch (error: any) {

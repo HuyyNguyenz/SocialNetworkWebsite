@@ -30,7 +30,7 @@ export default function ForgotPassword(props: Props) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try {
-      const result = (await fetchApi.post('verifyOtp', { otpCode: otpValue, userEmail: email })).data
+      const result = (await fetchApi.post('verify-otp', { otpCode: otpValue, email })).data
       const userOtp = JSON.stringify(result.userOtp)
       sessionStorage.setItem('recovery', userOtp)
       navigate('/recovery')
@@ -58,7 +58,7 @@ export default function ForgotPassword(props: Props) {
           clearInterval(interval)
           setCounter(60)
         }, 60000)
-        const result = (await fetchApi.post('verifyEmail', { email })).data
+        const result = (await fetchApi.post('verify-email', { email })).data
         toast(result.message, { autoClose: 2000, position: 'top-right', type: 'success' })
       } catch (error: any) {
         toast(error.response.data.message, { autoClose: 2000, position: 'top-right', type: 'error' })

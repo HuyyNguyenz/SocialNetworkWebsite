@@ -24,12 +24,8 @@ class Http {
     this.instance.interceptors.response.use(
       (config) => config,
       (error) => {
-        if (
-          error &&
-          error.response &&
-          error.response.status === 403 &&
-          error.response.data.message === 'Token is not valid'
-        ) {
+        const { errors } = error.response.data
+        if (errors && errors.authorization.msg === 'Access token is not valid') {
           this.requestRefreshToken = this.requestRefreshToken
             ? this.requestRefreshToken
             : handleRefreshToken().finally(() => (this.requestRefreshToken = null))
@@ -59,7 +55,7 @@ const handleRefreshToken = async () => {
   const refreshToken = getCookie('refreshToken') as string
   if (refreshToken) {
     try {
-      const result = (await fetchApi.post('refresh', { refreshToken })).data
+      const result = (await fetchApi.post('refresh-token', { refreshToken })).data
       setCookie('accessToken', result.accessToken, remember === 'true' ? 7 : 0)
       setCookie('refreshToken', result.refreshToken, remember === 'true' ? 7 : 0)
       return result
