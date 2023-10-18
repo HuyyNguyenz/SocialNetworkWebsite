@@ -25,7 +25,7 @@ export default function UserSettingLayout(props: Props) {
         <div className='flex flex-col md:flex-row items-start justify-start mt-4 w-full'>
           <div className='w-full md:w-auto bg-bg-light dark:bg-bg-dark rounded-md border border-solid border-border-color dark:border-dark-border-color font-semibold text-title-color dark:text-dark-title-color'>
             <ul className='flex items-center justify-between md:flex-col md:items-start md:justify-start'>
-              <NavLink to={`/${userData.username}/setting/${userData.id}`}>
+              <NavLink to={`/${userData.username}/setting`}>
                 <li className='px-4 py-2 my-2 hover:text-primary-color dark:hover:text-dark-primary-color transition-all ease-linear duration-200 cursor-pointer'>
                   <span>Thông tin tài khoản</span>
                 </li>

@@ -19,21 +19,22 @@ export default function Home() {
   const dispatch = useDispatch()
   const [friends, setFriends] = useState<Friend[]>([])
   const [posts, setPosts] = useState<Post[]>([])
-  const [offset, setOffset] = useState<number>(0)
+  const [page, setPage] = useState<number>(2)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [isLoading, setLoading] = useState<boolean>(false)
 
   const getPostList = useCallback(
     async (controller?: AbortController) => {
       try {
-        const result = (await fetchApi.get(`posts/5/${offset}`, controller && { signal: controller.signal })).data
+        const result = (await fetchApi.get(`posts?limit=5&page=${page}`, controller && { signal: controller.signal }))
+          .data
         result.length === 0 ? setHasMore(false) : setPosts((prev) => [...prev, ...result])
-        setOffset((prev) => prev + 5)
+        setPage((prev) => prev + 1)
       } catch (error: any) {
         error.name !== 'CanceledError' && console.log(error)
       }
     },
-    [offset]
+    [page]
   )
 
   const handleFilterPosts = useCallback(
@@ -107,11 +108,11 @@ export default function Home() {
     if (newPost !== null) {
       const controller = new AbortController()
       fetchApi
-        .get(`posts/5/0`, { signal: controller.signal })
+        .get('posts?limit=5&page=1', { signal: controller.signal })
         .then((res) => {
           setPosts(res.data)
           setHasMore(true)
-          setOffset(5)
+          setPage(2)
         })
         .catch((error) => error.name !== 'CanceledError' && console.log(error))
       return () => {

@@ -24,8 +24,8 @@ class Http {
     this.instance.interceptors.response.use(
       (config) => config,
       (error) => {
-        const { errors } = error.response.data
-        if (errors && errors.authorization.msg === 'Access token is not valid') {
+        const { message } = error.response.data
+        if (message && message === 'Access token is not valid') {
           this.requestRefreshToken = this.requestRefreshToken
             ? this.requestRefreshToken
             : handleRefreshToken().finally(() => (this.requestRefreshToken = null))

@@ -19,7 +19,6 @@ export default function ProfileSetting() {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const currentYear = new Date().getFullYear()
-
     switch (event.target.name) {
       case 'firstName':
         event.target.value.trim() === ''
@@ -66,7 +65,7 @@ export default function ProfileSetting() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (errorFirstName.innerText === '' && errorLastName.innerText === '' && errorBirthDay.innerText === '') {
-      const result = (await fetchApi.put(`user/${userData.id}`, user as User)).data
+      const result = (await fetchApi.put('user', user as User)).data
       result.message && toast(result.message, { autoClose: 2000, position: 'top-right', type: 'success' })
       dispatch(setUserData(user as User))
       setEditing(false)

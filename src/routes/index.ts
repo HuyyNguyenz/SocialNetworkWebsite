@@ -23,7 +23,7 @@ const routes: Router[] = [
   { path: '/:username/profile/:userId/friends', component: UserFriend },
   { path: '/verify/register/:username', component: VerifyRegister },
   { path: '/message/:userFriendId', component: Chat },
-  { path: '/:username/setting/:userId', component: ProfileSetting },
+  { path: '/:username/setting', component: ProfileSetting },
   { path: '/*', component: NotFound }
 ]
 

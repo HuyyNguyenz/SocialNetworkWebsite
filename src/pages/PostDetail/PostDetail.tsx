@@ -62,7 +62,7 @@ export default function PostDetail() {
     postId &&
       fetchApi
         .get(`post/${postId}`, { signal: controller.signal })
-        .then((res) => setPost(res.data[0]))
+        .then((res) => setPost(res.data))
         .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {
       controller.abort()

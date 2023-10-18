@@ -17,25 +17,25 @@ export default function Profile() {
   const userData = useSelector((state: RootState) => state.userData.data)
   const postList = useSelector((state: RootState) => state.postList.data)
   const newPost = useSelector((state: RootState) => state.postList.newPost)
-  const [offset, setOffset] = useState<number>(0)
+  const [page, setPage] = useState<number>(2)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const dispatch = useDispatch()
 
   const getPostList = async () => {
-    const result = (await fetchApi.get(`postsUser/${userId}/5/${offset}`)).data
+    const result = (await fetchApi.get(`posts-user/${userId}?limit=5&page=${page}`)).data
     result.length === 0 ? setHasMore(false) : dispatch(setPostList([...postList, ...result]))
-    setOffset((prev) => prev + 5)
+    setPage((prev) => prev + 1)
   }
 
   useEffect(() => {
     if (userId || newPost !== null) {
       const controller = new AbortController()
       fetchApi
-        .get(`postsUser/${userId}/5/0`, { signal: controller.signal })
+        .get(`posts-user/${userId}?limit=5&page=1`, { signal: controller.signal })
         .then((res) => {
           dispatch(setPostList(res.data))
           setHasMore(true)
-          setOffset(5)
+          setPage(2)
         })
         .catch((error) => error.name !== 'CanceledError' && console.log(error))
       return () => {

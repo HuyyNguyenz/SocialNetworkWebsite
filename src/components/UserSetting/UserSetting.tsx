@@ -10,10 +10,11 @@ import { RootState } from '~/store'
 import socket from '~/socket'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { removeUserData } from '~/features/userData/userDataSlice'
+import fetchApi from '~/utils/fetchApi'
 
 export default function UserSetting() {
   const [isOpen, setOpen] = useState<boolean>(false)
-  const [, , removeCookie] = useCookie()
+  const [, getCookie, removeCookie] = useCookie()
   const navigate = useNavigate()
   const userData = useSelector((state: RootState) => state.userData.data)
   const [isDarkMode, setDarkMode] = useState<boolean>(false)
@@ -23,13 +24,17 @@ export default function UserSetting() {
     setOpen((prev) => !prev)
   }
 
-  const handleLogout = () => {
-    removeCookie('accessToken')
-    removeCookie('refreshToken')
-    dispatch(removeUserData())
-    localStorage.removeItem('remember')
-    socket.emit('sendRequestOfflineClient', { userId: userData.id })
-    navigate('/login')
+  const handleLogout = async () => {
+    const refreshToken = getCookie('refreshToken') as string
+    const result = (await fetchApi.post('logout', { refreshToken })).data
+    if (result.message) {
+      removeCookie('accessToken')
+      removeCookie('refreshToken')
+      dispatch(removeUserData())
+      localStorage.removeItem('remember')
+      socket.emit('sendRequestOfflineClient', { userId: userData.id })
+      navigate('/login')
+    }
   }
 
   const handleToggleDarkMode = () => {
@@ -81,7 +86,7 @@ export default function UserSetting() {
                 <span className='text-18 dark:text-dark-title-color font-semibold ml-2 line-clamp-1'>{`${userData.firstName} ${userData.lastName}`}</span>
               </li>
             </Link>
-            <NavLink to={`/${userData.username}/setting/${userData.id}`}>
+            <NavLink to={`/${userData.username}/setting`}>
               <li className='flex items-center justify-start py-2 px-4 my-2 cursor-pointer hover:bg-hover-color dark:hover:bg-dark-hover-color'>
                 <FontAwesomeIcon icon={faGear} />
                 <span className='ml-2'>Cài đặt chung</span>

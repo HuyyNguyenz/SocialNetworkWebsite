@@ -44,7 +44,7 @@ export default function DefaultLayout(props: Props) {
     const controller = new AbortController()
     const handleGetUserData = async () => {
       try {
-        const result = (await fetchApi.get(`user/${getCookie('refreshToken')}`, { signal: controller.signal })).data
+        const result = (await fetchApi.get('me', { signal: controller.signal })).data
         dispatch(setUserData(result))
       } catch (error: any) {
         error.name !== 'CanceledError' && console.log(error)
