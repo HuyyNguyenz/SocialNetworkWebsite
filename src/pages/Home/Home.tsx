@@ -19,7 +19,7 @@ export default function Home() {
   const dispatch = useDispatch()
   const [friends, setFriends] = useState<Friend[]>([])
   const [posts, setPosts] = useState<Post[]>([])
-  const [page, setPage] = useState<number>(2)
+  const [page, setPage] = useState<number>(1)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [isLoading, setLoading] = useState<boolean>(false)
 

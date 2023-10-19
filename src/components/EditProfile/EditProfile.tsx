@@ -64,8 +64,8 @@ export default function EditProfile(props: Props) {
     }
   }
 
-  const handleGetUser = async () => {
-    const result = (await fetchApi.get(`user/${userData.username}`)).data
+  const handleGetMyProfile = async () => {
+    const result = (await fetchApi.get('me')).data
     dispatch(setUserData(result))
   }
 
@@ -83,7 +83,7 @@ export default function EditProfile(props: Props) {
         avatar: avatarImage.name !== '' ? avatarImage : userData.avatar,
         backgroundImage: backgroundImage.name !== '' ? backgroundImage : userData.backgroundImage
       }
-      const result = (await fetchApi.put(`user/${userData.id}`, data)).data
+      const result = (await fetchApi.put('user', data)).data
       toast(result.message, { type: 'success', autoClose: 2000, position: 'top-right' })
       setAvatar(initialValue)
       setCoverImage(initialValue)
@@ -91,7 +91,7 @@ export default function EditProfile(props: Props) {
       avatarImage.url = ''
       backgroundImage.name = ''
       backgroundImage.url = ''
-      handleGetUser()
+      handleGetMyProfile()
       setLoading(false)
     }
   }
