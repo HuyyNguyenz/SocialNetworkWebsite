@@ -101,7 +101,7 @@ export default function PostItem(props: Props) {
     const controller = new AbortController()
     post &&
       fetchApi
-        .get(`commentsPost/${post.id}/0/0`, { signal: controller.signal })
+        .get(`comments-post/${post.id}?limit=0&page=0`, { signal: controller.signal })
         .then((res) => {
           detail ? dispatch(setCommentList(res.data)) : setComments(res.data)
         })
@@ -116,7 +116,7 @@ export default function PostItem(props: Props) {
     socket.on('sendCommentNotify', (res: any) => {
       res.message !== '' &&
         fetchApi
-          .get(`commentsPost/${post.id}/0/0`, { signal: controller.signal })
+          .get(`comments-post/${post.id}?limit=0&page=0`, { signal: controller.signal })
           .then((res) => {
             detail ? dispatch(setCommentList(res.data)) : setComments(res.data)
           })
@@ -136,7 +136,7 @@ export default function PostItem(props: Props) {
         const usernameAuthor = articleElement.text.split('/')[3]
         fetchApi
           .get(`post/${postId}`, { signal: controller.signal })
-          .then((res) => setSharePost(res.data[0]))
+          .then((res) => setSharePost(res.data))
           .catch((error) => error.name !== 'CanceledError' && console.log(error))
         fetchApi
           .get(`user/${usernameAuthor}`, { signal: controller.signal })

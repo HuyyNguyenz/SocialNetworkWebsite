@@ -18,7 +18,7 @@ export default function PostDetail() {
   const [comments, setComments] = useState<Comment[]>([])
   const { author, postId } = useParams()
   const dispatch = useDispatch()
-  const [offset, setOffset] = useState<number>(0)
+  const [page, setPage] = useState<number>(1)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [stopHasMore, setStopHasMore] = useState<boolean>(false)
   const [isLoading, setLoading] = useState<boolean>(false)
@@ -28,7 +28,10 @@ export default function PostDetail() {
     async (controller?: AbortController) => {
       try {
         const comments: Comment[] = (
-          await fetchApi.get(`commentsPost/${postId}/5/${offset}`, controller && { signal: controller.signal })
+          await fetchApi.get(
+            `comments-post/${postId}?limit=5&page=${page}`,
+            controller && { signal: controller.signal }
+          )
         ).data
         if (comments.length > 0) {
           isLoading
@@ -44,12 +47,12 @@ export default function PostDetail() {
           setStopHasMore(true)
         }
         setHasMore(false)
-        setOffset((prev) => prev + 5)
+        setPage((prev) => prev + 1)
       } catch (error: any) {
         error.name !== 'CanceledError' && console.log(error)
       }
     },
-    [postId, offset, isLoading]
+    [postId, page, isLoading]
   )
 
   useEffect(() => {
@@ -105,10 +108,10 @@ export default function PostDetail() {
     const controller = new AbortController()
     commentList.length > 0 &&
       fetchApi
-        .get(`commentsPost/${postId}/5/0`, { signal: controller.signal })
+        .get(`comments-post/${postId}?limit=5&page=1`, { signal: controller.signal })
         .then((res) => {
           setComments(res.data)
-          setOffset(5)
+          setPage(2)
         })
         .catch((error) => error.name !== 'CanceledError' && console.log(error))
     return () => {

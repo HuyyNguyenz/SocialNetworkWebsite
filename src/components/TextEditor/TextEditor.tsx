@@ -144,7 +144,7 @@ export default function TextEditor(props: Props) {
   }
 
   const handleGetCommentList = async () => {
-    const result: Comment[] = (await fetchApi.get(`commentsPost/${postId}/0/0`)).data
+    const result: Comment[] = (await fetchApi.get(`comments-post/${postId}?limit=0&page=0`)).data
     dispatch(setCommentList(result))
   }
 
@@ -183,13 +183,8 @@ export default function TextEditor(props: Props) {
             await handleUploadFile()
           }
           const result = (await fetchApi.put(`post/${post.id}`, { ...post, modifiedAt: createdAt, userId })).data
-          const postUpdated = { ...post, modifiedAt: createdAt, userId: userId as number }
-          postUpdated.images &&
-            postUpdated.images.length > 0 &&
-            postUpdated.images.forEach((image) => (image.origin = {} as File))
-          postUpdated.video && postUpdated.video.origin && (postUpdated.video.origin = {} as File)
           toast(result.message, { autoClose: 2000, type: 'success', position: 'top-right' })
-          dispatch(setNewPost(postUpdated))
+          dispatch(setNewPost(post))
         } else if (editingComment !== null && comment) {
           setLoading(true)
           if (images.length > 0 || video.name) {

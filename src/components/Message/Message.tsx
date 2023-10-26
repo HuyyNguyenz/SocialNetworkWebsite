@@ -75,7 +75,7 @@ export default function Message(props: Props) {
         const usernameAuthor = articleElement.text.split('/')[3]
         fetchApi
           .get(`post/${postId}`, { signal: controller.signal })
-          .then((res) => setSharePost(res.data[0]))
+          .then((res) => setSharePost(res.data))
           .catch((error) => error.name !== 'CanceledError' && console.log(error))
         fetchApi
           .get(`user/${usernameAuthor}`, { signal: controller.signal })
