@@ -10,7 +10,7 @@ import fetchApi from '~/utils/fetchApi'
 import { toast } from 'react-toastify'
 import { deleteFile } from '~/utils/firebase'
 import { deleteMessage, startEditingMessage } from '~/features/message/messageSlice'
-import socket from '~/socket'
+import socket from '~/utils/socket'
 import { RootState } from '~/store'
 
 interface Props {

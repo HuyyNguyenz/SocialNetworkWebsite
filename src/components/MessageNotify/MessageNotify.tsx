@@ -7,7 +7,7 @@ import { RootState } from '~/store'
 import { Friend, Message, Notify, User } from '~/types'
 import fetchApi from '~/utils/fetchApi'
 import UserPreview from '../UserPreview'
-import socket from '~/socket'
+import socket from '~/utils/socket'
 import audioMessage from '~/assets/audios/audio_message.mp3'
 
 export default function MessageNotify() {

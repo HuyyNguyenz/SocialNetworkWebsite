@@ -10,7 +10,7 @@ import { RootState } from '~/store'
 import EditProfile from '~/components/EditProfile'
 import Skeleton from 'react-loading-skeleton'
 import Loading from '~/components/Loading'
-import socket from '~/socket'
+import socket from '~/utils/socket'
 
 interface Props {
   children: React.ReactNode

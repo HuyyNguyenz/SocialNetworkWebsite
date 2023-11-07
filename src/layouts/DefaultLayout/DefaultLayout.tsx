@@ -8,7 +8,7 @@ import { setUserData } from '~/features/userData/userDataSlice'
 import { RootState } from '~/store'
 import { ToastContainer } from 'react-toastify'
 import VideoCall from '~/components/VideoCall'
-import socket from '~/socket'
+import socket from '~/utils/socket'
 import { User } from '~/types'
 
 interface Props {

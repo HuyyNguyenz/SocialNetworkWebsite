@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import fetchApi from '~/utils/fetchApi'
 import { useSelector } from 'react-redux'
 import { RootState } from '~/store'
-import socket from '~/socket'
+import socket from '~/utils/socket'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 interface Props {
